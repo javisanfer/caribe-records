@@ -1,68 +1,618 @@
+/* =========================
+   RESET / BASE GLOBAL
+========================= */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #111827;           /* texto por defecto oscuro neutro */
+  background-color: #ffffff;
 
-  font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+#root {
+  min-height: 100vh;
 }
 
+/* Enlaces: por defecto heredan el color, ligerísimo énfasis */
+a {
+  font-weight: 500;
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Títulos base (luego se puede sobrescribir en cada página) */
+h1 {
+  font-size: 2.4rem;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Botones base */
 button {
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 1em;
+  font-size: 0.95rem;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #111827;
+  color: #f9fafb;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+button:hover {
+  background-color: #020617;
+  transform: translateY(-1px);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
+/* Utilidad genérica */
+.letter-spaced {
+  letter-spacing: 0.18em;
+}
+
+/* =========================
+   EDITORIAL
+========================= */
+
+.editorial-list {
+  background: #000;
+  color: #fff;
+}
+
+.editorial-list .row > div {
+  border-color: #111;
+}
+
+.editorial-hero img {
+  display: block;
+  object-fit: cover;
+}
+
+.editorial-hero-text {
+  text-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+}
+
+.editorial-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 860px;
+}
+
+.editorial-body p {
+  margin-bottom: 1.25rem;
+}
+
+.editorial-body img {
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+.editorial-footer-nav {
+  background: #f7f7f7;
+}
+
+/* Página editorial genérica */
+.editorial-page {
+  background: #000;
+  color: #fff;
+}
+
+/* =========================
+   EVENTS (estilo Warp)
+========================= */
+
+.events-wrap {
+  background: #000;
+  color: #fff;
+}
+
+.events-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #000;
+}
+
+.events-month-bar {
+  z-index: 1;
+  backdrop-filter: blur(4px);
+}
+
+.events-page {
+  background: #000;
+  color: #fff;
+}
+
+.event-row {
+  gap: 16px;
+  color: #fff;
+}
+
+.event-row:hover {
+  background: #0d0d0d;
+}
+
+.event-row .event-cell {
+  width: 28%;
+}
+
+.event-row .event-cell:last-child {
+  width: 16%;
+}
+
+@media (max-width: 992px) {
+  .event-row {
+    flex-wrap: wrap;
+    gap: 6px 12px;
   }
-  a:hover {
-    color: #747bff;
+
+  .event-row .event-cell {
+    width: 50%;
   }
-  button {
-    background-color: #f9f9f9;
+
+  .event-row .event-cell:last-child {
+    width: 100%;
+    text-align: left;
   }
+}
+
+/* =========================
+   RELEASES (Discography)
+========================= */
+
+.releases-wrap {
+  background: #000;
+  color: #fff;
+}
+
+.releases-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #000;
+}
+
+/* LIST layout grid: izquierda (320-380px) | derecha (tabla) */
+.release-row {
+  grid-template-columns: minmax(260px, 360px) 1fr;
+  border-bottom: 1px solid #0f0f0f;
+}
+
+@media (max-width: 992px) {
+  .release-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tabla de tracks */
+.tracktable {
+  border: 1px solid #0f0f0f;
+}
+
+.tracktable-head,
+.tracktable-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr 90px;
+  gap: 8px;
+  align-items: center;
+  border-bottom: 1px solid #0f0f0f;
+  padding: 8px 10px;
+}
+
+.tracktable-head {
+  background: #040404;
+  color: #9aa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tracktable-row:hover {
+  background: #0d0d0d;
+}
+
+.tracktable-row .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
+}
+
+/* Tarjeta GRID */
+.release-card img {
+  display: block;
+}
+
+/* Utilidades */
+.object-fit-cover {
+  object-fit: cover;
+}
+
+/* Página de releases genérica */
+.release-page {
+  background: #000;
+  color: #fff;
+}
+
+/* =========================
+   HOME PAGE
+========================= */
+
+.home {
+  width: 100%;
+  min-height: 100vh;
+  background: #0057d8;
+  padding: 0;      /* <-- a sangre */
+  color: #ffffff;
+}
+
+/* Header */
+.home-header {
+  padding: 12px 18px;
+}
+
+.home-logo {
+  font-size: 22px;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+
+/* Main layout */
+.home-main {
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr;
+  padding: 16px 40px 32px;
+  align-items: center;
+}
+
+.home-graphic {
+  position: relative;
+  height: 70vh;
+}
+
+.home-burst {
+  position: absolute;
+  width: 50%;
+  max-width: 360px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-40%, -50%) rotate(-8deg);
+}
+
+/* Menu */
+.home-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.home-menu-item {
+  color: white;
+  font-size: 20px;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.home-menu-item:hover {
+  transform: translateX(6px);
+  opacity: 0.8;
+}
+
+/* Footer */
+.home-footer {
+  background: white;
+  padding: 12px 18px;
+}
+
+.home-contact {
+  color: #0050d8;
+  text-decoration: none;
+}
+
+.home-contact:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   ARTISTS PAGE
+========================= */
+
+.artists-page {
+  background: #000;
+  color: #fff;
+}
+
+.artists-header {
+  background: #050505;
+}
+
+.artists-content {
+  padding-bottom: 24px;
+}
+
+/* =========================
+   PAGE LAYOUT (card blanco)
+========================= */
+
+/* Fondo general detrás del contenido */
+.page-layout-shell {
+  background: #f3f4f6;               /* gris muy suave */
+  min-height: calc(100vh - 56px);    /* ajusta si tu navbar mide otra cosa */
+  padding: 24px 16px;                /* “aire” alrededor del card */
+}
+
+/* “Card” central donde va el contenido de la página */
+.page-layout {
+  max-width: 1120px;                 /* ancho máximo desktop */
+  margin: 0 auto;                    /* centrado horizontal */
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px 28px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08); /* sombra suave */
+}
+
+/* Mobile un poco más compacto */
+@media (max-width: 640px) {
+  .page-layout-shell {
+    padding: 16px 12px;
+  }
+
+  .page-layout {
+    padding: 24px 18px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  }
+}
+
+/* Desktop grande: un pelín más de aire */
+@media (min-width: 1024px) {
+  .page-layout {
+    padding: 40px 36px;
+  }
+}
+
+.page-transition {
+  min-height: 100vh; /* asegura que la transición cubre toda la pantalla */
+}
+
+/* Contenedor sticky del header (barra azul + nav) */
+.cr-header {
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+}
+
+/* Barra superior tipo Warp */
+.cr-header-bar {
+  height: 10px;
+  background: #2563eb; /* azul en vez de morado */
+}
+
+/* Nav */
+.cr-navbar {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Logo */
+.cr-logo {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+}
+
+/* Links */
+.cr-link {
+  color: #bbbbbb;
+  text-decoration: none;
+}
+
+.cr-link:hover {
+  color: #ffffff;
+}
+
+.cr-link-active {
+  color: #ffffff;
+}
+
+/* Botón admin */
+.cr-admin-btn {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding-inline: 1.1rem;
+}
+
+/* Contenedor del header (línea azul + nav) */
+.cr-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+}
+
+/* Línea azul que siempre se ve */
+.cr-header-bar {
+  height: 6px;
+  background: #2563eb; /* azul */
+}
+
+/* Nav principal */
+.cr-navbar {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: #000;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+/* Estado colapsado: solo se ve la barra azul, el nav se desplaza hacia arriba */
+.cr-header--collapsed .cr-navbar {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Logo */
+.cr-logo {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+}
+
+/* Links */
+.cr-link {
+  color: #bbbbbb;
+  text-decoration: none;
+}
+
+.cr-link:hover {
+  color: #ffffff;
+}
+
+.cr-link-active {
+  color: #ffffff;
+}
+
+/* Botón admin */
+.cr-admin-btn {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding-inline: 1.1rem;
+}
+
+/* ---- ARTIST DETAIL LISTS ---- */
+
+.release-cover {
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border: 1px solid #333;
+}
+
+.release-item,
+.editorial-item,
+.event-item {
+  border-bottom: 1px solid #222;
+  text-decoration: none;
+  color: white;
+}
+
+.release-item:hover,
+.editorial-item:hover,
+.event-item:hover {
+  background: #111;
+}
+
+.editorial-thumb {
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border: 1px solid #333;
+}
+
+/* =========================
+   FOOTER – FINAL (SIN SOLAPES)
+========================= */
+
+.site-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 100%;
+  padding: 32px 24px;        /* NO TOCAR */
+  background: #f2f2f2;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 13px;
+  line-height: 1.4;
+  z-index: 1000;
+
+  overflow: visible;
+
+  /* control fino */
+  --mark-h: 40px;            /* caja base (layout) */
+  --mark-scale: 1.7;         /* tamaño visual */
+}
+
+/* IZQUIERDA */
+.site-footer-left {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+/* ISOTIPO – GRANDE, CENTRADO Y SIN COMER TEXTO */
+.site-footer-mark {
+  height: var(--mark-h);
+  width: auto;
+  display: block;
+  flex: 0 0 auto;
+
+  transform: scale(var(--mark-scale));
+  transform-origin: left center;
+
+  /* 🔑 reserva el “extra” que añade el scale para que NO se solape */
+  margin-right: calc((var(--mark-scale) - 1) * var(--mark-h));
+}
+
+/* TEXTO */
+.site-footer-logo {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+/* LINKS */
+.site-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* DERECHA */
+.site-footer-right a {
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
 }

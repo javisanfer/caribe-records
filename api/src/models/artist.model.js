@@ -40,14 +40,14 @@ const photosSchema = new mongoose.Schema({
 const artistSchema = new mongoose.Schema({
   // Identidad
   name:   { type: String, required: true, trim: true },
-  slug:   { type: String, unique: true },  // ← dejamos SOLO unique aquí (sin schema.index duplicado)
+  slug:   { type: String, unique: true },
   bio:    { type: String },
   genres: [{ type: String, trim: true }],
 
   // Ubicación / metadatos
   country: { type: String, trim: true }, // ISO-2, ej: ES, US
   city:    { type: String, trim: true },
-  members: [{ type: String, trim: true }], // Por si es una banda
+  members: [{ type: String, trim: true }],
   formedYear: Number,
 
   // Media
@@ -64,10 +64,15 @@ const artistSchema = new mongoose.Schema({
   // Relación con releases (no duplica datos)
   albums: [{ type: mongoose.Schema.Types.ObjectId, ref: "Release" }],
 
+  // Editoriales donde aparece el artista
+  editorials: [{ type: mongoose.Schema.Types.ObjectId, ref: "Editorial" }],
+
+  // Eventos en los que participa
+  events: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }],
+
 }, { timestamps: true });
 
 // --- Hooks y virtuals ---
-// Generar slug automáticamente si no se pasa
 artistSchema.pre("save", function (next) {
   if (!this.slug && this.name) {
     this.slug = slugify(this.name, { lower: true, strict: true, trim: true });
@@ -75,8 +80,8 @@ artistSchema.pre("save", function (next) {
   next();
 });
 
-// --- Índices (sin duplicar slug) ---
+// --- Índices ---
 artistSchema.index({ name: "text", bio: "text" });
 
-// --- Export (evita recompilar el modelo en hot-reload) ---
+// --- Export ---
 module.exports = mongoose.models.Artist || mongoose.model("Artist", artistSchema);

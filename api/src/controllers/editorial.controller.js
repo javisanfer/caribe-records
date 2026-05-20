@@ -1,30 +1,50 @@
 const Editorial = require("../models/editorial.model");
+const Artist = require("../models/artist.model"); // 👈 NUEVO
 
 // -------------------- Utilidad de paginación --------------------
 function getPagination(query) {
-  const page  = Math.max(1, parseInt(query.page || "1", 10));
+  const page = Math.max(1, parseInt(query.page || "1", 10));
   const limit = Math.min(50, Math.max(1, parseInt(query.limit || "12", 10)));
-  const skip  = (page - 1) * limit;
+  const skip = (page - 1) * limit;
   return { page, limit, skip };
 }
 
-// ======================================================
-// PÚBLICO
-// ======================================================
+const slugify = require("slugify");
+const generateSlug = (title) =>
+  slugify(title, { lower: true, strict: true, trim: true });
 
-// GET /api/editorials?tag=&q=&page=&limit=
+// 👇 Helper para normalizar IDs de artistas desde el body
+function normalizeIdArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value.map(String).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    // admite "id", "id1,id2,id3"
+    return value
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+/* ======================================================
+   PÚBLICO
+====================================================== */
+
+// GET /api/editorials
 exports.getEditorialsPublic = async (req, res) => {
   try {
     const { tag, q } = req.query;
     const { page, limit, skip } = getPagination(req.query);
     const now = new Date();
 
-    // Solo visibles: published o scheduled ya alcanzada
     const visibility = {
       $or: [
         { status: "published" },
-        { status: "scheduled", publishAt: { $lte: now } }
-      ]
+        { status: "scheduled", publishAt: { $lte: now } },
+      ],
     };
 
     const filter = { ...visibility };
@@ -37,10 +57,8 @@ exports.getEditorialsPublic = async (req, res) => {
         .sort({ publishAt: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .select("-blocks") // listado ligero (sin cuerpo completo)
-        .populate({ path: "relatedArtists", select: "name slug photos.portraitUrl" })
-        .populate({ path: "relatedReleases", select: "title slug cover_image release_date" })
-        .lean()
+        .select("-blocks")
+        .lean(),
     ]);
 
     res.json({
@@ -51,7 +69,10 @@ exports.getEditorialsPublic = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching editorials", error: error.message });
+    res.status(500).json({
+      message: "Error fetching editorials",
+      error: error.message,
+    });
   }
 };
 
@@ -59,28 +80,31 @@ exports.getEditorialsPublic = async (req, res) => {
 exports.getEditorialBySlugPublic = async (req, res) => {
   try {
     const now = new Date();
+
     const doc = await Editorial.findOne({
       slug: req.params.slug,
       $or: [
         { status: "published" },
-        { status: "scheduled", publishAt: { $lte: now } }
-      ]
-    })
-      .populate({ path: "relatedArtists", select: "name slug photos.portraitUrl" })
-      .populate({ path: "relatedReleases", select: "title slug cover_image release_date" });
+        { status: "scheduled", publishAt: { $lte: now } },
+      ],
+    });
 
     if (!doc) return res.status(404).json({ message: "Editorial not found" });
+
     res.json(doc);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching editorial", error: error.message });
+    res.status(500).json({
+      message: "Error fetching editorial",
+      error: error.message,
+    });
   }
 };
 
-// ======================================================
-// ADMIN
-// ======================================================
+/* ======================================================
+   ADMIN
+====================================================== */
 
-// GET /api/admin/editorials?status=&tag=&q=&page=&limit=
+// GET /api/admin/editorials
 exports.getEditorialsAdmin = async (req, res) => {
   try {
     const { status, tag, q } = req.query;
@@ -97,8 +121,10 @@ exports.getEditorialsAdmin = async (req, res) => {
         .sort({ updatedAt: -1 })
         .skip(skip)
         .limit(limit)
-        .select("title slug status publishAt featured section series createdAt updatedAt")
-        .lean()
+        .select(
+          "title slug status publishAt featured section series createdAt updatedAt"
+        )
+        .lean(),
     ]);
 
     res.json({
@@ -109,89 +135,285 @@ exports.getEditorialsAdmin = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching admin editorials", error: error.message });
+    res.status(500).json({
+      message: "Error fetching admin editorials",
+      error: error.message,
+    });
   }
 };
 
-// GET /api/admin/editorials/:id
-exports.getEditorialByIdAdmin = async (req, res) => {
+// GET /api/admin/editorials/:slug
+exports.getEditorialBySlugAdmin = async (req, res) => {
   try {
-    const doc = await Editorial.findById(req.params.id)
-      .populate({ path: "relatedArtists", select: "name slug photos.portraitUrl" })
-      .populate({ path: "relatedReleases", select: "title slug cover_image release_date" });
+    const doc = await Editorial.findOne({ slug: req.params.slug });
 
     if (!doc) return res.status(404).json({ message: "Editorial not found" });
+
     res.json(doc);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching editorial", error: error.message });
+    res.status(500).json({
+      message: "Error fetching editorial",
+      error: error.message,
+    });
   }
 };
+
+/* ======================================================
+   CREATE
+====================================================== */
 
 // POST /api/admin/editorials
 exports.createEditorial = async (req, res) => {
   try {
-    const payload = { ...req.body };
+    const body = req.body;
+    const payload = {};
 
-    // ✅ author es opcional
-    if (req.user?.sub && !payload.author) payload.author = req.user.sub;
+    if (!body.title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
 
-    // Limpieza de relaciones (evita CastError)
-    if (!Array.isArray(payload.relatedArtists)) payload.relatedArtists = [];
-    if (!Array.isArray(payload.relatedReleases)) payload.relatedReleases = [];
+    // Title + slug
+    payload.title = body.title;
+    payload.slug = body.slug || generateSlug(body.title);
+
+    payload.subtitle = body.subtitle || "";
+
+    payload.status = body.status || "draft";
+    if (body.publishAt) payload.publishAt = body.publishAt;
+
+    // author opcional
+    if (req.user?.sub) payload.author = req.user.sub;
+
+    // HERO -------------------------
+    payload.hero = {};
+
+    if (req.file) {
+      payload.hero.url = req.file.path;
+    } else if (body.heroUrl) {
+      payload.hero.url = body.heroUrl;
+    } else {
+      return res.status(400).json({ message: "Hero image is required" });
+    }
+
+    payload.hero.alt = body.heroAlt || "";
+    payload.hero.caption = body.heroCaption || "";
+    payload.hero.credit = body.heroCredit || "";
+
+    // BODY → blocks
+    payload.blocks = [];
+    if (body.body) {
+      payload.blocks.push({
+        type: "paragraph",
+        text: body.body,
+      });
+    }
+
+    if (body.embedHtml) {
+      payload.blocks.push({
+        type: "embed",
+        embed: body.embedHtml,
+      });
+    }
+
+    // Excerpt
+    if (body.excerpt) payload.excerpt = body.excerpt;
+
+    // Tags
+    payload.tags =
+      typeof body.tags === "string"
+        ? body.tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [];
+
+    // SEO
+    if (body.seoTitle || body.seoDescription || body.seoOgImage) {
+      payload.seo = {
+        title: body.seoTitle || undefined,
+        description: body.seoDescription || undefined,
+        ogImage: body.seoOgImage || payload.hero.url,
+      };
+    }
+
+    // Extra
+    payload.featured =
+      body.featured === "true" ||
+      body.featured === "on" ||
+      body.featured === true;
+
+    if (body.section) payload.section = body.section;
+    if (body.series) payload.series = body.series;
+
+    // 👇 NUEVO: artistas relacionados
+    const relatedArtistsIds = normalizeIdArray(body.relatedArtists);
+    if (relatedArtistsIds.length) {
+      payload.relatedArtists = relatedArtistsIds;
+    }
 
     const editorial = new Editorial(payload);
     await editorial.save();
 
+    // 👇 NUEVO: añadimos la editorial al array editorials de cada artista
+    if (relatedArtistsIds.length) {
+      await Artist.updateMany(
+        { _id: { $in: relatedArtistsIds } },
+        { $addToSet: { editorials: editorial._id } }
+      );
+    }
+
     res.status(201).json(editorial);
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(409).json({
-        message: "Duplicate key (slug or unique field)",
-        error: error.keyValue
-      });
+      return res
+        .status(409)
+        .json({ message: "Duplicate slug", error: error.keyValue });
     }
+
     res.status(400).json({
       message: "Error creating editorial",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-// PATCH /api/admin/editorials/:id
+/* ======================================================
+   UPDATE + DELETE (por SLUG)
+====================================================== */
+
+// PATCH /api/admin/editorials/:slug
 exports.updateEditorial = async (req, res) => {
   try {
-    const doc = await Editorial.findById(req.params.id);
-    if (!doc) return res.status(404).json({ message: "Editorial not found" });
+    const slug = req.params.slug;
 
-    Object.assign(doc, req.body);
-    await doc.save();
-
-    const updated = await Editorial.findById(doc._id)
-      .populate({ path: "relatedArtists", select: "name slug photos.portraitUrl" })
-      .populate({ path: "relatedReleases", select: "title slug cover_image release_date" });
-
-    res.json(updated);
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({
-        message: "Duplicate key (slug or unique field)",
-        error: error.keyValue
-      });
+    const editorial = await Editorial.findOne({ slug });
+    if (!editorial) {
+      return res.status(404).json({ message: "Editorial not found" });
     }
+
+    const body = req.body;
+
+    // Guardamos los artistas anteriores para sincronizar
+    const prevArtists = (editorial.relatedArtists || []).map((id) => id.toString());
+
+    // Si cambia el título → regenerar slug
+    if (body.title && !body.slug) {
+      editorial.slug = generateSlug(body.title);
+    } else if (body.slug) {
+      editorial.slug = body.slug;
+    }
+
+    // Campos básicos
+    editorial.title = body.title ?? editorial.title;
+    editorial.subtitle = body.subtitle ?? editorial.subtitle;
+    editorial.status = body.status ?? editorial.status;
+    editorial.publishAt = body.publishAt ?? editorial.publishAt;
+
+    // Hero
+    if (req.file) {
+      editorial.hero.url = req.file.path;
+    } else if (body.heroUrl) {
+      editorial.hero.url = body.heroUrl;
+    }
+    editorial.hero.alt = body.heroAlt ?? editorial.hero.alt;
+    editorial.hero.caption = body.heroCaption ?? editorial.hero.caption;
+    editorial.hero.credit = body.heroCredit ?? editorial.hero.credit;
+
+    // Blocks — reseteamos y regeneramos
+    editorial.blocks = [];
+    if (body.body) {
+      editorial.blocks.push({ type: "paragraph", text: body.body });
+    }
+    if (body.embedHtml) {
+      editorial.blocks.push({ type: "embed", embed: body.embedHtml });
+    }
+
+    // Excerpt
+    editorial.excerpt = body.excerpt ?? editorial.excerpt;
+
+    // Tags
+    if (typeof body.tags === "string") {
+      editorial.tags = body.tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+    }
+
+    // SEO
+    editorial.seo = {
+      title: body.seoTitle ?? editorial.seo?.title,
+      description: body.seoDescription ?? editorial.seo?.description,
+      ogImage: body.seoOgImage ?? editorial.seo?.ogImage,
+    };
+
+    // Otros
+    editorial.featured =
+      body.featured === "true" ||
+      body.featured === "on" ||
+      body.featured === true;
+
+    editorial.section = body.section ?? editorial.section;
+    editorial.series = body.series ?? editorial.series;
+
+    // 👇 NUEVO: actualizar artistas relacionados
+    let newArtists = prevArtists;
+    if (body.relatedArtists !== undefined) {
+      newArtists = normalizeIdArray(body.relatedArtists);
+      editorial.relatedArtists = newArtists;
+    }
+
+    await editorial.save();
+
+    // Sincronizar relación en Artist.editorials
+    const prevSet = new Set(prevArtists);
+    const newSet = new Set(newArtists);
+
+    const toAdd = newArtists.filter((id) => !prevSet.has(id));
+    const toRemove = prevArtists.filter((id) => !newSet.has(id));
+
+    if (toAdd.length) {
+      await Artist.updateMany(
+        { _id: { $in: toAdd } },
+        { $addToSet: { editorials: editorial._id } }
+      );
+    }
+
+    if (toRemove.length) {
+      await Artist.updateMany(
+        { _id: { $in: toRemove } },
+        { $pull: { editorials: editorial._id } }
+      );
+    }
+
+    res.json(editorial);
+  } catch (error) {
     res.status(400).json({
       message: "Error updating editorial",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-// DELETE /api/admin/editorials/:id
+// DELETE /api/admin/editorials/:slug
 exports.deleteEditorial = async (req, res) => {
   try {
-    const deleted = await Editorial.findByIdAndDelete(req.params.id);
+    const deleted = await Editorial.findOneAndDelete({
+      slug: req.params.slug,
+    });
+
     if (!deleted) return res.status(404).json({ message: "Editorial not found" });
+
+    // 👇 NUEVO: limpiar referencia en Artist.editorials
+    await Artist.updateMany(
+      { editorials: deleted._id },
+      { $pull: { editorials: deleted._id } }
+    );
+
     res.json({ message: "Editorial deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting editorial", error: error.message });
+    res.status(500).json({
+      message: "Error deleting editorial",
+      error: error.message,
+    });
   }
 };

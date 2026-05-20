@@ -22,14 +22,14 @@ const eventController = require("../controllers/events.controller");
 // USERS & SESSIONS
 // ======================================================
 
-// 🔹 Usuarios
+// Usuarios
 router.post("/users", upload.single("avatar"), users.create);
 router.patch("/users/me", auth.isAuthenticated, users.update);
 router.get("/users", users.getAllUsers);
 router.get("/users/me", auth.isAuthenticated, users.profile);
 router.get("/users/:id/validate", users.validate);
 
-// 🔹 Sesiones
+// Sesiones
 router.post("/sessions", sessions.create);
 router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
 
@@ -39,15 +39,40 @@ router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
 
 // Público
 router.get("/artists", artistController.getArtists);
+
+// slug FIRST
+router.get("/artists/slug/:slug", artistController.getArtistBySlug);
+
+// id AFTER
 router.get("/artists/:id", artistController.getArtistById);
 
-// Admin (creación/edición/eliminación solo autenticado)
-router.post("/admin/artists", auth.isAuthenticated, /* auth.requireRole(["owner","editor"]), */ artistController.createArtists);
-router.patch("/admin/artists/:id", auth.isAuthenticated, /* auth.requireRole(["owner","editor"]), */ artistController.updateArtist);
-router.delete("/admin/artists/:id", auth.isAuthenticated, /* auth.requireRole(["owner"]), */ artistController.deleteArtist);
+// Admin
+router.post(
+  "/admin/artists",
+  auth.isAuthenticated,
+  artistController.createArtists
+);
+
+router.get(
+  "/admin/artists/slug/:slug",
+  auth.isAuthenticated,
+  artistController.getArtistBySlug
+);
+
+router.patch(
+  "/admin/artists/slug/:slug",
+  auth.isAuthenticated,
+  artistController.updateArtist
+);
+
+router.delete(
+  "/admin/artists/slug/:slug",
+  auth.isAuthenticated,
+  artistController.deleteArtist
+);
 
 // ======================================================
-// RELEASES (sin dependencia de 'master')
+// RELEASES
 // ======================================================
 
 // Público
@@ -55,11 +80,35 @@ router.get("/releases", releaseController.getReleases);
 router.get("/releases/:id", releaseController.getReleaseById);
 
 // Admin
-router.get("/admin/releases", auth.isAuthenticated, releaseController.getReleases);
-router.get("/admin/releases/:id", auth.isAuthenticated, releaseController.getReleaseById);
-router.post("/admin/releases", auth.isAuthenticated, /* auth.requireRole(["owner","editor"]), */ releaseController.createRelease);
-router.patch("/admin/releases/:id", auth.isAuthenticated, /* auth.requireRole(["owner","editor"]), */ releaseController.updateRelease);
-router.delete("/admin/releases/:id", auth.isAuthenticated, /* auth.requireRole(["owner"]), */ releaseController.deleteRelease);
+router.get(
+  "/admin/releases",
+  auth.isAuthenticated,
+  releaseController.getReleases
+);
+
+router.get(
+  "/admin/releases/:id",
+  auth.isAuthenticated,
+  releaseController.getReleaseById
+);
+
+router.post(
+  "/admin/releases",
+  auth.isAuthenticated,
+  releaseController.createRelease
+);
+
+router.patch(
+  "/admin/releases/:id",
+  auth.isAuthenticated,
+  releaseController.updateRelease
+);
+
+router.delete(
+  "/admin/releases/:id",
+  auth.isAuthenticated,
+  releaseController.deleteRelease
+);
 
 // ======================================================
 // EVENTS
@@ -70,11 +119,35 @@ router.get("/events", eventController.getEventsPublic);
 router.get("/events/slug/:slug", eventController.getEventBySlugPublic);
 
 // Admin
-router.get("/admin/events", auth.isAuthenticated, eventController.getEventsAdmin);
-router.get("/admin/events/:id", auth.isAuthenticated, eventController.getEventByIdAdmin);
-router.post("/admin/events", auth.isAuthenticated, /* auth.requireRole(["owner","editor"]), */ eventController.createEvent);
-router.patch("/admin/events/:id", auth.isAuthenticated, /* auth.requireRole(["owner","editor"]), */ eventController.updateEvent);
-router.delete("/admin/events/:id", auth.isAuthenticated, /* auth.requireRole(["owner"]), */ eventController.deleteEvent);
+router.get(
+  "/admin/events",
+  auth.isAuthenticated,
+  eventController.getEventsAdmin
+);
+
+router.get(
+  "/admin/events/slug/:slug",
+  auth.isAuthenticated,
+  eventController.getEventByIdAdmin
+);
+
+router.post(
+  "/admin/events",
+  auth.isAuthenticated,
+  eventController.createEvent
+);
+
+router.patch(
+  "/admin/events/slug/:slug",
+  auth.isAuthenticated,
+  eventController.updateEvent
+);
+
+router.delete(
+  "/admin/events/slug/:slug",
+  auth.isAuthenticated,
+  eventController.deleteEvent
+);
 
 // ======================================================
 // EDITORIALS
@@ -82,22 +155,53 @@ router.delete("/admin/events/:id", auth.isAuthenticated, /* auth.requireRole(["o
 
 // Público
 router.get("/editorials", editorialController.getEditorialsPublic);
-router.get("/editorials/slug/:slug", editorialController.getEditorialBySlugPublic);
+router.get(
+  "/editorials/slug/:slug",
+  editorialController.getEditorialBySlugPublic
+);
 
 // Admin
-router.get("/admin/editorials", auth.isAuthenticated, editorialController.getEditorialsAdmin);
-router.get("/admin/editorials/:id", auth.isAuthenticated, editorialController.getEditorialByIdAdmin);
-router.post("/admin/editorials", auth.isAuthenticated, /* auth.requireRole(["owner","editor"]), */ editorialController.createEditorial);
-router.patch("/admin/editorials/:id", auth.isAuthenticated, /* auth.requireRole(["owner","editor"]), */ editorialController.updateEditorial);
-router.delete("/admin/editorials/:id", auth.isAuthenticated, /* auth.requireRole(["owner"]), */ editorialController.deleteEditorial);
+router.get(
+  "/admin/editorials",
+  auth.isAuthenticated,
+  editorialController.getEditorialsAdmin
+);
+
+router.get(
+  "/admin/editorials/slug/:slug",
+  auth.isAuthenticated,
+  editorialController.getEditorialBySlugAdmin
+);
+
+router.post(
+  "/admin/editorials",
+  auth.isAuthenticated,
+  upload.single("heroFile"),
+  editorialController.createEditorial
+);
+
+router.patch(
+  "/admin/editorials/slug/:slug",
+  auth.isAuthenticated,
+  upload.single("heroFile"),
+  editorialController.updateEditorial
+);
+
+router.delete(
+  "/admin/editorials/slug/:slug",
+  auth.isAuthenticated,
+  editorialController.deleteEditorial
+);
 
 // ======================================================
-// UPLOADS
+// UPLOADS GENERIC
 // ======================================================
 
 router.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ message: "No se ha subido ninguna imagen" });
+    return res
+      .status(400)
+      .json({ message: "No se ha subido ninguna imagen" });
   }
   res.status(200).json({ imageUrl: req.file.path });
 });
@@ -106,15 +210,13 @@ router.post("/upload", upload.single("image"), (req, res) => {
 // ERRORES
 // ======================================================
 
-// 404
 router.use((req, res, next) => next(createError(404, "Route not found")));
 
-// Manejo general de errores
 router.use((error, req, res, next) => {
   if (error instanceof mongoose.Error.CastError && error.message.includes("_id")) {
     error = createError(404, "Resource not found");
   } else if (error instanceof mongoose.Error.ValidationError) {
-    error = createError(400, error);
+    error = createError(400, error.message);
   } else if (!error.status) {
     error = createError(500, error.message);
   }
