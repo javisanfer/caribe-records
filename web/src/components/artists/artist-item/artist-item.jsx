@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function ArtistItem({ artist, isActive, onHover }) {
+export default function ArtistItem({ artist, index }) {
   const safeSlug =
     artist.slug ||
     (artist.name
@@ -13,18 +13,11 @@ export default function ArtistItem({ artist, isActive, onHover }) {
   return (
     <Link
       to={`/artistas/${safeSlug}`}
-      onMouseEnter={onHover}
-      onFocus={onHover}
-      className={`d-block w-100 py-1 text-start text-decoration-none ${
-        isActive ? "text-white text-decoration-underline" : "text-white"
-      }`}
-      style={{
-        fontSize: "clamp(1.1rem, 2.4vw, 1.75rem)",
-        textUnderlineOffset: 4,
-      }}
-      aria-current={isActive ? "true" : "false"}
+      className="artist-index__link"
     >
-      {artist.name}
+      <span className="artist-index__number">{String(index).padStart(2, "0")}</span>
+      <span className="artist-index__name">{artist.name}</span>
+      <span className="artist-index__action">Ver artista <span aria-hidden="true">↗</span></span>
     </Link>
   );
 }

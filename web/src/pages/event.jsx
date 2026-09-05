@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import EventList from "../components/events/event-list/event-list";
+import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 
 export default function EventPage() {
   const [events, setEvents] = useState([]);
@@ -58,28 +58,24 @@ export default function EventPage() {
   }, []);
 
   return (
-    <div className="events-page bg-black text-white min-vh-100">
-      <section>
+    <PublicIndexPage
+      className="events-page"
+      title="Agenda"
+      description="Próximas fechas, encuentros y directos de la familia Caribe."
+      count={loading ? null : events.length}
+      countLabel="eventos"
+    >
         {loading && (
-          <div className="text-center text-secondary py-4">
-            Cargando eventos…
-          </div>
+          <p className="public-index__status">Cargando agenda…</p>
         )}
 
         {error && (
-          <div className="alert alert-danger rounded-0 m-3" role="alert">
-            {error}
-          </div>
+          <p className="public-index__status public-index__status--error" role="alert">{error}</p>
         )}
 
         {!loading && !error && (
-          <EventList
-            title="Upcoming Events"
-            scope="Worldwide"
-            events={events}
-          />
+          <EventList events={events} />
         )}
-      </section>
-    </div>
+    </PublicIndexPage>
   );
 }

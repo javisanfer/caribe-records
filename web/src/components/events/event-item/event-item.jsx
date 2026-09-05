@@ -14,7 +14,7 @@ export default function EventItem({ event = {} }) {
 
   const dateLabel =
     d && !Number.isNaN(d.getTime())
-      ? d.toLocaleDateString(undefined, {
+      ? d.toLocaleDateString("es-ES", {
           day: "2-digit",
           month: "short",
           year: "numeric",
@@ -25,58 +25,52 @@ export default function EventItem({ event = {} }) {
   const artist = event.artist || "Unknown Artist";
   const city = event.city || "";
   const country = event.country || "";
-  const venue = event.venue || "—";
-  const url = event.url || "#";
+  const venue = event.venue || "Por confirmar";
+  const url = event.url && event.url !== "#" ? event.url : null;
 
   // 👇 NUEVO: slug del artista si existe
   const artistSlug = event.artistSlug;
 
   return (
-    <div
-      className="d-flex align-items-center text-decoration-none event-row px-3 py-2"
+    <article
+      className="event-row"
       aria-label={`${artist} en ${city}${country ? ", " + country : ""} — ${dateLabel}`}
     >
-      {/* 1) ARTISTA (link si hay slug, texto si no) */}
-      <div className="flex-grow-1 fw-semibold text-white text-truncate">
+      <div className="event-row__artist">
         {artistSlug ? (
           <Link
             to={`/artistas/${artistSlug}`}
-            className="text-white text-decoration-none"
           >
             {artist}
           </Link>
         ) : (
-          artist
+          <strong>{artist}</strong>
         )}
+        {event.title && <span>{event.title}</span>}
       </div>
 
-      {/* 2) CIUDAD / PAÍS */}
-      <div className="event-cell text-white-50 text-truncate">
-        {city}
-        {country ? `, ${country}` : ""}
+      <div className="event-row__place">
+        <strong>{venue}</strong>
+        <span>{[city, country].filter(Boolean).join(", ") || "Ubicación por confirmar"}</span>
       </div>
 
-      {/* 3) VENUE */}
-      <div className="event-cell text-white-50 text-truncate">
-        {venue}
-      </div>
-
-      {/* 4) FECHA */}
-      <div className="event-cell text-end text-white text-nowrap">
+      <time className="event-row__date" dateTime={rawDate || undefined}>
         {dateLabel}
-      </div>
+      </time>
 
-      {/* 5) LINK TICKETS */}
-      <div className="ms-3">
+      <div className="event-row__ticket">
+        {url ? (
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer nofollow"
-          className="btn btn-sm btn-outline-light rounded-0"
         >
-          Tickets
+          Entradas <span aria-hidden="true">↗</span>
         </a>
+        ) : (
+          <span>Próximamente</span>
+        )}
       </div>
-    </div>
+    </article>
   );
 }

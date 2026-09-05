@@ -74,10 +74,11 @@ export default function ReleaseItem({ release, view = "list" }) {
       <article className="release-card bg-black text-white border border-dark p-2 h-100">
         <div className="ratio ratio-1x1 mb-2">
           {coverUrl && (
-            // eslint-disable-next-line jsx-a11y/img-redundant-alt
             <img
               src={coverUrl}
               alt={coverAlt}
+              loading="lazy"
+              decoding="async"
               className="w-100 h-100 object-fit-cover"
             />
           )}
@@ -121,10 +122,11 @@ export default function ReleaseItem({ release, view = "list" }) {
 
         <div className="border border-dark p-2 mb-2">
           {coverUrl && (
-            // eslint-disable-next-line jsx-a11y/img-redundant-alt
             <img
               src={coverUrl}
               alt={coverAlt}
+              loading="lazy"
+              decoding="async"
               className="w-100 h-auto d-block"
             />
           )}

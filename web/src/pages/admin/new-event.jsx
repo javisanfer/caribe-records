@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { listArtists, adminCreateEvent } from "../../services/api-services";
 
-const API_BASE = "http://localhost:3000/api/v1";
+const API_BASE = "/api/v1";
 
 export default function NewEventPage({ isEditMode = false }) {
   const { slug } = useParams(); // /admin/edit-event/:slug
@@ -176,37 +176,41 @@ export default function NewEventPage({ isEditMode = false }) {
     }
   };
 
-  const headerLabel = effectiveEditMode ? "Edit Event" : "New Event";
-  const titleLabel = effectiveEditMode ? "Edit Event" : "Create Event";
+  const headerLabel = effectiveEditMode ? "Editar evento" : "Nuevo evento";
+  const titleLabel = effectiveEditMode ? "Editar evento" : "Nuevo evento";
 
   return (
-    <div className="bg-black text-white min-vh-100">
+    <main className="admin-page admin-form-page">
       {/* Header */}
-      <header className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-dark">
+      <header className="admin-form-header">
         <button
           type="button"
-          className="btn btn-sm btn-outline-light"
+          className="admin-back"
           onClick={() => navigate(-1)}
         >
-          ← Back
+          ← Panel
         </button>
-        <span className="text-uppercase small letter-spaced">
+        <span>
           Caribe Records · {headerLabel}
         </span>
         <span />
       </header>
 
       {/* Form */}
-      <div className="container py-4">
-        <h1 className="h5 text-uppercase mb-3">{titleLabel}</h1>
+      <div className="admin-form-container">
+        <div className="admin-form-intro">
+          <p>04 / Evento</p>
+          <h1>{titleLabel}</h1>
+          <span>Fecha, lugar, artista y venta de entradas.</span>
+        </div>
 
         {effectiveEditMode && loadingInitial ? (
           <p className="text-muted">Loading event…</p>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="row g-3">
+          <form onSubmit={handleSubmit(onSubmit)} className="row g-3 admin-form">
             {/* Title */}
             <div className="col-12">
-              <label className="form-label">Title</label>
+              <label className="form-label">Título</label>
               <input
                 className={`form-control bg-dark text-white border-secondary ${
                   errors.title ? "is-invalid" : ""
@@ -220,7 +224,7 @@ export default function NewEventPage({ isEditMode = false }) {
 
             {/* Artist */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Artist</label>
+              <label className="form-label">Artista</label>
               <select
                 className={`form-control bg-dark text-white border-secondary ${
                   errors.artistId ? "is-invalid" : ""
@@ -229,7 +233,7 @@ export default function NewEventPage({ isEditMode = false }) {
                   required: "Artist is required",
                 })}
               >
-                <option value="">Select artist…</option>
+                <option value="">Seleccionar artista…</option>
                 {artists.map((a) => (
                   <option key={a._id} value={a._id}>
                     {a.name}
@@ -245,7 +249,7 @@ export default function NewEventPage({ isEditMode = false }) {
 
             {/* Venue */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Venue</label>
+              <label className="form-label">Sala</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 {...register("venue")}
@@ -254,7 +258,7 @@ export default function NewEventPage({ isEditMode = false }) {
 
             {/* City */}
             <div className="col-12 col-md-4">
-              <label className="form-label">City</label>
+              <label className="form-label">Ciudad</label>
               <input
                 className={`form-control bg-dark text-white border-secondary ${
                   errors.city ? "is-invalid" : ""
@@ -268,7 +272,7 @@ export default function NewEventPage({ isEditMode = false }) {
 
             {/* Country */}
             <div className="col-12 col-md-4">
-              <label className="form-label">Country</label>
+              <label className="form-label">País</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="ES / FR / PT…"
@@ -278,7 +282,7 @@ export default function NewEventPage({ isEditMode = false }) {
 
             {/* Date & time */}
             <div className="col-12 col-md-4">
-              <label className="form-label">Date & time</label>
+              <label className="form-label">Fecha y hora</label>
               <input
                 type="datetime-local"
                 className={`form-control bg-dark text-white border-secondary ${
@@ -297,7 +301,7 @@ export default function NewEventPage({ isEditMode = false }) {
 
             {/* Address */}
             <div className="col-12">
-              <label className="form-label">Address</label>
+              <label className="form-label">Dirección</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Street, number…"
@@ -307,7 +311,7 @@ export default function NewEventPage({ isEditMode = false }) {
 
             {/* Ticket URL */}
             <div className="col-12">
-              <label className="form-label">Ticket / Event URL</label>
+              <label className="form-label">URL de entradas / evento</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="https://..."
@@ -317,7 +321,7 @@ export default function NewEventPage({ isEditMode = false }) {
 
             {/* Description */}
             <div className="col-12">
-              <label className="form-label">Description</label>
+              <label className="form-label">Descripción</label>
               <textarea
                 rows={4}
                 className="form-control bg-dark text-white border-secondary"
@@ -338,8 +342,8 @@ export default function NewEventPage({ isEditMode = false }) {
                     ? "Saving…"
                     : "Saving…"
                   : effectiveEditMode
-                  ? "Update event"
-                  : "Save event"}
+                  ? "Actualizar evento"
+                  : "Guardar evento"}
               </button>
 
               {effectiveEditMode && (
@@ -348,13 +352,13 @@ export default function NewEventPage({ isEditMode = false }) {
                   className="btn btn-danger"
                   onClick={handleDelete}
                 >
-                  Delete event
+                  Eliminar evento
                 </button>
               )}
             </div>
           </form>
         )}
       </div>
-    </div>
+    </main>
   );
 }

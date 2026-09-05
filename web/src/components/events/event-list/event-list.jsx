@@ -17,13 +17,7 @@ import EventItem from "../event-item/event-item";
  *   url?: string
  * }
  */
-export default function EventList({
-  title = "All Events",
-  scope = "Worldwide",
-  events = [],
-}) {
-  const safeEvents = Array.isArray(events) ? events : [];
-
+export default function EventList({ events = [] }) {
   const getDate = (e) => {
     if (!e) return null;
     const raw =
@@ -34,6 +28,7 @@ export default function EventList({
   };
 
   const sorted = useMemo(() => {
+    const safeEvents = Array.isArray(events) ? events : [];
     return [...safeEvents]
       .filter(Boolean)
       .sort((a, b) => {
@@ -43,30 +38,29 @@ export default function EventList({
         const tb = db ? db.getTime() : 0;
         return ta - tb;
       });
-  }, [safeEvents]);
+  }, [events]);
 
   return (
-    <section className="events-wrap container-fluid px-0 bg-black text-white">
-      <header className="events-header d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-dark">
-        <h2 className="m-0 text-uppercase small">
-          {title} ({sorted.length})
-        </h2>
-        <div className="text-uppercase small">{scope}</div>
+    <section className="events-wrap">
+      <header className="event-index__labels" aria-hidden="true">
+        <span>Artista</span>
+        <span>Lugar</span>
+        <span>Fecha</span>
+        <span>Entradas</span>
       </header>
 
       {sorted.length > 0 ? (
-        <ul className="list-unstyled m-0">
+        <ul className="event-index">
           {sorted.map((e, idx) => (
             <li
               key={e.id || e._id || idx}
-              className="border-bottom border-dark"
             >
               <EventItem event={e} />
             </li>
           ))}
         </ul>
       ) : (
-        <div className="px-3 py-4 text-secondary">
+        <div className="public-index__status">
           No hay eventos programados.
         </div>
       )}

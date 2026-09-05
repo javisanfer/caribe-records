@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import ReleaseList from "../components/releases/release-list/release-list";
+import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 
 export default function ReleasePage() {
   const [releases, setReleases] = useState([]);
@@ -79,25 +79,24 @@ export default function ReleasePage() {
   }, []);
 
   return (
-    <div className="release-page bg-black text-white min-vh-100">
-      {/* Contenido */}
-      <section>
+    <PublicIndexPage
+      className="release-page"
+      title="Discografía"
+      description="El catálogo completo de Caribe Records: lanzamientos, créditos y escucha."
+      count={loading ? null : releases.length}
+      countLabel="referencias"
+    >
         {loading && (
-          <div className="text-center text-secondary py-4">
-            Cargando releases…
-          </div>
+          <p className="public-index__status">Cargando discografía…</p>
         )}
 
         {error && (
-          <div className="alert alert-danger rounded-0 m-3" role="alert">
-            {error}
-          </div>
+          <p className="public-index__status public-index__status--error" role="alert">{error}</p>
         )}
 
         {!loading && !error && (
-          <ReleaseList title="All Releases" releases={releases} />
+          <ReleaseList releases={releases} />
         )}
-      </section>
-    </div>
+    </PublicIndexPage>
   );
 }

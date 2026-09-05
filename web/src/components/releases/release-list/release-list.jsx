@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import ReleaseItem from "../release-item/release-item";
 
-export default function ReleaseList({ title = "All Releases", releases = [] }) {
+export default function ReleaseList({ releases = [] }) {
   const [view, setView] = useState("list"); // "list" | "grid"
 
   const sorted = useMemo(
@@ -27,60 +27,44 @@ export default function ReleaseList({ title = "All Releases", releases = [] }) {
   }, [sorted]);
 
   return (
-    <section className="releases-wrap container-fluid px-0 bg-black text-white">
-      <header className="releases-header d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-dark">
-        <div className="d-flex align-items-center gap-3">
-          <h2 className="m-0 text-uppercase small">
-            {title} ({sorted.length})
-          </h2>
-          <nav className="small d-none d-md-flex align-items-center gap-2">
+    <section className="releases-wrap">
+      <header className="index-toolbar">
+          <p>{yearsRange || "Archivo completo"}</p>
+          <div className="index-toolbar__views" role="group" aria-label="Vista de discografía">
             <button
-              className={`btn btn-sm ${
-                view === "list"
-                  ? "btn-outline-light"
-                  : "btn-outline-secondary border-dark text-secondary"
-              }`}
+              className={view === "list" ? "is-active" : ""}
               onClick={() => setView("list")}
+              aria-pressed={view === "list"}
             >
-              LIST
+              Lista
             </button>
-            <span>•</span>
             <button
-              className={`btn btn-sm ${
-                view === "grid"
-                  ? "btn-outline-light"
-                  : "btn-outline-secondary border-dark text-secondary"
-              }`}
+              className={view === "grid" ? "is-active" : ""}
               onClick={() => setView("grid")}
+              aria-pressed={view === "grid"}
             >
-              GRID
+              Retícula
             </button>
-          </nav>
-        </div>
-        <div className="text-uppercase small">{yearsRange}</div>
+          </div>
       </header>
 
       {sorted.length === 0 && (
-        <div className="px-3 py-4 text-secondary">No hay releases.</div>
+        <p className="public-index__status">No hay lanzamientos.</p>
       )}
 
       {view === "grid" ? (
-        <div className="row g-3 p-3">
+        <div className="release-grid">
           {sorted.map((rel) => (
-            <div
-              key={rel.id || rel._id}
-              className="col-12 col-sm-6 col-lg-4"
-            >
+            <div key={rel.id || rel._id}>
               <ReleaseItem release={rel} view="grid" />
             </div>
           ))}
         </div>
       ) : (
-        <ul className="list-unstyled m-0">
+        <ul className="release-index">
           {sorted.map((rel) => (
             <li
               key={rel.id || rel._id}
-              className="border-bottom border-dark"
             >
               <ReleaseItem release={rel} view="list" />
             </li>

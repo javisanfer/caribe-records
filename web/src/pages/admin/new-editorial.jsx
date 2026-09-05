@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API_BASE = "http://localhost:3000/api/v1";
+const API_BASE = "/api/v1";
 
 export default function NewEditorialPage({ isEditMode = false }) {
   const { slug } = useParams(); // /admin/edit-editorial/:slug
@@ -180,35 +180,39 @@ export default function NewEditorialPage({ isEditMode = false }) {
   /* -----------------------------------------------
    * UI
    * ----------------------------------------------- */
-  const headerLabel = effectiveEditMode ? "Edit Editorial" : "New Editorial";
-  const titleLabel = effectiveEditMode ? "Edit Editorial" : "Create Editorial";
+  const headerLabel = effectiveEditMode ? "Editar editorial" : "Nueva editorial";
+  const titleLabel = effectiveEditMode ? "Editar editorial" : "Nueva editorial";
 
   return (
-    <div className="bg-black text-white min-vh-100">
-      <header className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-dark">
+    <main className="admin-page admin-form-page">
+      <header className="admin-form-header">
         <button
           type="button"
-          className="btn btn-sm btn-outline-light"
+          className="admin-back"
           onClick={() => navigate(-1)}
         >
-          ← Back
+          ← Panel
         </button>
-        <span className="text-uppercase small letter-spaced">
+        <span>
           Caribe Records · {headerLabel}
         </span>
         <span />
       </header>
 
-      <div className="container py-4">
-        <h1 className="h5 text-uppercase mb-3">{titleLabel}</h1>
+      <div className="admin-form-container">
+        <div className="admin-form-intro">
+          <p>03 / Editorial</p>
+          <h1>{titleLabel}</h1>
+          <span>Portada, contenido, publicación y SEO.</span>
+        </div>
 
         {effectiveEditMode && loadingInitial ? (
           <p className="text-muted">Loading editorial…</p>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="row g-3">
+          <form onSubmit={handleSubmit(onSubmit)} className="row g-3 admin-form">
             {/* --- Basic Fields --- */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Title</label>
+              <label className="form-label">Título</label>
               <input
                 className={`form-control bg-dark text-white border-secondary ${
                   errors.title ? "is-invalid" : ""
@@ -232,7 +236,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
             </div>
 
             <div className="col-12">
-              <label className="form-label">Subtitle</label>
+              <label className="form-label">Subtítulo</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 {...register("subtitle")}
@@ -241,20 +245,20 @@ export default function NewEditorialPage({ isEditMode = false }) {
 
             {/* --- Status + publishAt --- */}
             <div className="col-12 col-md-4">
-              <label className="form-label">Status</label>
+              <label className="form-label">Estado</label>
               <select
                 className="form-select bg-dark text-white border-secondary"
                 {...register("status")}
               >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="scheduled">Scheduled</option>
+                <option value="draft">Borrador</option>
+                <option value="published">Publicada</option>
+                <option value="scheduled">Programada</option>
               </select>
             </div>
 
             <div className="col-12 col-md-4">
               <label className="form-label">
-                Publish at <span className="text-muted">(si es scheduled)</span>
+                Publicar el <span className="text-muted">(si está programada)</span>
               </label>
               <input
                 type="datetime-local"
@@ -272,14 +276,14 @@ export default function NewEditorialPage({ isEditMode = false }) {
                   {...register("featured")}
                 />
                 <label className="form-check-label" htmlFor="featuredCheck">
-                  Featured
+                  Destacada
                 </label>
               </div>
             </div>
 
             {/* --- Section / Series --- */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Section</label>
+              <label className="form-label">Sección</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Ej: Editorial"
@@ -288,7 +292,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
             </div>
 
             <div className="col-12 col-md-6">
-              <label className="form-label">Series</label>
+              <label className="form-label">Serie</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Ej: Memory of Music"
@@ -298,11 +302,11 @@ export default function NewEditorialPage({ isEditMode = false }) {
 
             {/* --- Hero Image --- */}
             <div className="col-12 mt-3">
-              <h2 className="h6 text-uppercase mb-2">Hero Image</h2>
+              <h2 className="h6 text-uppercase mb-2">Imagen principal</h2>
             </div>
 
             <div className="col-12">
-              <label className="form-label">Upload Image</label>
+              <label className="form-label">Subir imagen</label>
               <input
                 type="file"
                 accept="image/*"
@@ -312,7 +316,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
             </div>
 
             <div className="col-12">
-              <label className="form-label">Or Hero URL</label>
+              <label className="form-label">O usar una URL</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="https://..."
@@ -330,7 +334,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
             </div>
 
             <div className="col-12 col-md-4">
-              <label className="form-label">Hero Caption</label>
+              <label className="form-label">Pie de foto</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Pie de foto"
@@ -339,7 +343,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
             </div>
 
             <div className="col-12 col-md-4">
-              <label className="form-label">Hero Credit</label>
+              <label className="form-label">Crédito de imagen</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Autor / agencia"
@@ -349,7 +353,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
 
             {/* --- Body --- */}
             <div className="col-12 mt-3">
-              <label className="form-label">Body (paragraph block)</label>
+              <label className="form-label">Cuerpo del artículo</label>
               <textarea
                 rows={8}
                 className={`form-control bg-dark text-white border-secondary ${
@@ -378,7 +382,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
 
             {/* --- Excerpt / Tags --- */}
             <div className="col-12">
-              <label className="form-label">Excerpt</label>
+              <label className="form-label">Extracto</label>
               <textarea
                 rows={3}
                 className="form-control bg-dark text-white border-secondary"
@@ -443,8 +447,8 @@ export default function NewEditorialPage({ isEditMode = false }) {
                     ? "Saving…"
                     : "Saving…"
                   : effectiveEditMode
-                  ? "Update editorial"
-                  : "Create editorial"}
+                  ? "Actualizar editorial"
+                  : "Guardar editorial"}
               </button>
 
               {effectiveEditMode && (
@@ -453,13 +457,13 @@ export default function NewEditorialPage({ isEditMode = false }) {
                   className="btn btn-danger"
                   onClick={handleDelete}
                 >
-                  Delete editorial
+                  Eliminar editorial
                 </button>
               )}
             </div>
           </form>
         )}
       </div>
-    </div>
+    </main>
   );
 }

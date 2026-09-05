@@ -7,7 +7,7 @@ import {
   uploadImage,
 } from "../../services/api-services";
 
-const API_BASE = "http://localhost:3000/api/v1";
+const API_BASE = "/api/v1";
 
 export default function NewArtistPage({ isEditMode = false }) {
   const {
@@ -185,39 +185,43 @@ export default function NewArtistPage({ isEditMode = false }) {
     }
   };
 
-  const titleText = isEditMode ? "Edit Artist" : "Create Artist";
+  const titleText = isEditMode ? "Editar artista" : "Nuevo artista";
   const headerText = isEditMode
-    ? "Caribe Records · Edit Artist"
-    : "Caribe Records · New Artist";
+    ? "Caribe Records · Editar artista"
+    : "Caribe Records · Nuevo artista";
 
   return (
-    <div className="bg-black text-white min-vh-100">
+    <main className="admin-page admin-form-page">
       {/* Header */}
-      <header className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-dark">
+      <header className="admin-form-header">
         <button
           type="button"
-          className="btn btn-sm btn-outline-light"
+          className="admin-back"
           onClick={() => navigate(-1)}
         >
-          ← Back
+          ← Panel
         </button>
-        <span className="text-uppercase small letter-spaced">
+        <span>
           {headerText}
         </span>
         <span />
       </header>
 
       {/* Form */}
-      <div className="container py-4">
-        <h1 className="h5 text-uppercase mb-3">{titleText}</h1>
+      <div className="admin-form-container">
+        <div className="admin-form-intro">
+          <p>01 / Artista</p>
+          <h1>{titleText}</h1>
+          <span>Identidad, imágenes y biografía.</span>
+        </div>
 
         {isEditMode && loadingInitial ? (
           <p className="text-muted">Loading artist…</p>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="row g-3">
+          <form onSubmit={handleSubmit(onSubmit)} className="row g-3 admin-form">
             {/* Name */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Name</label>
+              <label className="form-label">Nombre</label>
               <input
                 className={`form-control bg-dark text-white border-secondary ${
                   errors.name ? "is-invalid" : ""
@@ -246,7 +250,7 @@ export default function NewArtistPage({ isEditMode = false }) {
 
             {/* City */}
             <div className="col-12 col-md-6">
-              <label className="form-label">City</label>
+              <label className="form-label">Ciudad</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 {...register("city")}
@@ -255,7 +259,7 @@ export default function NewArtistPage({ isEditMode = false }) {
 
             {/* Country */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Country</label>
+              <label className="form-label">País</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="ES, PT, FR…"
@@ -265,7 +269,7 @@ export default function NewArtistPage({ isEditMode = false }) {
 
             {/* Portrait Image File */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Portrait Image</label>
+              <label className="form-label">Retrato</label>
               <input
                 type="file"
                 accept="image/*"
@@ -279,7 +283,7 @@ export default function NewArtistPage({ isEditMode = false }) {
 
             {/* Cover Image File */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Cover Image (optional)</label>
+              <label className="form-label">Imagen de cabecera (opcional)</label>
               <input
                 type="file"
                 accept="image/*"
@@ -293,7 +297,7 @@ export default function NewArtistPage({ isEditMode = false }) {
 
             {/* Bio */}
             <div className="col-12">
-              <label className="form-label">Bio</label>
+              <label className="form-label">Biografía</label>
               <textarea
                 rows={6}
                 className="form-control bg-dark text-white border-secondary"
@@ -310,11 +314,11 @@ export default function NewArtistPage({ isEditMode = false }) {
               >
                 {isSubmitting
                   ? isEditMode
-                    ? "Updating…"
-                    : "Saving…"
+                    ? "Actualizando…"
+                    : "Guardando…"
                   : isEditMode
-                  ? "Update artist"
-                  : "Save artist"}
+                  ? "Actualizar artista"
+                  : "Guardar artista"}
               </button>
 
               {isEditMode && (
@@ -323,13 +327,13 @@ export default function NewArtistPage({ isEditMode = false }) {
                   className="btn btn-danger"
                   onClick={handleDelete}
                 >
-                  Delete artist
+                  Eliminar artista
                 </button>
               )}
             </div>
           </form>
         )}
       </div>
-    </div>
+    </main>
   );
 }

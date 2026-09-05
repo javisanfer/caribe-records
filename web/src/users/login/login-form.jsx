@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import * as CaribeRecordsAPI from "../../services/api-services";
-import { useAuthContext } from "../../contexts/auth-context";
+import { useAuthContext } from "../../contexts/use-auth-context";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {

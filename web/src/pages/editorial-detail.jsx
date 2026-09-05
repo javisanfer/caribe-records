@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import EditorialDetail from "../components/editorials/editorial-detail/editorial-detail";
 
 export default function EditorialDetailPage() {
   const { slug } = useParams();
-
   const [editorial, setEditorial] = useState(null);
   const [prevNext, setPrevNext] = useState({});
   const [loading, setLoading] = useState(true);
@@ -15,17 +14,27 @@ export default function EditorialDetailPage() {
       try {
         setLoading(true);
         setError(null);
+        const [detailRes, listRes] = await Promise.all([
+          fetch(`/api/v1/editorials/slug/${slug}`),
+          fetch("/api/v1/editorials"),
+        ]);
+        if (!detailRes.ok) throw new Error("No se pudo cargar el editorial");
 
-        // 👇 OJO: tu backend expone /editorials/slug/:slug
-        const res = await fetch(`/api/v1/editorials/slug/${slug}`);
+        const detail = await detailRes.json();
+        setEditorial(detail);
 
-        if (!res.ok) throw new Error("No se pudo cargar el editorial");
-
-        const data = await res.json();
-
-        // Tu controller devuelve el doc directamente (no { editorial })
-        setEditorial(data);
-        setPrevNext({}); // de momento vacío, si luego haces prev/next lo rellenamos
+        if (listRes.ok) {
+          const payload = await listRes.json();
+          const items = Array.isArray(payload) ? payload : payload.data || [];
+          const ordered = [...items].sort(
+            (a, b) => new Date(b.publishAt || b.createdAt || 0) - new Date(a.publishAt || a.createdAt || 0)
+          );
+          const index = ordered.findIndex((item) => item.slug === slug);
+          setPrevNext({
+            prev: index > 0 ? ordered[index - 1] : null,
+            next: index >= 0 ? ordered[index + 1] || null : null,
+          });
+        }
       } catch (err) {
         console.error(err);
         setError("No se encontró este artículo editorial.");
@@ -33,30 +42,16 @@ export default function EditorialDetailPage() {
         setLoading(false);
       }
     }
-
     loadEditorial();
   }, [slug]);
 
-  if (loading)
-    return (
-      <div className="text-center text-secondary py-5">
-        Cargando artículo…
-      </div>
-    );
-
-  if (error)
-    return <div className="alert alert-danger m-3">{error}</div>;
+  if (loading) return <p className="detail-state">Cargando artículo…</p>;
+  if (error) return <p className="detail-state detail-state--error">{error}</p>;
 
   return (
-    <div className="editorial-detail-page">
-      <Link
-        to="/editoriales"
-        className="text-white text-decoration-none small d-block px-3 py-2"
-      >
-        ← Volver
-      </Link>
-
+    <main className="editorial-detail-page">
+      <Link to="/editoriales" className="detail-back-link">← Editorial</Link>
       <EditorialDetail editorial={editorial} prevNext={prevNext} />
-    </div>
+    </main>
   );
 }

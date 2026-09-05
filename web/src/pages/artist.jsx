@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import ArtistList from "../components/artists/artist-list/artist-list";
+import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState([]);
@@ -29,7 +29,7 @@ export default function ArtistsPage() {
                 .toLowerCase()
                 .trim()
                 .replace(/\s+/g, "-")
-                .replace(/[^\w\-]+/g, "")
+                .replace(/[^\w-]+/g, "")
             : undefined;
 
           return {
@@ -53,25 +53,25 @@ export default function ArtistsPage() {
   }, []);
 
   return (
-    <div className="artists-page bg-black text-white min-vh-100">
-
-      <section className="artists-content">
+    <PublicIndexPage
+      className="artists-page"
+      tone="blue"
+      title="Artistas"
+      description="Proyectos con voz propia, desde Madrid hacia cualquier lugar."
+      count={loading ? null : artists.length}
+      countLabel="artistas"
+    >
         {loading && (
-          <div className="text-center text-secondary py-4">
-            Cargando artistas…
-          </div>
+          <p className="public-index__status">Cargando artistas…</p>
         )}
 
         {error && (
-          <div className="alert alert-danger rounded-0 mb-0" role="alert">
-            {error}
-          </div>
+          <p className="public-index__status public-index__status--error" role="alert">{error}</p>
         )}
 
         {!loading && !error && (
-          <ArtistList title="Current Artists" artists={artists} />
+          <ArtistList artists={artists} />
         )}
-      </section>
-    </div>
+    </PublicIndexPage>
   );
 }

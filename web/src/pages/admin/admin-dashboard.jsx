@@ -1,199 +1,159 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
-const API_BASE = "http://localhost:3000/api/v1";
+const API_BASE = "/api/v1";
+const PAGE_SIZE = 15;
 
 const TYPE_LABELS = {
-  artist: "Artist",
-  release: "Release",
-  event: "Event",
+  artist: "Artista",
+  release: "Lanzamiento",
+  event: "Evento",
   editorial: "Editorial",
 };
 
-const PAGE_SIZE = 15;
+const CREATE_LINKS = [
+  ["01", "Artista", "/admin/new-artist"],
+  ["02", "Lanzamiento", "/admin/new-release"],
+  ["03", "Editorial", "/admin/new-editorial"],
+  ["04", "Evento", "/admin/new-event"],
+];
 
 export default function AdminDashboardPage() {
   const [items, setItems] = useState([]);
   const [typeFilter, setTypeFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const navigate = useNavigate();
-
-  const loadData = async (type = "all") => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      params.set("limit", "200");
-      if (type !== "all") params.set("type", type);
-
-      const res = await fetch(
-        `${API_BASE}/admin/activity?${params.toString()}`,
-        { credentials: "include" }
-      );
-      const data = await res.json();
-      setItems(data.data || []);
-      setCurrentPage(1);
-    } catch (err) {
-      console.error("Error loading activity:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadData(typeFilter);
+    async function loadData() {
+      setLoading(true);
+      setError("");
+      try {
+        const params = new URLSearchParams({ limit: "200" });
+        if (typeFilter !== "all") params.set("type", typeFilter);
+        const response = await fetch(`${API_BASE}/admin/activity?${params}`, {
+          credentials: "include",
+        });
+        if (!response.ok) throw new Error("No se pudo cargar la actividad");
+        const data = await response.json();
+        setItems(data.data || []);
+        setCurrentPage(1);
+      } catch (loadError) {
+        console.error("Error loading activity:", loadError);
+        setError("No se ha podido cargar la actividad del panel.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
   }, [typeFilter]);
 
-  const formatDateTime = (value) => {
-    if (!value) return "—";
-    const d = new Date(value);
-    return d.toLocaleString("es-ES", {
-      dateStyle: "short",
-      timeStyle: "short",
-    });
-  };
-
-  const getEditUrl = (item) => {
-    switch (item.type) {
-      case "artist":
-        return `/admin/edit-artist/${item.slug}`;
-      case "event":
-        return `/admin/edit-event/${item.slug}`;
-      case "editorial":
-        return `/admin/edit-editorial/${item.slug}`;
-      case "release":
-        return `/admin/edit-release/${item.id}`;
-      default:
-        return "#";
-    }
-  };
+  const counts = useMemo(() => items.reduce((result, item) => {
+    result[item.type] = (result[item.type] || 0) + 1;
+    return result;
+  }, {}), [items]);
 
   const totalItems = items.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
   const startIndex = (safePage - 1) * PAGE_SIZE;
-  const endIndex = startIndex + PAGE_SIZE;
-  const pageItems = items.slice(startIndex, endIndex);
+  const pageItems = items.slice(startIndex, startIndex + PAGE_SIZE);
+
+  const formatDateTime = (value) => value
+    ? new Date(value).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })
+    : "—";
+
+  const getEditUrl = (item) => ({
+    artist: `/admin/edit-artist/${item.slug}`,
+    event: `/admin/edit-event/${item.slug}`,
+    editorial: `/admin/edit-editorial/${item.slug}`,
+    release: `/admin/edit-release/${item.id}`,
+  }[item.type] || "#");
 
   return (
-    <div className="text-white">
-      {/* HEADER */}
-      <header className="d-flex justify-content-between align-items-center mb-4 p-2 rounded-3 bg-dark border border-secondary">
-        <h1 className="h5 text-uppercase mb-0 fw-bold">Admin Dashboard</h1>
-
-        <div className="d-flex align-items-center gap-3">
-          {/* FILTRO */}
-          <select
-            className="form-select form-select-sm bg-black text-white border-secondary"
-            style={{ width: "180px" }}
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-          >
-            <option value="all">All types</option>
-            <option value="artist">Artists</option>
-            <option value="release">Releases</option>
-            <option value="event">Events</option>
-            <option value="editorial">Editorials</option>
-          </select>
-
-          {/* BOTONES DE CREAR */}
-          <div className="btn-group">
-            <button
-              className="btn btn-sm btn-primary"
-              onClick={() => navigate("/admin/new-artist")}
-            >
-              + Artist
-            </button>
-            <button
-              className="btn btn-sm btn-success"
-              onClick={() => navigate("/admin/new-release")}
-            >
-              + Release
-            </button>
-            <button
-              className="btn btn-sm btn-warning text-black"
-              onClick={() => navigate("/admin/new-editorial")}
-            >
-              + Editorial
-            </button>
-            <button
-              className="btn btn-sm btn-info text-black"
-              onClick={() => navigate("/admin/new-event")}
-            >
-              + Event
-            </button>
-          </div>
+    <main className="admin-page admin-dashboard">
+      <header className="admin-dashboard__hero">
+        <p>Caribe Records · Gestión</p>
+        <div>
+          <h1>Panel</h1>
+          <span>{String(totalItems).padStart(2, "0")} registros</span>
         </div>
       </header>
 
-      {/* CONTENT CARD */}
-      <div className="bg-black rounded-4 p-4 border border-secondary shadow-sm">
+      <section className="admin-create" aria-labelledby="admin-create-title">
+        <div className="admin-section-heading">
+          <h2 id="admin-create-title">Crear contenido</h2>
+          <span>Accesos rápidos</span>
+        </div>
+        <div className="admin-create__grid">
+          {CREATE_LINKS.map(([number, label, url]) => (
+            <Link to={url} key={url}>
+              <small>{number}</small>
+              <span>{label}</span>
+              <b aria-hidden="true">＋</b>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="admin-activity" aria-labelledby="admin-activity-title">
+        <div className="admin-section-heading admin-activity__heading">
+          <div>
+            <h2 id="admin-activity-title">Actividad</h2>
+            <p>
+              {Object.entries(TYPE_LABELS).map(([type, label]) => (
+                <span key={type}>{label} {String(counts[type] || 0).padStart(2, "0")}</span>
+              ))}
+            </p>
+          </div>
+          <label>
+            <span>Filtrar por</span>
+            <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
+              <option value="all">Todo</option>
+              <option value="artist">Artistas</option>
+              <option value="release">Lanzamientos</option>
+              <option value="event">Eventos</option>
+              <option value="editorial">Editorial</option>
+            </select>
+          </label>
+        </div>
+
         {loading ? (
-          <p className="text-muted mb-0">Loading activity…</p>
+          <p className="admin-status">Cargando actividad…</p>
+        ) : error ? (
+          <p className="admin-status admin-status--error">{error}</p>
         ) : totalItems === 0 ? (
-          <p className="text-muted mb-0">No activity yet.</p>
+          <p className="admin-status">Todavía no hay actividad.</p>
         ) : (
           <>
-            <div className="table-responsive mb-3">
-              <table className="table table-dark table-hover table-sm align-middle">
-                <thead>
-                  <tr className="text-secondary text-uppercase small border-bottom border-secondary">
-                    <th style={{ width: "120px" }}>Type</th>
-                    <th>Title / Name</th>
-                    <th style={{ width: "150px" }}>Created</th>
-                    <th style={{ width: "150px" }}>Updated</th>
-                    <th style={{ width: "80px" }}>Edit</th>
-                  </tr>
-                </thead>
-
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead><tr><th>Tipo</th><th>Título / nombre</th><th>Creado</th><th>Actualizado</th><th><span className="visually-hidden">Acción</span></th></tr></thead>
                 <tbody>
                   {pageItems.map((item) => (
                     <tr key={`${item.type}-${item.id}`}>
-                      <td className="text-uppercase small">{TYPE_LABELS[item.type]}</td>
-                      <td className="fw-light">{item.title}</td>
-                      <td className="text-secondary small">{formatDateTime(item.createdAt)}</td>
-                      <td className="text-secondary small">{formatDateTime(item.updatedAt)}</td>
-                      <td>
-                        <a
-                          href={getEditUrl(item)}
-                          className="btn btn-sm btn-outline-light"
-                        >
-                          Edit
-                        </a>
-                      </td>
+                      <td><span className={`admin-type admin-type--${item.type}`}>{TYPE_LABELS[item.type]}</span></td>
+                      <td>{item.title}</td>
+                      <td>{formatDateTime(item.createdAt)}</td>
+                      <td>{formatDateTime(item.updatedAt)}</td>
+                      <td><Link to={getEditUrl(item)} aria-label={`Editar ${item.title}`}>Editar ↗</Link></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-
-            {/* FOOTER PAGINACIÓN */}
-            <div className="d-flex justify-content-between align-items-center">
-              <span className="small text-muted">
-                Showing {startIndex + 1}–{Math.min(endIndex, totalItems)} of {totalItems}
-              </span>
-
-              <div className="btn-group btn-group-sm">
-                <button
-                  className="btn btn-outline-light"
-                  disabled={safePage === 1}
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                >
-                  ‹ Prev
-                </button>
-                <button
-                  className="btn btn-outline-light"
-                  disabled={safePage === totalPages}
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                >
-                  Next ›
-                </button>
+            <footer className="admin-pagination">
+              <span>{startIndex + 1}–{Math.min(startIndex + PAGE_SIZE, totalItems)} de {totalItems}</span>
+              <div>
+                <button disabled={safePage === 1} onClick={() => setCurrentPage((page) => page - 1)}>← Anterior</button>
+                <span>{String(safePage).padStart(2, "0")} / {String(totalPages).padStart(2, "0")}</span>
+                <button disabled={safePage === totalPages} onClick={() => setCurrentPage((page) => page + 1)}>Siguiente →</button>
               </div>
-            </div>
+            </footer>
           </>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

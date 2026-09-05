@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { useAuthContext } from "../../contexts/auth-context";
+import { useAuthContext } from "../../contexts/use-auth-context";
 import whiteLogo from "../../assets/brand/caribe-logotipo-white.png";
 
 const navigation = [
@@ -16,7 +16,6 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
   const toggleRef = useRef(null);
-  const isAdminSection = location.pathname.startsWith("/admin");
 
   useEffect(() => setIsOpen(false), [location.pathname]);
 
@@ -62,28 +61,13 @@ export default function Navbar() {
           <img src={whiteLogo} alt="" className="cr-brand-mark" />
         </Link>
 
-        <ul className="cr-nav" aria-label="Secciones">
-          {navigation.map((item) => (
-            <li key={item.to}>
-              <NavLink to={item.to} className={({ isActive }) => `cr-link${isActive ? " cr-link-active" : ""}`}>
-                <span className="cr-link-index">{item.index}</span>
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-
         <div className="cr-navbar-actions">
-          <a className="cr-shop-link" href="https://cariberecords.bigcartel.com/" target="_blank" rel="noreferrer">
-            Tienda <span aria-hidden="true">↗</span>
-          </a>
-          {user && !isAdminSection && <Link to="/admin" className="cr-admin-link">Admin</Link>}
           <button
             type="button"
             ref={toggleRef}
             className="cr-menu-toggle"
             aria-expanded={isOpen}
-            aria-controls="cr-mobile-menu"
+            aria-controls="cr-menu-panel"
             onClick={() => setIsOpen((value) => !value)}
           >
             <span>{isOpen ? "Cerrar" : "Menú"}</span>
@@ -93,7 +77,7 @@ export default function Navbar() {
       </nav>
 
       <div
-        id="cr-mobile-menu"
+        id="cr-menu-panel"
         ref={menuRef}
         className={`cr-mobile-menu${isOpen ? " is-open" : ""}`}
         role="dialog"
@@ -110,10 +94,16 @@ export default function Navbar() {
                 <NavLink to={item.to} tabIndex={isOpen ? 0 : -1}>{item.label}</NavLink>
               </li>
             ))}
-            <li>
+            <li className="cr-menu-shop">
               <span>05</span>
               <a href="https://cariberecords.bigcartel.com/" target="_blank" rel="noreferrer" tabIndex={isOpen ? 0 : -1}>Tienda ↗</a>
             </li>
+            {user && (
+              <li>
+                <span>06</span>
+                <NavLink to="/admin" tabIndex={isOpen ? 0 : -1}>Admin</NavLink>
+              </li>
+            )}
           </ol>
           <div className="cr-menu-footer">
             <a href="mailto:hola@caribe-records.com" tabIndex={isOpen ? 0 : -1}>hola@caribe-records.com</a>

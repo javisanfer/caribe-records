@@ -8,7 +8,7 @@ import {
   uploadImage,
 } from "../../services/api-services";
 
-const API_BASE = "http://localhost:3000/api/v1";
+const API_BASE = "/api/v1";
 
 export default function NewReleasePage() {
   const { id } = useParams();
@@ -165,7 +165,7 @@ export default function NewReleasePage() {
         await adminCreateRelease(payload);
       }
 
-      navigate("/releases");
+      navigate("/admin");
     } catch (err) {
       console.error(err);
       alert(
@@ -195,7 +195,7 @@ export default function NewReleasePage() {
         throw new Error("Error deleting release");
       }
 
-      navigate("/releases");
+      navigate("/admin");
     } catch (err) {
       console.error(err);
       alert("No se pudo borrar el release.");
@@ -206,36 +206,40 @@ export default function NewReleasePage() {
    * UI
    * ------------- */
   return (
-    <div className="bg-black text-white min-vh-100">
+    <main className="admin-page admin-form-page">
       {/* Header */}
-      <header className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-dark">
+      <header className="admin-form-header">
         <button
           type="button"
-          className="btn btn-sm btn-outline-light"
+          className="admin-back"
           onClick={() => navigate(-1)}
         >
-          ← Back
+          ← Panel
         </button>
-        <span className="text-uppercase small letter-spaced">
-          Caribe Records · {isEditMode ? "Edit Release" : "New Release"}
+        <span>
+          Caribe Records · {isEditMode ? "Editar lanzamiento" : "Nuevo lanzamiento"}
         </span>
         <span />
       </header>
 
       {/* Form */}
-      <div className="container py-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h1 className="h5 text-uppercase mb-0">
-            {isEditMode ? "Edit Release" : "Create Release"}
-          </h1>
+      <div className="admin-form-container">
+        <div className="admin-form-intro admin-form-intro--with-action">
+          <div>
+            <p>02 / Lanzamiento</p>
+            <h1>
+            {isEditMode ? "Editar lanzamiento" : "Nuevo lanzamiento"}
+            </h1>
+            <span>Ficha de catálogo, portada y tracklist.</span>
+          </div>
 
           {isEditMode && (
             <button
               type="button"
-              className="btn btn-sm btn-outline-danger"
+              className="admin-delete"
               onClick={handleDelete}
             >
-              Delete release
+              Eliminar lanzamiento
             </button>
           )}
         </div>
@@ -243,10 +247,10 @@ export default function NewReleasePage() {
         {isEditMode && loadingRelease ? (
           <p className="text-muted">Loading release…</p>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="row g-3">
+          <form onSubmit={handleSubmit(onSubmit)} className="row g-3 admin-form">
             {/* Title */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Title</label>
+              <label className="form-label">Título</label>
               <input
                 className={`form-control bg-dark text-white border-secondary ${
                   errors.title ? "is-invalid" : ""
@@ -260,14 +264,14 @@ export default function NewReleasePage() {
 
             {/* Artist - Select by ID */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Artist</label>
+              <label className="form-label">Artista</label>
               <select
                 className={`form-control bg-dark text-white border-secondary ${
                   errors.artist ? "is-invalid" : ""
                 }`}
                 {...register("artist", { required: "Artist is required" })}
               >
-                <option value="">Select artist…</option>
+                <option value="">Seleccionar artista…</option>
                 {artists.map((a) => (
                   <option key={a._id} value={a._id}>
                     {a.name}
@@ -283,7 +287,7 @@ export default function NewReleasePage() {
 
             {/* Catalog */}
             <div className="col-12 col-md-4">
-              <label className="form-label">Catalog number</label>
+              <label className="form-label">Número de catálogo</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="CRB-001"
@@ -293,7 +297,7 @@ export default function NewReleasePage() {
 
             {/* Serial number */}
             <div className="col-12 col-md-4">
-              <label className="form-label">Serial number</label>
+              <label className="form-label">Número de serie</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="#023/300"
@@ -303,14 +307,14 @@ export default function NewReleasePage() {
 
             {/* Format */}
             <div className="col-12 col-md-4">
-              <label className="form-label">Format</label>
+              <label className="form-label">Formato</label>
               <select
                 className={`form-control bg-dark text-white border-secondary ${
                   errors.format ? "is-invalid" : ""
                 }`}
                 {...register("format", { required: "Format is required" })}
               >
-                <option value="">Select format…</option>
+                <option value="">Seleccionar formato…</option>
                 <option value="single">Single</option>
                 <option value="ep">EP</option>
                 <option value="lp">LP</option>
@@ -325,7 +329,7 @@ export default function NewReleasePage() {
 
             {/* Release date */}
             <div className="col-12 col-md-4">
-              <label className="form-label">Release Date</label>
+              <label className="form-label">Fecha de lanzamiento</label>
               <input
                 type="date"
                 className="form-control bg-dark text-white border-secondary"
@@ -335,7 +339,7 @@ export default function NewReleasePage() {
 
             {/* Country */}
             <div className="col-12 col-md-4">
-              <label className="form-label">Country</label>
+              <label className="form-label">País</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="ES / US / AR…"
@@ -355,7 +359,7 @@ export default function NewReleasePage() {
 
             {/* Cover URL */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Cover URL (optional)</label>
+              <label className="form-label">URL de portada (opcional)</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="https://..."
@@ -368,7 +372,7 @@ export default function NewReleasePage() {
 
             {/* Cover file */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Cover file</label>
+              <label className="form-label">Archivo de portada</label>
               <input
                 type="file"
                 accept="image/*"
@@ -382,7 +386,7 @@ export default function NewReleasePage() {
 
             {/* Cover alt */}
             <div className="col-12 col-md-6">
-              <label className="form-label">Cover alt text</label>
+              <label className="form-label">Texto alternativo de portada</label>
               <input
                 className="form-control bg-dark text-white border-secondary"
                 placeholder="Alt text para accesibilidad"
@@ -392,7 +396,7 @@ export default function NewReleasePage() {
 
             {/* Tracklist header */}
             <div className="col-12 mt-4">
-              <h5>Tracklist</h5>
+              <h5>Lista de temas</h5>
               <div className="row g-2 small text-secondary mb-1">
                 <div className="col-1">#</div>
                 <div className="col-7">Title</div>
@@ -443,7 +447,7 @@ export default function NewReleasePage() {
                 className="btn btn-outline-light"
                 onClick={() => append({ title: "", duration: "" })}
               >
-                + Add Track
+                + Añadir tema
               </button>
             </div>
 
@@ -457,13 +461,13 @@ export default function NewReleasePage() {
                 {isSubmitting
                   ? "Saving…"
                   : isEditMode
-                  ? "Update Release"
-                  : "Save Release"}
+                  ? "Actualizar lanzamiento"
+                  : "Guardar lanzamiento"}
               </button>
             </div>
           </form>
         )}
       </div>
-    </div>
+    </main>
   );
 }

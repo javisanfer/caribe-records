@@ -3,15 +3,15 @@ import EditorialItem from "../editorial-item/editorial-item";
 
 export default function EditorialList({ editorials = [] }) {
   if (!editorials.length) {
-    return <p className="text-muted">No hay artículos editoriales.</p>;
+    return <p className="public-index__status">No hay artículos editoriales.</p>;
   }
 
   return (
-    <section className="editorial-list container-fluid px-0 bg-black text-white">
-      <div className="row g-0">
-        {editorials.map((item) => (
-          <div key={item.id} className="col-12 col-md-6 border-dark border-1 border-bottom border-end">
-            <EditorialItem editorial={item} />
+    <section className="editorial-list">
+      <div className="editorial-index">
+        {editorials.map((item, index) => (
+          <div key={item.id || item._id || item.slug}>
+            <EditorialItem editorial={item} index={index + 1} />
           </div>
         ))}
       </div>

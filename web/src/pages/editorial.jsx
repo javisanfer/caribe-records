@@ -1,7 +1,6 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import EditorialList from "../components/editorials/editorial-list/editorial-list";
+import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 
 export default function EditorialPage() {
   const [editorials, setEditorials] = useState([]);
@@ -36,26 +35,24 @@ export default function EditorialPage() {
   }, []);
 
   return (
-    <div className="editorial-page bg-black text-white min-vh-100">
-  
-      {/* Contenido */}
-      <section>
+    <PublicIndexPage
+      className="editorial-page"
+      title="Editorial"
+      description="Historias, procesos y conversaciones alrededor de la música que editamos."
+      count={loading ? null : editorials.length}
+      countLabel="historias"
+    >
         {loading && (
-          <div className="text-center text-secondary py-4">
-            Cargando editoriales…
-          </div>
+          <p className="public-index__status">Cargando editorial…</p>
         )}
 
         {error && (
-          <div className="alert alert-danger rounded-0 m-3" role="alert">
-            {error}
-          </div>
+          <p className="public-index__status public-index__status--error" role="alert">{error}</p>
         )}
 
         {!loading && !error && (
           <EditorialList editorials={editorials} />
         )}
-      </section>
-    </div>
+    </PublicIndexPage>
   );
 }

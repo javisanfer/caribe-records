@@ -1,32 +1,21 @@
 import React from "react";
 import ArtistItem from "../artist-item/artist-item";
 
-export default function ArtistList({ title = "Current Artists", artists = [] }) {
+export default function ArtistList({ artists = [] }) {
   if (!artists.length) {
-    return (
-      <div className="p-3">
-        <p className="text-muted m-0">No hay artistas.</p>
-      </div>
-    );
+    return <p className="public-index__status">No hay artistas.</p>;
   }
 
   return (
-    <div className="p-3">
-      <h2 className="text-uppercase text-secondary small mb-3">
-        {title} ({artists.length})
-      </h2>
-
-      <ul className="list-unstyled m-0">
-        {artists.map((artist) => (
-          <li key={artist.id || artist._id} className="mb-1">
+    <ul className="artist-index">
+        {artists.map((artist, index) => (
+          <li key={artist.id || artist._id}>
             <ArtistItem
               artist={artist}
-              isActive={false}
-              onHover={() => {}}
+              index={index + 1}
             />
           </li>
         ))}
-      </ul>
-    </div>
+    </ul>
   );
 }

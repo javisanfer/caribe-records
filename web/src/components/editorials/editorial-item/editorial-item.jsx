@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function EditorialItem({ editorial }) {
+export default function EditorialItem({ editorial, index }) {
   if (!editorial) return null;
 
   const slug = editorial.slug || "#";
@@ -9,36 +9,28 @@ export default function EditorialItem({ editorial }) {
   return (
     <Link
       to={`/editorial/${slug}`}
-      className="editorial-item d-block position-relative text-decoration-none text-white"
+      className="editorial-item"
       style={{ cursor: slug === "#" ? "default" : "pointer" }}
     >
-      {/* Imagen de portada */}
-      {editorial.hero?.url && (
-        <div className="ratio ratio-1x1 overflow-hidden">
+      <div className="editorial-item__media">
+        {editorial.hero?.url ? (
           <img
             src={editorial.hero.url}
             alt={editorial.hero.alt || editorial.title}
-            className="w-100 h-100 object-fit-cover"
+            loading="lazy"
+            decoding="async"
           />
-        </div>
-      )}
-
-      {/* Overlay */}
-      <div
-        className="editorial-item-overlay position-absolute top-0 start-0 w-100 h-100
-                   d-flex flex-column justify-content-center align-items-center
-                   text-center px-3"
-        style={{
-          background: "rgba(0,0,0,0.55)",
-          opacity: 0,
-          transition: "opacity .35s ease",
-        }}
-      >
-        <h2 className="fs-4 text-uppercase mb-2">{editorial.title}</h2>
-
-        {editorial.subtitle && (
-          <p className="small text-light mb-0">{editorial.subtitle}</p>
+        ) : (
+          <span aria-hidden="true">CR</span>
         )}
+      </div>
+      <div className="editorial-item__copy">
+        <p>{String(index).padStart(2, "0")} · Caribe Editorial</p>
+        <h2>{editorial.title}</h2>
+        {editorial.subtitle && (
+          <p className="editorial-item__subtitle">{editorial.subtitle}</p>
+        )}
+        <span>Leer historia <span aria-hidden="true">↗</span></span>
       </div>
     </Link>
   );

@@ -1,13 +1,10 @@
 import React, {
-  useContext,
-  createContext,
   useState,
   useEffect
 } from "react";
 
 import { profile } from "../services/api-services";
-
-const AuthContext = createContext();
+import { AuthContext } from "./auth-context-instance";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined); 
@@ -49,9 +46,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-// Hook para consumir el contexto
-export function useAuthContext() {
-  return useContext(AuthContext);
 }
