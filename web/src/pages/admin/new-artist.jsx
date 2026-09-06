@@ -207,129 +207,70 @@ export default function NewArtistPage({ isEditMode = false }) {
         <span />
       </header>
 
-      {/* Form */}
       <div className="admin-form-container">
         <div className="admin-form-intro">
-          <p>01 / Artista</p>
-          <h1>{titleText}</h1>
-          <span>Identidad, imágenes y biografía.</span>
+          <div>
+            <p>Artistas / {isEditMode ? "Editar" : "Crear"}</p>
+            <h1>{titleText}</h1>
+          </div>
+          <span>Completa primero la información esencial. Podrás volver a editarla cuando quieras.</span>
         </div>
 
         {isEditMode && loadingInitial ? (
           <p className="text-muted">Loading artist…</p>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="row g-3 admin-form">
-            {/* Name */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Nombre</label>
-              <input
-                className={`form-control bg-dark text-white border-secondary ${
-                  errors.name ? "is-invalid" : ""
-                }`}
-                {...register("name", { required: "Name is required" })}
-              />
-              {errors.name && (
-                <div className="invalid-feedback">{errors.name.message}</div>
-              )}
-            </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="admin-form admin-editor-form">
+            <div className="admin-editor-layout">
+              <div className="admin-editor-main">
+                <section className="admin-form-card">
+                  <div className="admin-form-card__heading"><span>01</span><div><h2>Identidad</h2><p>El nombre público y la dirección de su ficha.</p></div></div>
+                  <div className="admin-field-grid admin-field-grid--2">
+                    <div className="admin-field">
+                      <label className="form-label">Nombre <b>Obligatorio</b></label>
+                      <input className={`form-control ${errors.name ? "is-invalid" : ""}`} placeholder="Nombre del artista" {...register("name", { required: "Escribe el nombre del artista" })} />
+                      {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+                    </div>
+                    <div className="admin-field">
+                      <label className="form-label">Slug <em>Opcional</em></label>
+                      <input className={`form-control ${errors.slug ? "is-invalid" : ""}`} placeholder="se-genera-automaticamente" {...register("slug")} />
+                      <div className="form-text">Déjalo vacío para generarlo desde el nombre.</div>
+                      {errors.slug && <div className="invalid-feedback">{errors.slug.message}</div>}
+                    </div>
+                  </div>
+                </section>
 
-            {/* Slug */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Slug</label>
-              <input
-                className={`form-control bg-dark text-white border-secondary ${
-                  errors.slug ? "is-invalid" : ""
-                }`}
-                placeholder="artist-slug (opcional)"
-                {...register("slug")}
-              />
-              {errors.slug && (
-                <div className="invalid-feedback">{errors.slug.message}</div>
-              )}
-            </div>
+                <section className="admin-form-card">
+                  <div className="admin-form-card__heading"><span>02</span><div><h2>Origen</h2><p>Información breve que aparecerá en su perfil.</p></div></div>
+                  <div className="admin-field-grid admin-field-grid--2">
+                    <div className="admin-field"><label className="form-label">Ciudad</label><input className="form-control" placeholder="A Coruña" {...register("city")} /></div>
+                    <div className="admin-field"><label className="form-label">País</label><input className="form-control" placeholder="ES" {...register("country")} /></div>
+                  </div>
+                </section>
 
-            {/* City */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Ciudad</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                {...register("city")}
-              />
-            </div>
+                <section className="admin-form-card">
+                  <div className="admin-form-card__heading"><span>03</span><div><h2>Imágenes</h2><p>Retrato para listados y cabecera para la ficha.</p></div></div>
+                  <div className="admin-field-grid admin-field-grid--2">
+                    <div className="admin-field"><label className="form-label">Retrato</label><input type="file" accept="image/*" className="form-control" {...register("portraitFile")} /><div className="form-text">Imagen vertical o cuadrada en JPG, PNG o WebP.</div></div>
+                    <div className="admin-field"><label className="form-label">Cabecera <em>Opcional</em></label><input type="file" accept="image/*" className="form-control" {...register("coverFile")} /><div className="form-text">Si no eliges una, se utilizará el retrato.</div></div>
+                  </div>
+                </section>
 
-            {/* Country */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">País</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="ES, PT, FR…"
-                {...register("country")}
-              />
-            </div>
-
-            {/* Portrait Image File */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Retrato</label>
-              <input
-                type="file"
-                accept="image/*"
-                className="form-control bg-dark text-white border-secondary"
-                {...register("portraitFile")}
-              />
-              <div className="form-text text-secondary">
-                Imagen principal del artista (JPG/PNG).
+                <section className="admin-form-card">
+                  <div className="admin-form-card__heading"><span>04</span><div><h2>Biografía</h2><p>Cuenta quién es y sitúa su trabajo.</p></div></div>
+                  <div className="admin-field"><label className="form-label">Texto</label><textarea rows={9} className="form-control admin-writing-area" placeholder="Escribe la biografía del artista…" {...register("bio")} /></div>
+                </section>
               </div>
-            </div>
 
-            {/* Cover Image File */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Imagen de cabecera (opcional)</label>
-              <input
-                type="file"
-                accept="image/*"
-                className="form-control bg-dark text-white border-secondary"
-                {...register("coverFile")}
-              />
-              <div className="form-text text-secondary">
-                Si no subes ninguna, usaremos la portrait como cover.
-              </div>
-            </div>
-
-            {/* Bio */}
-            <div className="col-12">
-              <label className="form-label">Biografía</label>
-              <textarea
-                rows={6}
-                className="form-control bg-dark text-white border-secondary"
-                {...register("bio")}
-              />
-            </div>
-
-            {/* Botones */}
-            <div className="col-12 d-flex gap-2">
-              <button
-                type="submit"
-                className="btn btn-outline-light"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? isEditMode
-                    ? "Actualizando…"
-                    : "Guardando…"
-                  : isEditMode
-                  ? "Actualizar artista"
-                  : "Guardar artista"}
-              </button>
-
-              {isEditMode && (
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={handleDelete}
-                >
-                  Eliminar artista
-                </button>
-              )}
+              <aside className="admin-editor-sidebar">
+                <section className="admin-action-card">
+                  <span className="admin-action-card__status">{isEditMode ? "Ficha existente" : "Nueva ficha"}</span>
+                  <h2>{isEditMode ? "Guardar cambios" : "Crear artista"}</h2>
+                  <p>Revisa los campos obligatorios antes de guardar.</p>
+                  <div className="admin-action-checks"><span><i>01</i> Identidad pública</span><span><i>02</i> Origen y contexto</span><span><i>03</i> Material visual</span><span><i>04</i> Biografía</span></div>
+                  <button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : isEditMode ? "Actualizar artista" : "Guardar artista"}</button>
+                </section>
+                {isEditMode && <section className="admin-danger-card"><h3>Zona sensible</h3><p>Esta acción elimina definitivamente la ficha.</p><button type="button" className="btn btn-danger" onClick={handleDelete}>Eliminar artista</button></section>}
+              </aside>
             </div>
           </form>
         )}

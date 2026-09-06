@@ -1,465 +1,125 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
+import EditorialBlockEditor from "../../components/admin/editorial-block-editor";
+import { createTextBlock } from "../../components/admin/editorial-block-utils";
 
 const API_BASE = "/api/v1";
 
 export default function NewEditorialPage({ isEditMode = false }) {
-  const { slug } = useParams(); // /admin/edit-editorial/:slug
+  const { slug } = useParams();
   const navigate = useNavigate();
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    defaultValues: {
-      status: "draft",
-      featured: false,
-    },
-  });
-
+  const effectiveEditMode = isEditMode && Boolean(slug);
   const [loadingInitial, setLoadingInitial] = useState(isEditMode);
+  const [blocks, setBlocks] = useState([createTextBlock()]);
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { status: "draft", featured: false, title: "" } });
+  const title = watch("title") || "";
+  const currentStatus = watch("status") || "draft";
+  const excerpt = watch("excerpt") || "";
+  const heroUrl = watch("heroUrl") || "";
+  const tags = watch("tags") || "";
+  const seoTitle = watch("seoTitle") || "";
+  const seoDescription = watch("seoDescription") || "";
+  const plainText = useMemo(() => blocks.map((block) => block.text || block.quote || block.image?.caption || "").join(" ").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim(), [blocks]);
+  const wordCount = useMemo(() => plainText ? plainText.split(/\s+/).length : 0, [plainText]);
+  const readingTime = Math.max(1, Math.ceil(wordCount / 220));
+  const completedChecks = [title, plainText, excerpt, heroUrl, tags, seoTitle, seoDescription].filter(Boolean).length;
+  const completion = Math.round((completedChecks / 7) * 100);
 
-  const effectiveEditMode = isEditMode && !!slug;
-
-  /* -----------------------------------------------
-   * FETCH editorial existente si estamos editando
-   * ----------------------------------------------- */
   useEffect(() => {
     if (!effectiveEditMode) return;
-
     const fetchEditorial = async () => {
       try {
-        const res = await fetch(
-          `${API_BASE}/admin/editorials/slug/${encodeURIComponent(slug)}`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (!res.ok) throw new Error("Error loading editorial");
-        const data = await res.json();
-
-        // Básico
-        setValue("title", data.title || "");
-        setValue("slug", data.slug || "");
-        setValue("subtitle", data.subtitle || "");
-        setValue("status", data.status || "draft");
-        setValue("featured", !!data.featured);
-        setValue("section", data.section || "");
-        setValue("series", data.series || "");
-
-        // publishAt → datetime-local requiere formato YYYY-MM-DDTHH:mm
-        if (data.publishAt) {
-          setValue("publishAt", data.publishAt.slice(0, 16));
-        }
-
-        // Hero
-        if (data.hero) {
-          setValue("heroUrl", data.hero.url || "");
-          setValue("heroAlt", data.hero.alt || "");
-          setValue("heroCaption", data.hero.caption || "");
-          setValue("heroCredit", data.hero.credit || "");
-        }
-
-        // Body (primer bloque paragraph)
-        const paragraph =
-          data.blocks?.find((b) => b.type === "paragraph")?.text || "";
-        setValue("body", paragraph);
-
-        // Embed (primer bloque embed)
-        const embed =
-          data.blocks?.find((b) => b.type === "embed")?.embed || "";
-        setValue("embedHtml", embed);
-
-        // Excerpt
-        setValue("excerpt", data.excerpt || "");
-
-        // Tags → string separada por comas
-        setValue("tags", data.tags?.join(", ") || "");
-
-        // SEO
-        if (data.seo) {
-          setValue("seoTitle", data.seo.title || "");
-          setValue("seoDescription", data.seo.description || "");
-          setValue("seoOgImage", data.seo.ogImage || "");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Error loading editorial");
-      } finally {
-        setLoadingInitial(false);
-      }
+        const response = await fetch(`${API_BASE}/admin/editorials/slug/${encodeURIComponent(slug)}`, { credentials: "include" });
+        if (!response.ok) throw new Error("Error loading editorial");
+        const data = await response.json();
+        setValue("title", data.title || ""); setValue("slug", data.slug || ""); setValue("subtitle", data.subtitle || "");
+        setValue("status", data.status || "draft"); setValue("featured", Boolean(data.featured)); setValue("section", data.section || ""); setValue("series", data.series || "");
+        if (data.publishAt) setValue("publishAt", data.publishAt.slice(0, 16));
+        if (data.hero) { setValue("heroUrl", data.hero.url || ""); setValue("heroAlt", data.hero.alt || ""); setValue("heroCaption", data.hero.caption || ""); setValue("heroCredit", data.hero.credit || ""); }
+        const contentBlocks = data.blocks?.filter((block) => block.type !== "embed") || [];
+        setBlocks(contentBlocks.length ? contentBlocks.map((block, index) => ({ ...block, id: `${block.type}-${index}-${Date.now()}` })) : [createTextBlock()]);
+        setValue("embedHtml", data.blocks?.find((block) => block.type === "embed")?.embed || "");
+        setValue("excerpt", data.excerpt || ""); setValue("tags", data.tags?.join(", ") || "");
+        if (data.seo) { setValue("seoTitle", data.seo.title || ""); setValue("seoDescription", data.seo.description || ""); setValue("seoOgImage", data.seo.ogImage || ""); }
+      } catch (error) { console.error(error); alert("No se pudo cargar la editorial."); } finally { setLoadingInitial(false); }
     };
-
     fetchEditorial();
-  }, [effectiveEditMode, slug, setValue]);
+  }, [effectiveEditMode, setValue, slug]);
 
-  /* -----------------------------------------------
-   * SUBMIT (POST o PATCH por slug)
-   * ----------------------------------------------- */
   const onSubmit = async (data) => {
     try {
+      const usableBlocks = blocks.filter((block) => block.type === "separator" || block.text?.replace(/<[^>]*>/g, "").trim() || block.quote?.trim() || block.image?.url?.trim());
+      if (!usableBlocks.length) {
+        alert("Añade al menos un bloque de contenido antes de guardar.");
+        return;
+      }
       const formData = new FormData();
-
-      // Campos normales (menos heroFile)
       Object.entries(data).forEach(([key, value]) => {
-        if (key === "heroFile") return;
-        if (value === undefined || value === null) return;
-
-        if (key === "featured") {
-          formData.append(key, value ? "true" : "false");
-        } else {
-          formData.append(key, value);
-        }
+        if (key === "heroFile" || value === undefined || value === null) return;
+        formData.append(key, key === "featured" ? (value ? "true" : "false") : value);
       });
-
-      // Archivo de imagen
-      if (data.heroFile && data.heroFile[0]) {
-        formData.append("heroFile", data.heroFile[0]);
-      }
-
-      const method = effectiveEditMode ? "PATCH" : "POST";
-      const url = effectiveEditMode
-        ? `${API_BASE}/admin/editorials/slug/${encodeURIComponent(slug)}`
-        : `${API_BASE}/admin/editorials`;
-
-      const res = await fetch(url, {
-        method,
-        credentials: "include",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const error = await res.json().catch(() => ({}));
-        console.error("Error saving editorial:", error);
-        throw new Error("Error saving editorial");
-      }
-
-      // Después de crear/editar volvemos al dashboard
+      formData.append("blocks", JSON.stringify(usableBlocks.map((block) => block.type === "image" ? { type: "image", image: block.image } : block.type === "quote" ? { type: "quote", quote: block.quote, cite: block.cite } : block.type === "separator" ? { type: "separator" } : { type: "paragraph", text: block.text })));
+      if (data.heroFile?.[0]) formData.append("heroFile", data.heroFile[0]);
+      const response = await fetch(effectiveEditMode ? `${API_BASE}/admin/editorials/slug/${encodeURIComponent(slug)}` : `${API_BASE}/admin/editorials`, { method: effectiveEditMode ? "PATCH" : "POST", credentials: "include", body: formData });
+      if (!response.ok) throw new Error("Error saving editorial");
       navigate("/admin");
-    } catch (err) {
-      console.error(err);
-      alert("No se pudo guardar la editorial.");
-    }
+    } catch (error) { console.error(error); alert("No se pudo guardar la editorial."); }
   };
 
-  /* -----------------------------------------------
-   * DELETE (solo en edición)
-   * ----------------------------------------------- */
   const handleDelete = async () => {
-    if (
-      !window.confirm("¿Seguro que quieres borrar esta editorial? Esta acción es permanente.")
-    )
-      return;
-
-    try {
-      const res = await fetch(
-        `${API_BASE}/admin/editorials/slug/${encodeURIComponent(slug)}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      if (!res.ok) {
-        const error = await res.json().catch(() => ({}));
-        console.error("Error deleting editorial:", error);
-        throw new Error("Error deleting editorial");
-      }
-
-      navigate("/admin");
-    } catch (err) {
-      console.error(err);
-      alert("No se pudo borrar la editorial.");
-    }
+    if (!window.confirm("¿Seguro que quieres borrar esta editorial? Esta acción es permanente.")) return;
+    try { const response = await fetch(`${API_BASE}/admin/editorials/slug/${encodeURIComponent(slug)}`, { method: "DELETE", credentials: "include" }); if (!response.ok) throw new Error("Error deleting editorial"); navigate("/admin"); }
+    catch (error) { console.error(error); alert("No se pudo borrar la editorial."); }
   };
 
-  /* -----------------------------------------------
-   * UI
-   * ----------------------------------------------- */
-  const headerLabel = effectiveEditMode ? "Editar editorial" : "Nueva editorial";
-  const titleLabel = effectiveEditMode ? "Editar editorial" : "Nueva editorial";
+  const pageTitle = effectiveEditMode ? "Editar editorial" : "Nueva editorial";
+  const statusLabel = { draft: "Borrador", published: "Publicada", scheduled: "Programada" }[currentStatus];
 
   return (
-    <main className="admin-page admin-form-page">
-      <header className="admin-form-header">
-        <button
-          type="button"
-          className="admin-back"
-          onClick={() => navigate(-1)}
-        >
-          ← Panel
-        </button>
-        <span>
-          Caribe Records · {headerLabel}
-        </span>
-        <span />
-      </header>
-
+    <main className="admin-page admin-form-page admin-wordpress-page">
+      <header className="admin-form-header"><button type="button" className="admin-back" onClick={() => navigate(-1)}>← Panel</button><span>Caribe Records · Editorial</span><span /></header>
       <div className="admin-form-container">
-        <div className="admin-form-intro">
-          <p>03 / Editorial</p>
-          <h1>{titleLabel}</h1>
-          <span>Portada, contenido, publicación y SEO.</span>
-        </div>
+        <div className="admin-form-intro admin-form-intro--editorial"><div><p>Editorial / {effectiveEditMode ? "Editar" : "Crear"}</p><h1>{pageTitle}</h1></div><span>Escribe en el lienzo y prepara la publicación desde la barra lateral.</span></div>
+        {effectiveEditMode && loadingInitial ? <p className="admin-loading-state">Cargando editorial…</p> : (
+          <form onSubmit={handleSubmit(onSubmit)} className="admin-form admin-editor-form admin-editorial-form">
+            <div className="admin-editorial-layout">
+              <div className="admin-editorial-canvas">
+                <div className="admin-editorial-document">
+                  <div className="admin-editorial-document__meta"><span>{statusLabel}</span><span>{wordCount} palabras · {readingTime} min de lectura</span></div>
+                  <label className="visually-hidden" htmlFor="editorial-title">Título</label>
+                  <textarea id="editorial-title" rows={2} className={`form-control admin-title-input ${errors.title ? "is-invalid" : ""}`} placeholder="Añadir título" {...register("title", { required: "Escribe un título" })} />
+                  {errors.title && <div className="invalid-feedback">{errors.title.message}</div>}
+                  <input className="form-control admin-subtitle-input" placeholder="Añadir subtítulo o entradilla…" aria-label="Subtítulo" {...register("subtitle")} />
 
-        {effectiveEditMode && loadingInitial ? (
-          <p className="text-muted">Loading editorial…</p>
-        ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="row g-3 admin-form">
-            {/* --- Basic Fields --- */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Título</label>
-              <input
-                className={`form-control bg-dark text-white border-secondary ${
-                  errors.title ? "is-invalid" : ""
-                }`}
-                {...register("title", { required: "Title is required" })}
-              />
-              {errors.title && (
-                <div className="invalid-feedback">{errors.title.message}</div>
-              )}
-            </div>
+                </div>
 
-            <div className="col-12 col-md-6">
-              <label className="form-label">
-                Slug{" "}
-                <span className="text-muted">(opcional, se autogenera)</span>
-              </label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                {...register("slug")}
-              />
-            </div>
+                <EditorialBlockEditor blocks={blocks} onChange={setBlocks} />
+                <div className="admin-document-footer admin-document-footer--floating"><span>{wordCount} palabras · {readingTime} min</span><span>{plainText.length} caracteres</span></div>
 
-            <div className="col-12">
-              <label className="form-label">Subtítulo</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                {...register("subtitle")}
-              />
-            </div>
-
-            {/* --- Status + publishAt --- */}
-            <div className="col-12 col-md-4">
-              <label className="form-label">Estado</label>
-              <select
-                className="form-select bg-dark text-white border-secondary"
-                {...register("status")}
-              >
-                <option value="draft">Borrador</option>
-                <option value="published">Publicada</option>
-                <option value="scheduled">Programada</option>
-              </select>
-            </div>
-
-            <div className="col-12 col-md-4">
-              <label className="form-label">
-                Publicar el <span className="text-muted">(si está programada)</span>
-              </label>
-              <input
-                type="datetime-local"
-                className="form-control bg-dark text-white border-secondary"
-                {...register("publishAt")}
-              />
-            </div>
-
-            <div className="col-12 col-md-4 d-flex align-items-end">
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="featuredCheck"
-                  {...register("featured")}
-                />
-                <label className="form-check-label" htmlFor="featuredCheck">
-                  Destacada
-                </label>
+                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>Extracto</span><small>{excerpt.length}/240 caracteres recomendados</small></div><div className="admin-form-panel__body"><textarea rows={4} maxLength={320} className="form-control" placeholder="Resume el artículo en dos o tres frases…" {...register("excerpt")} /></div></section>
+                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>Contenido incrustado</span><small>Spotify, YouTube u otro iframe</small></div><div className="admin-form-panel__body"><label className="form-label">Código HTML <em>Opcional</em></label><textarea rows={5} className="form-control admin-code-input" placeholder='<iframe src="https://…"></iframe>' {...register("embedHtml")} /></div></section>
               </div>
-            </div>
 
-            {/* --- Section / Series --- */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Sección</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Ej: Editorial"
-                {...register("section")}
-              />
-            </div>
+              <aside className="admin-editor-sidebar admin-editorial-sidebar">
+                <section className="admin-action-card admin-publish-card">
+                  <div className="admin-publish-card__top"><span className="admin-action-card__status">{statusLabel}</span><span>{title ? "Con título" : "Sin título"}</span></div>
+                  <h2>Publicación</h2>
+                  <div className="admin-completion"><div><span>Preparación</span><b>{completion}%</b></div><progress max="100" value={completion}>{completion}%</progress><small>Título, contenido, extracto, imagen, etiquetas y SEO.</small></div>
+                  <div className="admin-field"><label className="form-label">Estado</label><select className="form-select" {...register("status")}><option value="draft">Borrador</option><option value="published">Publicada</option><option value="scheduled">Programada</option></select></div>
+                  <div className="admin-field"><label className="form-label">Fecha de publicación</label><input type="datetime-local" className="form-control" {...register("publishAt")} /></div>
+                  <label className="admin-switch"><input type="checkbox" {...register("featured")} /><span /><b>Marcar como destacada</b></label>
+                  <button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar editorial" : currentStatus === "published" ? "Publicar editorial" : "Guardar borrador"}</button>
+                </section>
 
-            <div className="col-12 col-md-6">
-              <label className="form-label">Serie</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Ej: Memory of Music"
-                {...register("series")}
-              />
-            </div>
+                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>Imagen principal</span><small>Portada del artículo</small></div><div className="admin-form-panel__body admin-panel-fields">{heroUrl && <div className="admin-hero-preview"><img src={heroUrl} alt="Previsualización de la imagen principal" /><span>Vista previa</span></div>}<div className="admin-field"><label className="form-label">Subir imagen</label><input type="file" accept="image/*" className="form-control" {...register("heroFile")} /></div><div className="admin-field"><label className="form-label">O usar URL</label><input type="url" className="form-control" placeholder="https://…" {...register("heroUrl")} /></div><div className="admin-field"><label className="form-label">Texto alternativo</label><input className="form-control" placeholder="Describe lo que aparece en la imagen" {...register("heroAlt")} /></div><div className="admin-field-grid admin-field-grid--2"><div className="admin-field"><label className="form-label">Pie</label><input className="form-control" {...register("heroCaption")} /></div><div className="admin-field"><label className="form-label">Crédito</label><input className="form-control" {...register("heroCredit")} /></div></div></div></section>
 
-            {/* --- Hero Image --- */}
-            <div className="col-12 mt-3">
-              <h2 className="h6 text-uppercase mb-2">Imagen principal</h2>
-            </div>
+                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>Organización</span><small>Ruta, sección y etiquetas</small></div><div className="admin-form-panel__body admin-panel-fields"><div className="admin-field"><label className="form-label">Slug <em>Automático si está vacío</em></label><input className="form-control" placeholder="titulo-del-articulo" {...register("slug")} /></div><div className="admin-field-grid admin-field-grid--2"><div className="admin-field"><label className="form-label">Sección</label><input className="form-control" placeholder="Editorial" {...register("section")} /></div><div className="admin-field"><label className="form-label">Serie</label><input className="form-control" placeholder="Memory of Music" {...register("series")} /></div></div><div className="admin-field"><label className="form-label">Etiquetas</label><input className="form-control" placeholder="Galicia, shoegaze, entrevista" {...register("tags")} /><div className="form-text">{tags ? `${tags.split(",").filter(Boolean).length} etiquetas` : "Separa cada etiqueta con una coma."}</div></div></div></section>
 
-            <div className="col-12">
-              <label className="form-label">Subir imagen</label>
-              <input
-                type="file"
-                accept="image/*"
-                className="form-control bg-dark text-white"
-                {...register("heroFile")}
-              />
-            </div>
+                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>SEO y redes</span><small>Vista previa en buscadores</small></div><div className="admin-form-panel__body admin-panel-fields"><div className="admin-search-preview"><small>{window.location.host}</small><strong>{seoTitle || title || "Título de la editorial"}</strong><p>{seoDescription || excerpt || "La descripción aparecerá aquí cuando completes el campo SEO o el extracto."}</p></div><div className="admin-field"><label className="form-label">Título SEO <em>{seoTitle.length}/60</em></label><input maxLength={70} className="form-control" {...register("seoTitle")} /></div><div className="admin-field"><label className="form-label">Descripción SEO <em>{seoDescription.length}/160</em></label><textarea maxLength={180} rows={3} className="form-control" {...register("seoDescription")} /></div><div className="admin-field"><label className="form-label">Imagen social</label><input type="url" className="form-control" placeholder="Por defecto usa la imagen principal" {...register("seoOgImage")} /></div></div></section>
 
-            <div className="col-12">
-              <label className="form-label">O usar una URL</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="https://..."
-                {...register("heroUrl")}
-              />
-            </div>
-
-            <div className="col-12 col-md-4">
-              <label className="form-label">Hero ALT</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Descripción de la imagen"
-                {...register("heroAlt")}
-              />
-            </div>
-
-            <div className="col-12 col-md-4">
-              <label className="form-label">Pie de foto</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Pie de foto"
-                {...register("heroCaption")}
-              />
-            </div>
-
-            <div className="col-12 col-md-4">
-              <label className="form-label">Crédito de imagen</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Autor / agencia"
-                {...register("heroCredit")}
-              />
-            </div>
-
-            {/* --- Body --- */}
-            <div className="col-12 mt-3">
-              <label className="form-label">Cuerpo del artículo</label>
-              <textarea
-                rows={8}
-                className={`form-control bg-dark text-white border-secondary ${
-                  errors.body ? "is-invalid" : ""
-                }`}
-                {...register("body", { required: "Content is required" })}
-              />
-              {errors.body && (
-                <div className="invalid-feedback">{errors.body.message}</div>
-              )}
-            </div>
-
-            {/* --- Embed HTML (iframe) --- */}
-            <div className="col-12">
-              <label className="form-label">
-                Embed HTML (iframe de Spotify / YouTube){" "}
-                <span className="text-muted">(opcional)</span>
-              </label>
-              <textarea
-                rows={4}
-                className="form-control bg-dark text-white border-secondary"
-                placeholder='<iframe src="https://open.spotify.com/embed/track/..." width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>'
-                {...register("embedHtml")}
-              />
-            </div>
-
-            {/* --- Excerpt / Tags --- */}
-            <div className="col-12">
-              <label className="form-label">Extracto</label>
-              <textarea
-                rows={3}
-                className="form-control bg-dark text-white border-secondary"
-                {...register("excerpt")}
-              />
-            </div>
-
-            <div className="col-12">
-              <label className="form-label">
-                Tags{" "}
-                <span className="text-muted">
-                  (separadas por comas: Aeronave Adolescente, shoegaze, Galicia)
-                </span>
-              </label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                {...register("tags")}
-              />
-            </div>
-
-            {/* --- SEO --- */}
-            <div className="col-12 mt-3">
-              <h2 className="h6 text-uppercase mb-2">SEO</h2>
-            </div>
-
-            <div className="col-12 col-md-4">
-              <label className="form-label">SEO Title</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                {...register("seoTitle")}
-              />
-            </div>
-
-            <div className="col-12 col-md-4">
-              <label className="form-label">SEO Description</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                {...register("seoDescription")}
-              />
-            </div>
-
-            <div className="col-12 col-md-4">
-              <label className="form-label">
-                SEO ogImage <span className="text-muted">(por defecto la hero)</span>
-              </label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="https://..."
-                {...register("seoOgImage")}
-              />
-            </div>
-
-            {/* --- Botones --- */}
-            <div className="col-12 mt-4 d-flex gap-2">
-              <button
-                type="submit"
-                className="btn btn-outline-light"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? effectiveEditMode
-                    ? "Saving…"
-                    : "Saving…"
-                  : effectiveEditMode
-                  ? "Actualizar editorial"
-                  : "Guardar editorial"}
-              </button>
-
-              {effectiveEditMode && (
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={handleDelete}
-                >
-                  Eliminar editorial
-                </button>
-              )}
+                {effectiveEditMode && <section className="admin-danger-card"><h3>Zona sensible</h3><p>La editorial se eliminará definitivamente.</p><button type="button" className="btn btn-danger" onClick={handleDelete}>Eliminar editorial</button></section>}
+              </aside>
             </div>
           </form>
         )}

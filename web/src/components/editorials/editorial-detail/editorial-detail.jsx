@@ -1,9 +1,23 @@
 import React from "react";
+import DOMPurify from "dompurify";
 import { Link } from "react-router-dom";
 import "../../../index.css";
 
 function getBlockImage(block) {
   return block.image || (block.url ? block : null);
+}
+
+function getSafeEmbedUrl(value) {
+  if (!value || typeof value !== "string") return null;
+  const iframeSource = value.match(/src=["']([^"']+)["']/i)?.[1];
+  const candidate = iframeSource || value.trim();
+  try {
+    const url = new URL(candidate);
+    const allowedHosts = ["www.youtube.com", "youtube.com", "www.youtube-nocookie.com", "open.spotify.com"];
+    return url.protocol === "https:" && allowedHosts.includes(url.hostname) ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 export default function EditorialDetail({ editorial, prevNext }) {
@@ -72,7 +86,10 @@ export default function EditorialDetail({ editorial, prevNext }) {
               const Heading = block.level === 3 ? "h3" : "h2";
               return <Heading key={key}>{block.text}</Heading>;
             }
-            if (block.type === "paragraph") return <p key={key}>{block.text}</p>;
+            if (block.type === "paragraph") {
+              const cleanHtml = DOMPurify.sanitize(block.text || "", { USE_PROFILES: { html: true } });
+              return <div key={key} className="editorial-body__rich-text" dangerouslySetInnerHTML={{ __html: cleanHtml }} />;
+            }
             if (block.type === "image") {
               const image = getBlockImage(block);
               if (!image?.url) return null;
@@ -109,6 +126,14 @@ export default function EditorialDetail({ editorial, prevNext }) {
               );
             }
             if (block.type === "embed" && block.embed) {
+              const embedUrl = getSafeEmbedUrl(block.embed);
+              if (embedUrl) {
+                return (
+                  <div key={key} className="editorial-body__embed">
+                    <iframe src={embedUrl} title="Contenido multimedia del artículo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
+                  </div>
+                );
+              }
               return (
                 <p key={key} className="editorial-body__external">
                   <a href={block.embed} target="_blank" rel="noreferrer">Ver contenido externo ↗</a>

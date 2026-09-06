@@ -1,5 +1,5 @@
-import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import React, { lazy, Suspense } from "react";
+import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { PrivateRoute } from "./guards";
 
@@ -7,6 +7,7 @@ import { PrivateRoute } from "./guards";
 import Navbar from "./components/ui/navbar.jsx";
 import PageLayout from "./components/layouts/page-layout/page-layout.jsx";
 import PageTransition from "./components/layouts/page-transition/page-transition.jsx";
+import SiteFooter from "./components/layouts/site-footer/site-footer.jsx";
 
 // Páginas públicas
 import HomePage from "./pages/home.jsx";
@@ -23,18 +24,20 @@ import AdminDashboardPage from "./pages/admin/admin-dashboard.jsx";
 import NewArtistPage from "./pages/admin/new-artist.jsx";
 import NewReleasePage from "./pages/admin/new-release.jsx";
 import NewEventPage from "./pages/admin/new-event.jsx";
-import NewEditorialPage from "./pages/admin/new-editorial.jsx";
+const NewEditorialPage = lazy(() => import("./pages/admin/new-editorial.jsx"));
 
 function App() {
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const isPrivateArea = location.pathname.startsWith("/admin");
 
   return (
     <>
       {!isHome && <Navbar />}
 
       <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
+        <Suspense fallback={<main className="admin-page"><p className="admin-loading-state">Abriendo espacio editorial…</p></main>}>
+          <Routes location={location} key={location.pathname}>
           
           {/* HOME */}
           <Route
@@ -103,13 +106,15 @@ function App() {
 
           {/* LOGIN */}
           <Route
-            path="/login"
+            path="/admin/login"
             element={
               <PageTransition>
                 <LoginPage />
               </PageTransition>
             }
           />
+
+          <Route path="/login" element={<Navigate to="/admin/login" replace />} />
 
           {/* ===================== */}
           {/*   ADMIN — CREACIÓN    */}
@@ -240,8 +245,10 @@ function App() {
             }
           />
 
-        </Routes>
+          </Routes>
+        </Suspense>
       </AnimatePresence>
+      {!isPrivateArea && <SiteFooter />}
     </>
   );
 }

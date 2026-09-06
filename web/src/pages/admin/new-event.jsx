@@ -199,162 +199,46 @@ export default function NewEventPage({ isEditMode = false }) {
       {/* Form */}
       <div className="admin-form-container">
         <div className="admin-form-intro">
-          <p>04 / Evento</p>
-          <h1>{titleLabel}</h1>
-          <span>Fecha, lugar, artista y venta de entradas.</span>
+          <div><p>Eventos / {effectiveEditMode ? "Editar" : "Crear"}</p><h1>{titleLabel}</h1></div>
+          <span>Organiza los datos como los verá quien busca fecha, lugar y entradas.</span>
         </div>
 
         {effectiveEditMode && loadingInitial ? (
           <p className="text-muted">Loading event…</p>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="row g-3 admin-form">
-            {/* Title */}
-            <div className="col-12">
-              <label className="form-label">Título</label>
-              <input
-                className={`form-control bg-dark text-white border-secondary ${
-                  errors.title ? "is-invalid" : ""
-                }`}
-                {...register("title", { required: "Title is required" })}
-              />
-              {errors.title && (
-                <div className="invalid-feedback">{errors.title.message}</div>
-              )}
-            </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="admin-form admin-editor-form">
+            <div className="admin-editor-layout">
+              <div className="admin-editor-main">
+                <section className="admin-form-card">
+                  <div className="admin-form-card__heading"><span>01</span><div><h2>Evento</h2><p>Qué ocurre y quién actúa.</p></div></div>
+                  <div className="admin-field-grid admin-field-grid--2">
+                    <div className="admin-field admin-field--wide"><label className="form-label">Título <b>Obligatorio</b></label><input className={`form-control ${errors.title ? "is-invalid" : ""}`} placeholder="Nombre del evento" {...register("title", { required: "Escribe el título del evento" })} />{errors.title && <div className="invalid-feedback">{errors.title.message}</div>}</div>
+                    <div className="admin-field"><label className="form-label">Artista <b>Obligatorio</b></label><select className={`form-select ${errors.artistId ? "is-invalid" : ""}`} {...register("artistId", { required: "Selecciona un artista" })}><option value="">Seleccionar artista…</option>{artists.map((artist) => <option key={artist._id} value={artist._id}>{artist.name}</option>)}</select>{errors.artistId && <div className="invalid-feedback">{errors.artistId.message}</div>}</div>
+                    <div className="admin-field"><label className="form-label">Fecha y hora <b>Obligatorio</b></label><input type="datetime-local" className={`form-control ${errors.datetime ? "is-invalid" : ""}`} {...register("datetime", { required: "Selecciona fecha y hora" })} />{errors.datetime && <div className="invalid-feedback">{errors.datetime.message}</div>}</div>
+                  </div>
+                </section>
 
-            {/* Artist */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Artista</label>
-              <select
-                className={`form-control bg-dark text-white border-secondary ${
-                  errors.artistId ? "is-invalid" : ""
-                }`}
-                {...register("artistId", {
-                  required: "Artist is required",
-                })}
-              >
-                <option value="">Seleccionar artista…</option>
-                {artists.map((a) => (
-                  <option key={a._id} value={a._id}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
-              {errors.artistId && (
-                <div className="invalid-feedback">
-                  {errors.artistId.message}
-                </div>
-              )}
-            </div>
+                <section className="admin-form-card">
+                  <div className="admin-form-card__heading"><span>02</span><div><h2>Lugar</h2><p>Datos para que el público pueda encontrarlo.</p></div></div>
+                  <div className="admin-field-grid admin-field-grid--2">
+                    <div className="admin-field admin-field--wide"><label className="form-label">Sala o espacio</label><input className="form-control" placeholder="Nombre del recinto" {...register("venue")} /></div>
+                    <div className="admin-field"><label className="form-label">Ciudad <b>Obligatorio</b></label><input className={`form-control ${errors.city ? "is-invalid" : ""}`} placeholder="Madrid" {...register("city", { required: "Escribe la ciudad" })} />{errors.city && <div className="invalid-feedback">{errors.city.message}</div>}</div>
+                    <div className="admin-field"><label className="form-label">País</label><input className="form-control" placeholder="ES" {...register("country")} /></div>
+                    <div className="admin-field admin-field--wide"><label className="form-label">Dirección</label><input className="form-control" placeholder="Calle, número y código postal" {...register("address")} /></div>
+                  </div>
+                </section>
 
-            {/* Venue */}
-            <div className="col-12 col-md-6">
-              <label className="form-label">Sala</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                {...register("venue")}
-              />
-            </div>
+                <section className="admin-form-card">
+                  <div className="admin-form-card__heading"><span>03</span><div><h2>Información pública</h2><p>Venta de entradas y contexto adicional.</p></div></div>
+                  <div className="admin-field"><label className="form-label">Enlace de entradas</label><input type="url" className="form-control" placeholder="https://…" {...register("ticketUrl")} /></div>
+                  <div className="admin-field"><label className="form-label">Descripción <em>Opcional</em></label><textarea rows={7} className="form-control admin-writing-area" placeholder="Información útil sobre el evento…" {...register("description")} /></div>
+                </section>
+              </div>
 
-            {/* City */}
-            <div className="col-12 col-md-4">
-              <label className="form-label">Ciudad</label>
-              <input
-                className={`form-control bg-dark text-white border-secondary ${
-                  errors.city ? "is-invalid" : ""
-                }`}
-                {...register("city", { required: "City is required" })}
-              />
-              {errors.city && (
-                <div className="invalid-feedback">{errors.city.message}</div>
-              )}
-            </div>
-
-            {/* Country */}
-            <div className="col-12 col-md-4">
-              <label className="form-label">País</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="ES / FR / PT…"
-                {...register("country")}
-              />
-            </div>
-
-            {/* Date & time */}
-            <div className="col-12 col-md-4">
-              <label className="form-label">Fecha y hora</label>
-              <input
-                type="datetime-local"
-                className={`form-control bg-dark text-white border-secondary ${
-                  errors.datetime ? "is-invalid" : ""
-                }`}
-                {...register("datetime", {
-                  required: "Datetime is required",
-                })}
-              />
-              {errors.datetime && (
-                <div className="invalid-feedback">
-                  {errors.datetime.message}
-                </div>
-              )}
-            </div>
-
-            {/* Address */}
-            <div className="col-12">
-              <label className="form-label">Dirección</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Street, number…"
-                {...register("address")}
-              />
-            </div>
-
-            {/* Ticket URL */}
-            <div className="col-12">
-              <label className="form-label">URL de entradas / evento</label>
-              <input
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="https://..."
-                {...register("ticketUrl")}
-              />
-            </div>
-
-            {/* Description */}
-            <div className="col-12">
-              <label className="form-label">Descripción</label>
-              <textarea
-                rows={4}
-                className="form-control bg-dark text-white border-secondary"
-                placeholder="Optional description of the event…"
-                {...register("description")}
-              />
-            </div>
-
-            {/* Botones */}
-            <div className="col-12 mt-3 d-flex gap-2">
-              <button
-                type="submit"
-                className="btn btn-outline-light"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? effectiveEditMode
-                    ? "Saving…"
-                    : "Saving…"
-                  : effectiveEditMode
-                  ? "Actualizar evento"
-                  : "Guardar evento"}
-              </button>
-
-              {effectiveEditMode && (
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={handleDelete}
-                >
-                  Eliminar evento
-                </button>
-              )}
+              <aside className="admin-editor-sidebar">
+                <section className="admin-action-card"><span className="admin-action-card__status">{effectiveEditMode ? "Evento existente" : "Nuevo evento"}</span><h2>{effectiveEditMode ? "Guardar cambios" : "Crear evento"}</h2><p>Comprueba especialmente la fecha, la ciudad y el enlace de entradas.</p><div className="admin-action-checks"><span><i>01</i> Artista y fecha</span><span><i>02</i> Recinto y ubicación</span><span><i>03</i> Entradas e información</span></div><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar evento" : "Guardar evento"}</button></section>
+                {effectiveEditMode && <section className="admin-danger-card"><h3>Zona sensible</h3><p>El evento desaparecerá del calendario.</p><button type="button" className="btn btn-danger" onClick={handleDelete}>Eliminar evento</button></section>}
+              </aside>
             </div>
           </form>
         )}

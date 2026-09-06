@@ -29,6 +29,39 @@ function normalizeIdArray(value) {
   return [];
 }
 
+function normalizeEditorialBlocks(value) {
+  if (!value) return [];
+  let blocks = value;
+  if (typeof value === "string") {
+    try {
+      blocks = JSON.parse(value);
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(blocks)) return [];
+
+  return blocks.slice(0, 200).flatMap((block) => {
+    if (!block || typeof block !== "object") return [];
+    if (block.type === "paragraph" && typeof block.text === "string") {
+      return [{ type: "paragraph", text: block.text }];
+    }
+    if (block.type === "quote" && typeof block.quote === "string") {
+      return [{ type: "quote", quote: block.quote, cite: typeof block.cite === "string" ? block.cite : "" }];
+    }
+    if (block.type === "image" && block.image && typeof block.image.url === "string") {
+      return [{ type: "image", image: {
+        url: block.image.url,
+        alt: typeof block.image.alt === "string" ? block.image.alt : "",
+        caption: typeof block.image.caption === "string" ? block.image.caption : "",
+        credit: typeof block.image.credit === "string" ? block.image.credit : "",
+      } }];
+    }
+    if (block.type === "separator") return [{ type: "separator" }];
+    return [];
+  });
+}
+
 /* ======================================================
    PÚBLICO
 ====================================================== */
@@ -200,8 +233,8 @@ exports.createEditorial = async (req, res) => {
     payload.hero.credit = body.heroCredit || "";
 
     // BODY → blocks
-    payload.blocks = [];
-    if (body.body) {
+    payload.blocks = normalizeEditorialBlocks(body.blocks);
+    if (!payload.blocks.length && body.body) {
       payload.blocks.push({
         type: "paragraph",
         text: body.body,
@@ -320,10 +353,11 @@ exports.updateEditorial = async (req, res) => {
     editorial.hero.credit = body.heroCredit ?? editorial.hero.credit;
 
     // Blocks — reseteamos y regeneramos
-    editorial.blocks = [];
-    if (body.body) {
-      editorial.blocks.push({ type: "paragraph", text: body.body });
-    }
+    editorial.blocks = body.blocks !== undefined
+      ? normalizeEditorialBlocks(body.blocks)
+      : body.body
+        ? [{ type: "paragraph", text: body.body }]
+        : [];
     if (body.embedHtml) {
       editorial.blocks.push({ type: "embed", embed: body.embedHtml });
     }

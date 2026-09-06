@@ -43,7 +43,7 @@ const seoSchema = new mongoose.Schema({
 // ----- Esquema principal -----
 const editorialSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true },
-  slug:  { type: String, unique: true },
+  slug:  { type: String },
   subtitle: { type: String, trim: true },
   status: { type: String, enum: ["draft", "published", "scheduled"], default: "draft", index: true },
   publishAt: { type: Date, index: true },
@@ -95,7 +95,7 @@ editorialSchema.pre("save", async function(next) {
 
   const words = (this.blocks || [])
     .filter(b => ["paragraph", "heading", "quote"].includes(b.type))
-    .map(b => b.text || b.quote || "")
+    .map(b => (b.text || b.quote || "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " "))
     .join(" ")
     .trim()
     .split(/\s+/)
