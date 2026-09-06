@@ -17,6 +17,7 @@ import EditorialPage from "./pages/editorial.jsx";
 import EditorialDetailPage from "./pages/editorial-detail.jsx";
 import EventPage from "./pages/event.jsx";
 import ReleasePage from "./pages/release.jsx";
+import AboutPage from "./pages/about.jsx";
 import LoginPage from "./pages/login.jsx";
 
 // Admin
@@ -100,6 +101,15 @@ function App() {
             element={
               <PageTransition>
                 <ReleasePage />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/about"
+            element={
+              <PageTransition>
+                <AboutPage />
               </PageTransition>
             }
           />

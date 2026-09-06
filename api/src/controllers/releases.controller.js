@@ -104,15 +104,15 @@ exports.createRelease = async (req, res) => {
 };
 
 /* ======================================================
-   UPDATE RELEASE BY SLUG
+   UPDATE RELEASE BY ID
 ====================================================== */
 
-// PATCH /admin/releases/slug/:slug
+// PATCH /admin/releases/:id
 exports.updateRelease = async (req, res) => {
   try {
     const { artistId, artist, ...rest } = req.body;
 
-    const release = await Release.findOne({ slug: req.params.slug });
+    const release = await Release.findById(req.params.id);
     if (!release) return res.status(404).json({ message: "Release not found" });
 
     const prevArtist = release.artist?.toString() || null;
@@ -147,15 +147,13 @@ exports.updateRelease = async (req, res) => {
 };
 
 /* ======================================================
-   DELETE RELEASE BY SLUG
+   DELETE RELEASE BY ID
 ====================================================== */
 
-// DELETE /admin/releases/slug/:slug
+// DELETE /admin/releases/:id
 exports.deleteRelease = async (req, res) => {
   try {
-    const deletedRelease = await Release.findOneAndDelete({
-      slug: req.params.slug,
-    });
+    const deletedRelease = await Release.findByIdAndDelete(req.params.id);
 
     if (!deletedRelease) {
       return res.status(404).json({ message: "Release not found" });

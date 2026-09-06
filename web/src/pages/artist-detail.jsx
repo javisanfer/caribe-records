@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ArtistDetail from "../components/artists/artist-detail/artist-detail";
+import AdminEditLink from "../components/admin/admin-edit-link";
 
 export default function ArtistDetailPage() {
   const { slug } = useParams();
@@ -117,12 +118,15 @@ export default function ArtistDetailPage() {
 
   // Render principal
   return (
-    <ArtistDetail
-      artist={artist}
-      prevNext={prevNext}
-      releases={releases}
-      editorials={editorials}
-      events={events}
-    />
+    <div className="admin-edit-detail">
+      <AdminEditLink to={`/admin/edit-artist/${artist.slug}`} label={`a ${artist.name}`} />
+      <ArtistDetail
+        artist={artist}
+        prevNext={prevNext}
+        releases={releases}
+        editorials={editorials}
+        events={events}
+      />
+    </div>
   );
 }

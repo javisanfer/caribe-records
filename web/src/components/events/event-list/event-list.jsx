@@ -1,6 +1,7 @@
 // src/components/events/event-list/event-list.jsx
 import React, { useMemo } from "react";
 import EventItem from "../event-item/event-item";
+import AdminEditLink from "../../admin/admin-edit-link";
 
 /**
  * Espera events con forma:
@@ -53,9 +54,14 @@ export default function EventList({ events = [] }) {
         <ul className="event-index">
           {sorted.map((e, idx) => (
             <li
+              className="admin-edit-context"
               key={e.id || e._id || idx}
             >
               <EventItem event={e} />
+              <AdminEditLink
+                to={e.slug ? `/admin/edit-event/${e.slug}` : null}
+                label={`el evento ${e.title || e.artist}`}
+              />
             </li>
           ))}
         </ul>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import EditorialDetail from "../components/editorials/editorial-detail/editorial-detail";
+import AdminEditLink from "../components/admin/admin-edit-link";
 
 export default function EditorialDetailPage() {
   const { slug } = useParams();
@@ -51,6 +52,12 @@ export default function EditorialDetailPage() {
   return (
     <main className="editorial-detail-page">
       <Link to="/editoriales" className="detail-back-link">← Editorial</Link>
+      <div className="admin-edit-detail__action">
+        <AdminEditLink
+          to={`/admin/edit-editorial/${editorial.slug}`}
+          label={`el editorial ${editorial.title}`}
+        />
+      </div>
       <EditorialDetail editorial={editorial} prevNext={prevNext} />
     </main>
   );

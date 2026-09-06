@@ -1,5 +1,6 @@
 import React from "react";
 import EditorialItem from "../editorial-item/editorial-item";
+import AdminEditLink from "../../admin/admin-edit-link";
 
 export default function EditorialList({ editorials = [] }) {
   if (!editorials.length) {
@@ -10,8 +11,12 @@ export default function EditorialList({ editorials = [] }) {
     <section className="editorial-list">
       <div className="editorial-index">
         {editorials.map((item, index) => (
-          <div key={item.id || item._id || item.slug}>
+          <div className="admin-edit-context" key={item.id || item._id || item.slug}>
             <EditorialItem editorial={item} index={index + 1} />
+            <AdminEditLink
+              to={`/admin/edit-editorial/${item.slug}`}
+              label={`el editorial ${item.title}`}
+            />
           </div>
         ))}
       </div>

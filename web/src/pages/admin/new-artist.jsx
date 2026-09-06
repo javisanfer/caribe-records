@@ -6,6 +6,7 @@ import {
   adminCreateArtist,
   uploadImage,
 } from "../../services/api-services";
+import AdminImagePreview from "../../components/admin/admin-image-preview";
 
 const API_BASE = "/api/v1";
 
@@ -52,8 +53,8 @@ export default function NewArtistPage({ isEditMode = false }) {
 
         // Guardamos URLs actuales de fotos para reutilizarlas si no se suben nuevas
         setExistingPhotos({
-          portraitUrl: data.photos?.portraitUrl,
-          coverUrl: data.photos?.coverUrl,
+          portraitUrl: data.photos?.portraitUrl || data.portraitUrl || "",
+          coverUrl: data.photos?.coverUrl || data.coverUrl || "",
         });
 
         // Pre-rellenamos el formulario
@@ -250,8 +251,8 @@ export default function NewArtistPage({ isEditMode = false }) {
                 <section className="admin-form-card">
                   <div className="admin-form-card__heading"><span>03</span><div><h2>Imágenes</h2><p>Retrato para listados y cabecera para la ficha.</p></div></div>
                   <div className="admin-field-grid admin-field-grid--2">
-                    <div className="admin-field"><label className="form-label">Retrato</label><input type="file" accept="image/*" className="form-control" {...register("portraitFile")} /><div className="form-text">Imagen vertical o cuadrada en JPG, PNG o WebP.</div></div>
-                    <div className="admin-field"><label className="form-label">Cabecera <em>Opcional</em></label><input type="file" accept="image/*" className="form-control" {...register("coverFile")} /><div className="form-text">Si no eliges una, se utilizará el retrato.</div></div>
+                    <div className="admin-field"><label className="form-label">Retrato</label><AdminImagePreview src={existingPhotos.portraitUrl} alt="Retrato actual del artista" label="Retrato guardado" /><input type="file" accept="image/*" className="form-control" {...register("portraitFile")} /><div className="form-text">Imagen vertical o cuadrada en JPG, PNG o WebP. Déjalo vacío para conservar la actual.</div></div>
+                    <div className="admin-field"><label className="form-label">Cabecera <em>Opcional</em></label><AdminImagePreview src={existingPhotos.coverUrl} alt="Cabecera actual del artista" label="Cabecera guardada" /><input type="file" accept="image/*" className="form-control" {...register("coverFile")} /><div className="form-text">Déjalo vacío para conservar la actual; si no existe se utilizará el retrato.</div></div>
                   </div>
                 </section>
 

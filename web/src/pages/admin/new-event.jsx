@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { listArtists, adminCreateEvent } from "../../services/api-services";
+import { listArtists, adminCreateEvent, uploadImage } from "../../services/api-services";
+import AdminImagePreview from "../../components/admin/admin-image-preview";
 
 const API_BASE = "/api/v1";
 
@@ -14,6 +15,7 @@ export default function NewEventPage({ isEditMode = false }) {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm();
 
@@ -21,6 +23,7 @@ export default function NewEventPage({ isEditMode = false }) {
   const [loadingInitial, setLoadingInitial] = useState(isEditMode);
 
   const effectiveEditMode = isEditMode && !!slug;
+  const posterUrl = watch("posterUrl") || "";
 
   // ------------------------------
   // Cargar artistas para el select
@@ -66,6 +69,7 @@ export default function NewEventPage({ isEditMode = false }) {
         setValue("address", data.address || "");
         setValue("ticketUrl", data.ticketUrl || "");
         setValue("description", data.description || "");
+        setValue("posterUrl", data.posterUrl || "");
 
         // Fecha → datetime-local
         if (data.date) {
@@ -93,6 +97,12 @@ export default function NewEventPage({ isEditMode = false }) {
   // ------------------------------
   const onSubmit = async (data) => {
     try {
+      let nextPosterUrl = data.posterUrl?.trim() || "";
+      if (data.posterFile?.[0]) {
+        const uploadResponse = await uploadImage(data.posterFile[0]);
+        nextPosterUrl = uploadResponse.imageUrl || nextPosterUrl;
+      }
+
       const dateIso = data.datetime
         ? new Date(data.datetime).toISOString()
         : null;
@@ -106,6 +116,7 @@ export default function NewEventPage({ isEditMode = false }) {
         address: data.address?.trim() || "",
         ticketUrl: data.ticketUrl?.trim() || "",
         description: data.description?.trim() || "",
+        posterUrl: nextPosterUrl,
         lineup: data.artistId ? [data.artistId] : [],
       };
 
@@ -229,14 +240,23 @@ export default function NewEventPage({ isEditMode = false }) {
                 </section>
 
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>03</span><div><h2>Información pública</h2><p>Venta de entradas y contexto adicional.</p></div></div>
+                  <div className="admin-form-card__heading"><span>03</span><div><h2>Cartel</h2><p>La imagen principal del evento.</p></div></div>
+                  <div className="admin-field-grid admin-field-grid--2">
+                    <div className="admin-field admin-field--wide"><AdminImagePreview src={posterUrl} alt="Cartel actual del evento" label="Cartel guardado" /></div>
+                    <div className="admin-field"><label className="form-label">Archivo</label><input type="file" accept="image/*" className="form-control" {...register("posterFile")} /><div className="form-text">Déjalo vacío para conservar el cartel actual.</div></div>
+                    <div className="admin-field"><label className="form-label">URL alternativa</label><input type="url" className="form-control" placeholder="https://…" {...register("posterUrl")} /></div>
+                  </div>
+                </section>
+
+                <section className="admin-form-card">
+                  <div className="admin-form-card__heading"><span>04</span><div><h2>Información pública</h2><p>Venta de entradas y contexto adicional.</p></div></div>
                   <div className="admin-field"><label className="form-label">Enlace de entradas</label><input type="url" className="form-control" placeholder="https://…" {...register("ticketUrl")} /></div>
                   <div className="admin-field"><label className="form-label">Descripción <em>Opcional</em></label><textarea rows={7} className="form-control admin-writing-area" placeholder="Información útil sobre el evento…" {...register("description")} /></div>
                 </section>
               </div>
 
               <aside className="admin-editor-sidebar">
-                <section className="admin-action-card"><span className="admin-action-card__status">{effectiveEditMode ? "Evento existente" : "Nuevo evento"}</span><h2>{effectiveEditMode ? "Guardar cambios" : "Crear evento"}</h2><p>Comprueba especialmente la fecha, la ciudad y el enlace de entradas.</p><div className="admin-action-checks"><span><i>01</i> Artista y fecha</span><span><i>02</i> Recinto y ubicación</span><span><i>03</i> Entradas e información</span></div><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar evento" : "Guardar evento"}</button></section>
+                <section className="admin-action-card"><span className="admin-action-card__status">{effectiveEditMode ? "Evento existente" : "Nuevo evento"}</span><h2>{effectiveEditMode ? "Guardar cambios" : "Crear evento"}</h2><p>Comprueba especialmente la fecha, la ciudad y el enlace de entradas.</p><div className="admin-action-checks"><span><i>01</i> Artista y fecha</span><span><i>02</i> Recinto y ubicación</span><span><i>03</i> Cartel</span><span><i>04</i> Entradas e información</span></div><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar evento" : "Guardar evento"}</button></section>
                 {effectiveEditMode && <section className="admin-danger-card"><h3>Zona sensible</h3><p>El evento desaparecerá del calendario.</p><button type="button" className="btn btn-danger" onClick={handleDelete}>Eliminar evento</button></section>}
               </aside>
             </div>

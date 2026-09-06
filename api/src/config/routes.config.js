@@ -17,6 +17,7 @@ const artistController = require("../controllers/artists.controller");
 const releaseController = require("../controllers/releases.controller");
 const editorialController = require("../controllers/editorial.controller");
 const eventController = require("../controllers/events.controller");
+const adminController = require("../controllers/admin.controller");
 
 // ======================================================
 // USERS & SESSIONS
@@ -32,6 +33,16 @@ router.get("/users/:id/validate", users.validate);
 // Sesiones
 router.post("/sessions", sessions.create);
 router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
+
+// ======================================================
+// ADMIN OVERVIEW
+// ======================================================
+
+router.get(
+  "/admin/activity",
+  auth.isAuthenticated,
+  adminController.getActivity
+);
 
 // ======================================================
 // ARTISTS

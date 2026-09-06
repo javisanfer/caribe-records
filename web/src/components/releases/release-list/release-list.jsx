@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import ReleaseItem from "../release-item/release-item";
+import AdminEditLink from "../../admin/admin-edit-link";
 
 export default function ReleaseList({ releases = [] }) {
   const [view, setView] = useState("list"); // "list" | "grid"
@@ -55,8 +56,12 @@ export default function ReleaseList({ releases = [] }) {
       {view === "grid" ? (
         <div className="release-grid">
           {sorted.map((rel) => (
-            <div key={rel.id || rel._id}>
+            <div className="admin-edit-context" key={rel.id || rel._id}>
               <ReleaseItem release={rel} view="grid" />
+              <AdminEditLink
+                to={`/admin/edit-release/${rel.id || rel._id}`}
+                label={`el lanzamiento ${rel.title}`}
+              />
             </div>
           ))}
         </div>
@@ -64,9 +69,14 @@ export default function ReleaseList({ releases = [] }) {
         <ul className="release-index">
           {sorted.map((rel) => (
             <li
+              className="admin-edit-context"
               key={rel.id || rel._id}
             >
               <ReleaseItem release={rel} view="list" />
+              <AdminEditLink
+                to={`/admin/edit-release/${rel.id || rel._id}`}
+                label={`el lanzamiento ${rel.title}`}
+              />
             </li>
           ))}
         </ul>

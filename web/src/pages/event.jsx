@@ -33,6 +33,7 @@ export default function EventPage() {
 
             return {
               id: e._id || idx,
+              slug: e.slug || null,
               artist: mainArtist?.name || "Caribe Records",
               artistId: mainArtist?._id || null,
               artistSlug: mainArtist?.slug || null,

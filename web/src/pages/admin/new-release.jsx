@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { adminCreateRelease, listArtists, uploadImage } from "../../services/api-services";
+import AdminImagePreview from "../../components/admin/admin-image-preview";
 
 const API_BASE = "/api/v1";
 
@@ -11,8 +12,9 @@ export default function NewReleasePage() {
   const navigate = useNavigate();
   const [artists, setArtists] = useState([]);
   const [loadingRelease, setLoadingRelease] = useState(false);
-  const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm({ defaultValues: { tracklist: [{ title: "", duration: "" }] } });
+  const { register, handleSubmit, control, reset, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { tracklist: [{ title: "", duration: "" }] } });
   const { fields, append, remove } = useFieldArray({ control, name: "tracklist" });
+  const currentCoverUrl = watch("coverUrl") || "";
 
   useEffect(() => {
     listArtists().then((response) => setArtists(Array.isArray(response) ? response : response.data || [])).catch((error) => { console.error("No se pudieron cargar los artistas", error); setArtists([]); });
@@ -92,6 +94,7 @@ export default function NewReleasePage() {
                 <section className="admin-form-card">
                   <div className="admin-form-card__heading"><span>03</span><div><h2>Portada</h2><p>Sube un archivo o pega una URL existente.</p></div></div>
                   <div className="admin-field-grid admin-field-grid--2">
+                    <div className="admin-field admin-field--wide"><AdminImagePreview src={currentCoverUrl} alt="Portada actual del lanzamiento" label="Portada guardada" /></div>
                     <div className="admin-field"><label className="form-label">Archivo</label><input type="file" accept="image/*" className="form-control" {...register("coverFile")} /><div className="form-text">El archivo tiene prioridad sobre la URL.</div></div>
                     <div className="admin-field"><label className="form-label">URL alternativa</label><input type="url" className="form-control" placeholder="https://…" {...register("coverUrl")} /></div>
                     <div className="admin-field admin-field--wide"><label className="form-label">Texto alternativo</label><input className="form-control" placeholder="Describe brevemente la portada" {...register("coverAlt")} /></div>
