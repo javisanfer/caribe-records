@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:test": "VITE_API_PROXY=http://localhost:3001 vite --port 5174",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

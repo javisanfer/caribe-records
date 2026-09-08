@@ -38,7 +38,10 @@ export default function ArtistsPage() {
             slug: a.slug || fallbackSlug,              
             photo: a.photos?.portraitUrl || null,
           };
-        });
+        }).sort((a, b) => (a.name || "").localeCompare(b.name || "", "es", {
+          sensitivity: "base",
+          numeric: true,
+        }));
 
         setArtists(normalized);
       } catch (err) {

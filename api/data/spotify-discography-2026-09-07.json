@@ -1,0 +1,736 @@
+{
+  "retrievedAt": "2026-09-07",
+  "source": "Spotify public artist discographies and album pages (Spain)",
+  "releases": [
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Montaña",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-03-14",
+      "spotifyUrl": "https://open.spotify.com/album/2embhzmImu3iUclFoDVYPZ",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Montaña",
+          "duration": "3:05"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2735498fbaeea9e59d4c9153d50"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Maté",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-04-27",
+      "spotifyUrl": "https://open.spotify.com/album/6UgwsZSpn37pMPNYdgp2dZ",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Maté",
+          "duration": "2:43"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273458ba97229771b67bfce81ba"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Cartas de Ida y Vuelta",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-06-27",
+      "spotifyUrl": "https://open.spotify.com/album/314Hs8ruF5VRJCTqMT98nk",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Sombra (Carta de Perdón)",
+          "duration": "3:43"
+        },
+        {
+          "position": 2,
+          "title": "Octavo (Carta de Odio)",
+          "duration": "2:34"
+        },
+        {
+          "position": 3,
+          "title": "Megáfono (Carta de Angustia)",
+          "duration": "4:40"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273c13fffafd79f0c72ae3e85bf"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "No Love Lost",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-08-28",
+      "spotifyUrl": "https://open.spotify.com/album/0LOF7kHkeS9CaaicMGqB40",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "No Love Lost",
+          "duration": "4:40"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273b84d8fae0ae8b3606c9cfd84"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Cines",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-10-05",
+      "spotifyUrl": "https://open.spotify.com/album/5SOG4WC85oDDHC8lJiza3R",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Cines",
+          "duration": "3:27"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2732d653bd1316bb28492804636"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Hello?",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-10-21",
+      "spotifyUrl": "https://open.spotify.com/album/0XgkoYQJP3Bp5Z3A6nCoJx",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Hello?",
+          "duration": "4:00"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27352e401d7a96bdcc8a7054077"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "el mirador de la ría del burgo y otros puntos de inspiración",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-12-05",
+      "spotifyUrl": "https://open.spotify.com/album/0DMn3VD9g4YjI5yb9U5BBr",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Diálogo uno",
+          "duration": "2:16"
+        },
+        {
+          "position": 2,
+          "title": "Ninguna Respuesta Concedida",
+          "duration": "3:42"
+        },
+        {
+          "position": 3,
+          "title": "Nuevas Versiones",
+          "duration": "5:30"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273427c078f1311b698a5c442ec"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Héroes, Disco, Perfil",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2023-01-18",
+      "spotifyUrl": "https://open.spotify.com/album/00LHadEdvvRHZvJ9knPbe1",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Héroes, Disco, Perfil",
+          "duration": "2:46"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273d7a55d4c09e04913f7925dd4"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Servicio de Organización",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2023-02-15",
+      "spotifyUrl": "https://open.spotify.com/album/3j7vZJvy2CdT4uDqqbrXP2",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Servicio de Organización",
+          "duration": "3:22"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273a1abc04aa2d87bc384db880e"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Campus Muerte",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2023-03-15",
+      "spotifyUrl": "https://open.spotify.com/album/3LGiJLxos5xZv9AGXisZz6",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Campus Muerte",
+          "duration": "4:25"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273ed13b104481ef18e518dea5d"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Sempre Está Chovendo Na Beira Do Mar",
+      "artistName": "Aeronave Adolescente",
+      "format": "lp",
+      "release_date": "2023-03-29",
+      "spotifyUrl": "https://open.spotify.com/album/1DPfSwfbbbThGEZ2FytZPG",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Héroes, Disco, Perfil",
+          "duration": "2:46"
+        },
+        {
+          "position": 2,
+          "title": "Carrera Hacia El Sol",
+          "duration": "5:32"
+        },
+        {
+          "position": 3,
+          "title": "Campus Muerte",
+          "duration": "4:25"
+        },
+        {
+          "position": 4,
+          "title": "Caminos (Y Cómo Estos Se Convierten En Hogar)",
+          "duration": "4:26"
+        },
+        {
+          "position": 5,
+          "title": "Servicio de Organización",
+          "duration": "3:22"
+        },
+        {
+          "position": 6,
+          "title": "Pegadas No Pavimento",
+          "duration": "4:48"
+        },
+        {
+          "position": 7,
+          "title": "La Ayuda Está en Camino",
+          "duration": "5:36"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273afaf95173bfd47c65c8babe4"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "V.M.D.",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2025-10-24",
+      "spotifyUrl": "https://open.spotify.com/album/5b3ZHjsV0m8qYzHRdSBSHP",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "V.M.D.",
+          "duration": "3:38"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273247ee80f3c4461109d5d6f9f"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "El día de la marmota II",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2025-11-21",
+      "spotifyUrl": "https://open.spotify.com/album/5lzL8VhZdQ6u8kGDzhN6Ns",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "El día de la marmota II",
+          "duration": "2:52"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2737b4c5d1fd7179f07a053f4e6"
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Sueño con salones llenos",
+      "artistName": "Aeronave Adolescente",
+      "format": "lp",
+      "release_date": "2026-01-16",
+      "spotifyUrl": "https://open.spotify.com/album/1aLPQIrGlVyiP7sVXhF015",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "La última mota de polvo del mundo",
+          "duration": "2:29"
+        },
+        {
+          "position": 2,
+          "title": "El día de la marmota II",
+          "duration": "2:52"
+        },
+        {
+          "position": 3,
+          "title": "Brilla, brilla",
+          "duration": "4:22"
+        },
+        {
+          "position": 4,
+          "title": "V.M.D.",
+          "duration": "3:38"
+        },
+        {
+          "position": 5,
+          "title": "Salones llenos",
+          "duration": "1:47"
+        },
+        {
+          "position": 6,
+          "title": "Todo lo que tengo",
+          "duration": "4:52"
+        },
+        {
+          "position": 7,
+          "title": "La balada de José y Josefina",
+          "duration": "10:32"
+        },
+        {
+          "position": 8,
+          "title": "Solo gravilla",
+          "duration": "3:04"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273126c82dd4d4171c146bd8d2d"
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "Pole",
+      "artistName": "daddy san",
+      "format": "ep",
+      "release_date": "2018-01-01",
+      "spotifyUrl": "https://open.spotify.com/album/4zURoq1RAB7JdAon5l8KqI",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Bici Mad",
+          "duration": "2:44"
+        },
+        {
+          "position": 2,
+          "title": "Línea 5",
+          "duration": "3:08"
+        },
+        {
+          "position": 3,
+          "title": "Romance Romántico (Mujeres)",
+          "duration": "1:45"
+        },
+        {
+          "position": 4,
+          "title": "Uaaatusojos",
+          "duration": "3:28"
+        },
+        {
+          "position": 5,
+          "title": "Lisa",
+          "duration": "2:50"
+        },
+        {
+          "position": 6,
+          "title": "Tarantino",
+          "duration": "4:06"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273a79e054a63c84a199f8458e3"
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "Bici Mad",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2018-12-27",
+      "spotifyUrl": "https://open.spotify.com/album/3QLSLtSTWhlmSz1erRQv6r",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Bici Mad",
+          "duration": "2:44"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27375ec184ab79c8cb6039efe23"
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "Mercamadrid",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2022-11-17",
+      "spotifyUrl": "https://open.spotify.com/album/0I67htmj49B6hhw8p3pJO4",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Mercamadrid",
+          "duration": "2:55"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273ee99a095c00573f067af6619"
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "Teki",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2023-04-14",
+      "spotifyUrl": "https://open.spotify.com/album/4M9bcKqrR7nFKLjCHZOeJZ",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Teki",
+          "duration": "2:46"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2737cf0ac517f4e221e9da825ea"
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "oh bebé",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2024-02-23",
+      "spotifyUrl": "https://open.spotify.com/album/6ntSFagauWXIKJkYgwaHwF",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "oh bebé",
+          "duration": "2:26"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273386cab1551c1391221535c0a"
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "me sabe fatal",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2024-10-18",
+      "spotifyUrl": "https://open.spotify.com/album/2aUyWKJ7QT5n6CcDD0DeuR",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "me sabe fatal",
+          "duration": "1:41"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27356bb52898f62a512db06d5c9"
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "tarde",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2025-04-25",
+      "spotifyUrl": "https://open.spotify.com/album/0P5s15J5Mk4BPuHUUbkcCg",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "tarde",
+          "duration": "1:58"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273c37f853376e6557fa2e7449a"
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "todo pasará",
+      "artistName": "daddy san",
+      "format": "lp",
+      "release_date": "2025-05-29",
+      "spotifyUrl": "https://open.spotify.com/album/4GHcmukWrSCpGPNb9mYM2v",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "oh bebé",
+          "duration": "2:26"
+        },
+        {
+          "position": 2,
+          "title": "violetas",
+          "duration": "2:18"
+        },
+        {
+          "position": 3,
+          "title": "no hay nadie",
+          "duration": "1:54"
+        },
+        {
+          "position": 4,
+          "title": "me sabe fatal",
+          "duration": "1:41"
+        },
+        {
+          "position": 5,
+          "title": "tarde",
+          "duration": "1:58"
+        },
+        {
+          "position": 6,
+          "title": "oporto",
+          "duration": "2:15"
+        },
+        {
+          "position": 7,
+          "title": "nada en su lugar",
+          "duration": "2:44"
+        },
+        {
+          "position": 8,
+          "title": "todo pasará",
+          "duration": "2:16"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27318ddc77d54ac62219b012b9e"
+    },
+    {
+      "artistSlug": "ferrocentro-club",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/0J3vdISJ1KpsS4rydRges3",
+      "title": "VELOZ",
+      "artistName": "ferrocentro club",
+      "format": "ep",
+      "release_date": "2025-08-29",
+      "spotifyUrl": "https://open.spotify.com/album/1tZBbfuEE4Ye4y8PgZ8gvy",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "pez gato",
+          "duration": "4:26"
+        },
+        {
+          "position": 2,
+          "title": "daguerrotipo",
+          "duration": "4:22"
+        },
+        {
+          "position": 3,
+          "title": "noemí te quiero!",
+          "duration": "3:43"
+        },
+        {
+          "position": 4,
+          "title": "verano en syberia",
+          "duration": "2:16"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2733abf12da293b8cb14495fc49"
+    },
+    {
+      "artistSlug": "ferrocentro-club",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/0J3vdISJ1KpsS4rydRges3",
+      "title": "L.V.H.D.F.C. / Un olivo",
+      "artistName": "ferrocentro club",
+      "format": "single",
+      "release_date": "2025-10-31",
+      "spotifyUrl": "https://open.spotify.com/album/4TWrkJVsPfBfRxZeZo6FPf",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "la verdadera historia de ferrocentro club",
+          "duration": "4:02"
+        },
+        {
+          "position": 2,
+          "title": "Un olivo",
+          "duration": "11:44"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2735b23d2845a5a78f2a61fe439"
+    },
+    {
+      "artistSlug": "ferrocentro-club",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/0J3vdISJ1KpsS4rydRges3",
+      "title": "bueño TV",
+      "artistName": "ferrocentro club",
+      "format": "single",
+      "release_date": "2026-04-23",
+      "spotifyUrl": "https://open.spotify.com/album/75eicGeAG0v1GyR817tBzq",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "bueño TV",
+          "duration": "3:40"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273f0fe0bb775997a573a9dc4f7"
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Lo siento",
+      "artistName": "los reels",
+      "format": "single",
+      "release_date": "2022-10-14",
+      "spotifyUrl": "https://open.spotify.com/album/3vH6jXC2qbZQETZhaZI7fB",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Aeropuertos",
+          "duration": "2:40"
+        },
+        {
+          "position": 2,
+          "title": "Frágil",
+          "duration": "1:31"
+        },
+        {
+          "position": 3,
+          "title": "Mundo extraño",
+          "duration": "3:00"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27324b2a08d8ca510846fef229d"
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Recuerdos (cuándo)",
+      "artistName": "los reels",
+      "format": "single",
+      "release_date": "2024-09-27",
+      "spotifyUrl": "https://open.spotify.com/album/1vIADfW3pdEPTgQ5yeT0Cl",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Recuerdos (cuándo)",
+          "duration": "3:57"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273e4d29cf5eac19059799d4c18"
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Mis tres soles",
+      "artistName": "los reels",
+      "format": "single",
+      "release_date": "2024-10-24",
+      "spotifyUrl": "https://open.spotify.com/album/0sEDEd0WfWvwIPU1ZbPlE9",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Mis tres soles",
+          "duration": "2:41"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273ecd826fbd921056c7ad843a0"
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Forrest Gump",
+      "artistName": "los reels",
+      "format": "single",
+      "release_date": "2024-11-28",
+      "spotifyUrl": "https://open.spotify.com/album/1ruqUs3lVOV3JKCr0z51hf",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Forrest Gump",
+          "duration": "1:56"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273b827d2f6e01c39700c1ad814"
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Sigo necesitando un tiempo",
+      "artistName": "los reels",
+      "format": "lp",
+      "release_date": "2025-03-28",
+      "spotifyUrl": "https://open.spotify.com/album/5L4C86OjPtpvusYn2Q0v4C",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Sigo necesitando un tiempo",
+          "duration": "1:36"
+        },
+        {
+          "position": 2,
+          "title": "Mis tres soles",
+          "duration": "2:41"
+        },
+        {
+          "position": 3,
+          "title": "Diógenes social",
+          "duration": "2:10"
+        },
+        {
+          "position": 4,
+          "title": "Forrest Gump",
+          "duration": "1:56"
+        },
+        {
+          "position": 5,
+          "title": "Recuerdos (cuándo)",
+          "duration": "3:57"
+        },
+        {
+          "position": 6,
+          "title": "La torre",
+          "duration": "1:59"
+        },
+        {
+          "position": 7,
+          "title": "Aerofrágil",
+          "duration": "4:30"
+        },
+        {
+          "position": 8,
+          "title": "Modo telonio",
+          "duration": "2:16"
+        },
+        {
+          "position": 9,
+          "title": "Medio contrato",
+          "duration": "2:58"
+        },
+        {
+          "position": 10,
+          "title": "Laguna de dios",
+          "duration": "2:36"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2736221411d3845740c40381bc2"
+    }
+  ]
+}

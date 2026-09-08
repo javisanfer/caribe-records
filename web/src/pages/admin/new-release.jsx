@@ -12,7 +12,7 @@ export default function NewReleasePage() {
   const navigate = useNavigate();
   const [artists, setArtists] = useState([]);
   const [loadingRelease, setLoadingRelease] = useState(false);
-  const { register, handleSubmit, control, reset, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { tracklist: [{ title: "", duration: "" }] } });
+  const { register, handleSubmit, control, reset, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { catalogType: "own", catalogVisible: true, tracklist: [{ title: "", duration: "" }] } });
   const { fields, append, remove } = useFieldArray({ control, name: "tracklist" });
   const currentCoverUrl = watch("coverUrl") || "";
 
@@ -30,6 +30,8 @@ export default function NewReleasePage() {
         const data = await response.json();
         reset({
           title: data.title || "", artist: data.artist?._id || data.artist || "", catalog: data.catalog || "", serialNumber: data.serialNumber || "", format: data.format || "",
+          labelName: data.labelName || "", catalogType: data.catalogType || "own", catalogVisible: data.catalogVisible !== false,
+          bandcampUrl: data.bandcampUrl || "",
           release_date: data.release_date ? data.release_date.slice(0, 10) : "", country: data.country || "", spotifyUrl: data.spotifyUrl || "",
           coverUrl: data.cover?.url || data.cover_image || "", coverAlt: data.cover?.alt || "",
           tracklist: data.tracklist?.length ? data.tracklist.map((track) => ({ title: track.title || "", duration: track.duration || "" })) : [{ title: "", duration: "" }],
@@ -45,6 +47,8 @@ export default function NewReleasePage() {
       if (data.coverFile?.[0]) { const uploadResponse = await uploadImage(data.coverFile[0]); coverUrl = uploadResponse.imageUrl || coverUrl; }
       const payload = {
         title: data.title.trim(), artist: data.artist, format: data.format.trim().toLowerCase(), release_date: data.release_date || null,
+        labelName: data.labelName?.trim() || "", catalogType: data.catalogType || "own", catalogVisible: data.catalogVisible !== false,
+        bandcampUrl: data.bandcampUrl?.trim() || "",
         country: data.country?.trim() || "", spotifyUrl: data.spotifyUrl?.trim() || "", catalog: data.catalog?.trim() || "", serialNumber: data.serialNumber?.trim() || "",
         tracklist: (data.tracklist || []).filter((track) => track.title?.trim()).map((track, index) => ({ position: index + 1, title: track.title.trim(), duration: track.duration?.trim() || "" })),
       };
@@ -86,9 +90,13 @@ export default function NewReleasePage() {
                   <div className="admin-form-card__heading"><span>02</span><div><h2>Catálogo</h2><p>Referencias internas y disponibilidad.</p></div></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field"><label className="form-label">Número de catálogo</label><input className="form-control" placeholder="CRB-001" {...register("catalog")} /></div>
+                    <div className="admin-field"><label className="form-label">Sello</label><input className="form-control" placeholder="Caribe Records/Buenos Amigos" {...register("labelName")} /></div>
+                    <div className="admin-field"><label className="form-label">Relación con el catálogo</label><select className="form-select" {...register("catalogType")}><option value="own">Edición propia</option><option value="distribution">Distribución</option></select></div>
+                    <div className="admin-field"><label className="form-label"><input type="checkbox" {...register("catalogVisible")} /> Visible en el catálogo público</label></div>
                     <div className="admin-field"><label className="form-label">Número de serie</label><input className="form-control" placeholder="#023/300" {...register("serialNumber")} /></div>
                     <div className="admin-field"><label className="form-label">País</label><input className="form-control" placeholder="ES" {...register("country")} /></div>
                     <div className="admin-field"><label className="form-label">Spotify</label><input type="url" className="form-control" placeholder="https://open.spotify.com/album/…" {...register("spotifyUrl")} /></div>
+                    <div className="admin-field"><label className="form-label">Bandcamp</label><input type="url" className="form-control" placeholder="https://artista.bandcamp.com/album/…" {...register("bandcampUrl")} /></div>
                   </div>
                 </section>
                 <section className="admin-form-card">

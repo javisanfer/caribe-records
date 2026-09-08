@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../../index.css";
+import { sortReleases } from "../../../utils/release-order";
 
 const LINK_GROUPS = [
   ["web", "Web"],
@@ -25,6 +26,18 @@ function formatEventDate(value) {
   });
 }
 
+function releaseFormat(format) {
+  const normalized = format?.toLowerCase();
+  if (normalized === "single") return "Single";
+  if (normalized === "ep") return "EP";
+  if (["lp", "album", "álbum", "disco"].includes(normalized)) return "Disco";
+  return "Lanzamiento";
+}
+
+function releaseUrl(release) {
+  return release.spotifyUrl || release.bandcampUrl || "";
+}
+
 export default function ArtistDetail({
   artist,
   prevNext,
@@ -34,16 +47,17 @@ export default function ArtistDetail({
 }) {
   const [tab, setTab] = useState("overview");
   const [expandedBio, setExpandedBio] = useState(false);
+  const sortedReleases = useMemo(() => sortReleases(releases), [releases]);
 
   const releasesByYear = useMemo(() => {
-    const grouped = releases.reduce((result, release) => {
+    const grouped = sortedReleases.reduce((result, release) => {
       const year = release.release_date?.slice(0, 4) || release.year || "—";
       if (!result[year]) result[year] = [];
       result[year].push(release);
       return result;
     }, {});
     return Object.entries(grouped).sort((a, b) => Number(b[0]) - Number(a[0]));
-  }, [releases]);
+  }, [sortedReleases]);
 
   if (!artist) return null;
 
@@ -124,13 +138,19 @@ export default function ArtistDetail({
               <h2>{year}</h2>
               <div>
                 {items.map((release) => (
-                  <Link className="artist-release" to={`/releases/${release._id}`} key={release._id}>
+                  <a
+                    className="artist-release"
+                    href={releaseUrl(release) || undefined}
+                    target={releaseUrl(release) ? "_blank" : undefined}
+                    rel={releaseUrl(release) ? "noopener noreferrer" : undefined}
+                    key={release._id}
+                  >
                     {(release.cover?.url || release.cover_image) ? (
                       <img src={release.cover?.url || release.cover_image} alt={release.cover?.alt || release.title} />
                     ) : <span className="artist-release__placeholder">CR</span>}
                     <span className="artist-release__name">{release.title}</span>
-                    <small>{release.format?.toUpperCase() || "RELEASE"} ↗</small>
-                  </Link>
+                    <small>{releaseFormat(release.format)}{releaseUrl(release) ? " ↗" : ""}</small>
+                  </a>
                 ))}
               </div>
             </div>
@@ -156,13 +176,19 @@ export default function ArtistDetail({
           {releases.length > 0 && (
             <div className="artist-related-block">
               <p className="detail-section-label">Últimos lanzamientos</p>
-              {releases.slice(0, 4).map((release) => (
-                <Link to={`/releases/${release._id}`} key={release._id}><span>{release.title}</span><small>{release.release_date?.slice(0, 4) || "—"} ↗</small></Link>
-              ))}
+              {sortedReleases.slice(0, 4).map((release) => {
+                const listenUrl = releaseUrl(release);
+                const content = <><span>{release.title}</span><small>{releaseFormat(release.format)} · {release.release_date?.slice(0, 4) || "—"}{listenUrl ? " ↗" : ""}</small></>;
+                return listenUrl ? (
+                  <a href={listenUrl} target="_blank" rel="noopener noreferrer" key={release._id}>{content}</a>
+                ) : (
+                  <div className="artist-related-block__unavailable" key={release._id}>{content}</div>
+                );
+              })}
             </div>
           )}
           {editorials.length > 0 && (
-            <div className="artist-related-block">
+            <div className="artist-related-block artist-related-block--events">
               <p className="detail-section-label">Editorial</p>
               {editorials.slice(0, 4).map((editorial) => (
                 <Link to={`/editorial/${editorial.slug}`} key={editorial._id}><span>{editorial.title}</span><small>Leer ↗</small></Link>
@@ -172,9 +198,17 @@ export default function ArtistDetail({
           {validEvents.length > 0 && (
             <div className="artist-related-block">
               <p className="detail-section-label">Próximas fechas</p>
-              {validEvents.slice(0, 4).map((event) => (
-                <Link to={`/eventos/${event.slug}`} key={event._id}><span>{event.title || event.venue}</span><small>{formatEventDate(event.date)} ↗</small></Link>
-              ))}
+              {validEvents.slice(0, 4).map((event) => {
+                const ticketUrl = [event.ticketUrl, event.url].find(
+                  (url) => typeof url === "string" && /^https?:\/\//i.test(url)
+                );
+                const content = <><span>{event.title || event.venue}</span><small>{formatEventDate(event.date)} · {ticketUrl ? "Entradas ↗" : "Entradas próximamente"}</small></>;
+                return ticketUrl ? (
+                  <a href={ticketUrl} target="_blank" rel="noopener noreferrer" key={event._id}>{content}</a>
+                ) : (
+                  <div className="artist-related-block__unavailable" key={event._id}>{content}</div>
+                );
+              })}
             </div>
           )}
         </section>

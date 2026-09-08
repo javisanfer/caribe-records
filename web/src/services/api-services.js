@@ -18,7 +18,10 @@ export const http = axios.create({
 http.interceptors.response.use(
   (res) => res.data, // devolver solo data
   (error) => {
-    // Normaliza mensaje de error pero NO rompemos el objeto original
+    const isLogoutRequest = error.config?.method === "delete" && error.config?.url === "/sessions";
+    if (error.response?.status === 401 && !isLogoutRequest) {
+      window.dispatchEvent(new Event("caribe:session-expired"));
+    }
     return Promise.reject(error);
   }
 );
@@ -100,6 +103,17 @@ const adminDeleteEditorial = (id) =>
   http.delete(`/admin/editorials/${id}`);
 
 // ----------------------------------------------------------------------------
+// 📣 BANNERS
+// ----------------------------------------------------------------------------
+
+const getActiveBanner = () => http.get("/banners/active");
+const adminListBanners = () => http.get("/admin/banners");
+const adminGetBanner = (id) => http.get(`/admin/banners/${id}`);
+const adminCreateBanner = (payload) => http.post("/admin/banners", payload);
+const adminUpdateBanner = (id, payload) => http.patch(`/admin/banners/${id}`, payload);
+const adminDeleteBanner = (id) => http.delete(`/admin/banners/${id}`);
+
+// ----------------------------------------------------------------------------
 /* ☁️ UPLOADS */
 // ----------------------------------------------------------------------------
 const uploadImage = (file) => {
@@ -155,6 +169,14 @@ export {
   adminCreateEditorial,
   adminPatchEditorial,
   adminDeleteEditorial,
+
+  // banners
+  getActiveBanner,
+  adminListBanners,
+  adminGetBanner,
+  adminCreateBanner,
+  adminUpdateBanner,
+  adminDeleteBanner,
 
   // uploads
   uploadImage,

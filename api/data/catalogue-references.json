@@ -1,0 +1,303 @@
+[
+  {
+    "row": 5,
+    "artist": "LOS REELS",
+    "title": "RECUERDOS (CUÁNDO)",
+    "catalog": "CAR001",
+    "date": "2024-09-27"
+  },
+  {
+    "row": 6,
+    "artist": "DADDY SAN",
+    "title": "ME SABE FATAL",
+    "catalog": "CAR002",
+    "date": "2024-10-18"
+  },
+  {
+    "row": 7,
+    "artist": "LOS REELS",
+    "title": "MIS TRES SOLES",
+    "catalog": "CAR003",
+    "date": "2024-10-24"
+  },
+  {
+    "row": 8,
+    "artist": "LOS REELS",
+    "title": "FORREST GUMP",
+    "catalog": "CAR004",
+    "date": "2024-11-28"
+  },
+  {
+    "row": 9,
+    "artist": "JULIA GARBLAN",
+    "title": "PEQUEÑA NOTA DE VOZ",
+    "catalog": "CAR005",
+    "date": "2024-12-20"
+  },
+  {
+    "row": 10,
+    "artist": "D.TRILLO",
+    "title": "OO1",
+    "catalog": "CAR006",
+    "date": "2025-04-09"
+  },
+  {
+    "row": 11,
+    "artist": "LOS REELS",
+    "title": "SIGO NECESITANDO UN TIEMPO",
+    "catalog": "CAR007",
+    "date": "2025-03-28"
+  },
+  {
+    "row": 12,
+    "artist": "D.TRILLO",
+    "title": "OO2",
+    "catalog": "CAR008",
+    "date": "2025-05-07"
+  },
+  {
+    "row": 13,
+    "artist": "DADDY SAN, JULIA GARBLAN",
+    "title": "TARDE",
+    "catalog": "CAR009",
+    "date": "2025-04-25"
+  },
+  {
+    "row": 15,
+    "artist": "DADDY SAN",
+    "title": "TODO PASARÁ",
+    "catalog": "CAR011",
+    "date": "2025-05-29"
+  },
+  {
+    "row": 16,
+    "artist": "MI AMIGO MAC",
+    "title": "FANTASMA",
+    "catalog": "CAR012",
+    "date": "2025-10-27"
+  },
+  {
+    "row": 17,
+    "artist": "DEDEDEDE",
+    "title": "PLUMA FÉNIX",
+    "catalog": "CAR013",
+    "date": "2025-05-29"
+  },
+  {
+    "row": 18,
+    "artist": "DEDEDEDE",
+    "title": "SOY UNA NORIA",
+    "catalog": "CAR014",
+    "date": "2025-06-19"
+  },
+  {
+    "row": 19,
+    "artist": "DEDEDEDE",
+    "title": "MISION SECUNDARIA",
+    "catalog": "CAR015",
+    "date": "2025-07-03"
+  },
+  {
+    "row": 20,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "HÉROES, DISCO, PERFIL",
+    "catalog": "CAR016",
+    "date": "2023-01-18"
+  },
+  {
+    "row": 21,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "SERVICIO DE ORGANIZACIÓN",
+    "catalog": "CAR017",
+    "date": "2023-02-15"
+  },
+  {
+    "row": 22,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "CAMPUS MUERTE",
+    "catalog": "CAR018",
+    "date": "2023-03-15"
+  },
+  {
+    "row": 23,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "SEMPRE ESTÁ CHOVENDO",
+    "catalog": "CAR019",
+    "date": "2023-03-29"
+  },
+  {
+    "row": 24,
+    "artist": "LOS REELS",
+    "title": "LO SIENTO",
+    "catalog": "CAR020",
+    "date": "2022-10-14"
+  },
+  {
+    "row": 25,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "EL MIRADOR DE LA RIA DEL BURGO",
+    "catalog": "CAR021",
+    "date": "2020-12-05"
+  },
+  {
+    "row": 26,
+    "artist": "DADDY SAN",
+    "title": "BICI MAD",
+    "catalog": "CAR022",
+    "date": "2018-12-27"
+  },
+  {
+    "row": 27,
+    "artist": "DADDY SAN",
+    "title": "POLE",
+    "catalog": "CAR023",
+    "date": "2020-03-20"
+  },
+  {
+    "row": 28,
+    "artist": "DADDY SAN",
+    "title": "MERCAMADRID",
+    "catalog": "CAR024",
+    "date": "2022-11-17"
+  },
+  {
+    "row": 29,
+    "artist": "DADDY SAN",
+    "title": "TEKI",
+    "catalog": "CAR025",
+    "date": "2023-04-14"
+  },
+  {
+    "row": 30,
+    "artist": "DADDY SAN",
+    "title": "OH BEBE",
+    "catalog": "CAR026",
+    "date": "2024-02-23"
+  },
+  {
+    "row": 31,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "MONTAÑA",
+    "catalog": "CAR027",
+    "date": "2020-03-14"
+  },
+  {
+    "row": 32,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "MATÉ",
+    "catalog": "CAR028",
+    "date": "2020-04-27"
+  },
+  {
+    "row": 33,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "CARTAS DE IDA Y VUELTA",
+    "catalog": "CAR029",
+    "date": "2020-06-27"
+  },
+  {
+    "row": 34,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "NO LOVE LOST",
+    "catalog": "CAR030",
+    "date": "2020-08-28"
+  },
+  {
+    "row": 35,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "CINES",
+    "catalog": "CAR031",
+    "date": "2020-10-05"
+  },
+  {
+    "row": 36,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "HELLO?",
+    "catalog": "CAR032",
+    "date": "2020-10-21"
+  },
+  {
+    "row": 37,
+    "artist": "D.TRILLO",
+    "title": "ESPIRAL",
+    "catalog": "CAR033",
+    "date": "2025-05-22"
+  },
+  {
+    "row": 38,
+    "artist": "MI AMIGO MAC",
+    "title": "LINEA DE CORTE",
+    "catalog": "CAR034",
+    "date": "2025-06-17"
+  },
+  {
+    "row": 39,
+    "artist": "MI AMIGO MAC",
+    "title": "JUGADOR DEFENSIVO PT.3",
+    "catalog": "CAR035",
+    "date": "2025-08-22"
+  },
+  {
+    "row": 40,
+    "artist": "MI AMIGO MAC",
+    "title": "NO HACÍA FALTA",
+    "catalog": "CAR036",
+    "date": "2025-09-17"
+  },
+  {
+    "row": 41,
+    "artist": "MI AMIGO MAC",
+    "title": "LA MAS ALTA MANIFESTACIÓN DE LA MAGIA",
+    "catalog": "CAR037",
+    "date": "2025-10-31"
+  },
+  {
+    "row": 42,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "V.M.D.",
+    "catalog": "CAR038",
+    "date": "2025-10-24"
+  },
+  {
+    "row": 43,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "EL DÍA DE LA MARMOTA II",
+    "catalog": "CAR039",
+    "date": "2025-11-21"
+  },
+  {
+    "row": 44,
+    "artist": "AERONAVE ADOLESCENTE",
+    "title": "SUEÑO CON SALONES LLENOS",
+    "catalog": "CAR040",
+    "date": "2026-01-16"
+  },
+  {
+    "row": 45,
+    "artist": "FERROCENTRO",
+    "title": "VELOZ",
+    "catalog": "CAR041",
+    "date": "2025-08-29"
+  },
+  {
+    "row": 46,
+    "artist": "FERROCENTRO",
+    "title": "L.V.H.D.F.C./Un olivo",
+    "catalog": "CAR042",
+    "date": "2025-10-31"
+  },
+  {
+    "row": 47,
+    "artist": "FERROCENTRO",
+    "title": "BUEÑO TV",
+    "catalog": "CAR043",
+    "date": "2025-03-23"
+  },
+  {
+    "row": 48,
+    "artist": "REGO",
+    "title": "ESPADA EP",
+    "catalog": "CAR044",
+    "date": "2026-05-06"
+  }
+]

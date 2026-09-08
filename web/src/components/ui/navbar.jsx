@@ -11,7 +11,7 @@ const navigation = [
 ];
 
 export default function Navbar() {
-  const { user } = useAuthContext();
+  const { user, logout } = useAuthContext();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -62,6 +62,11 @@ export default function Navbar() {
         </Link>
 
         <div className="cr-navbar-actions">
+          {user && location.pathname.startsWith("/admin") && (
+            <button type="button" className="cr-logout" onClick={logout}>
+              Cerrar sesión
+            </button>
+          )}
           <button
             type="button"
             ref={toggleRef}

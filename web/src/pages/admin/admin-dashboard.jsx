@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { http } from "../../services/api-services";
 
-const API_BASE = "/api/v1";
 const PAGE_SIZE = 15;
 
 const TYPE_LABELS = {
@@ -9,6 +9,7 @@ const TYPE_LABELS = {
   release: "Lanzamiento",
   event: "Evento",
   editorial: "Editorial",
+  banner: "Banner",
 };
 
 const CREATE_LINKS = [
@@ -16,6 +17,7 @@ const CREATE_LINKS = [
   ["02", "Lanzamiento", "/admin/new-release"],
   ["03", "Editorial", "/admin/new-editorial"],
   ["04", "Evento", "/admin/new-event"],
+  ["05", "Banner", "/admin/new-banner"],
 ];
 
 export default function AdminDashboardPage() {
@@ -26,27 +28,29 @@ export default function AdminDashboardPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function loadData() {
       setLoading(true);
       setError("");
       try {
         const params = new URLSearchParams({ limit: "200" });
         if (typeFilter !== "all") params.set("type", typeFilter);
-        const response = await fetch(`${API_BASE}/admin/activity?${params}`, {
-          credentials: "include",
+        const data = await http.get(`/admin/activity?${params}`, {
+          signal: controller.signal,
         });
-        if (!response.ok) throw new Error("No se pudo cargar la actividad");
-        const data = await response.json();
+        if (controller.signal.aborted) return;
         setItems(data.data || []);
         setCurrentPage(1);
       } catch (loadError) {
+        if (controller.signal.aborted) return;
         console.error("Error loading activity:", loadError);
         setError("No se ha podido cargar la actividad del panel.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
     loadData();
+    return () => controller.abort();
   }, [typeFilter]);
 
   const counts = useMemo(() => items.reduce((result, item) => {
@@ -69,6 +73,7 @@ export default function AdminDashboardPage() {
     event: `/admin/edit-event/${item.slug}`,
     editorial: `/admin/edit-editorial/${item.slug}`,
     release: `/admin/edit-release/${item.id}`,
+    banner: `/admin/edit-banner/${item.id}`,
   }[item.type] || "#");
 
   return (
@@ -115,6 +120,7 @@ export default function AdminDashboardPage() {
               <option value="release">Lanzamientos</option>
               <option value="event">Eventos</option>
               <option value="editorial">Editorial</option>
+              <option value="banner">Banners</option>
             </select>
           </label>
         </div>

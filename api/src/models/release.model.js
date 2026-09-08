@@ -36,6 +36,9 @@ const releaseSchema = new mongoose.Schema(
 
     // Catálogo del sello (ej: CRB-001)
     catalog: { type: String, trim: true },
+    labelName: { type: String, trim: true },
+    catalogType: { type: String, enum: ["own", "distribution"], default: "own" },
+    catalogVisible: { type: Boolean, default: true },
 
     // Formato (controlado)
     format: {
@@ -57,6 +60,7 @@ const releaseSchema = new mongoose.Schema(
 
     // Enlace Spotify del disco
     spotifyUrl:   { type: String, trim: true },
+    bandcampUrl:  { type: String, trim: true },
 
     // Tracklist
     tracklist: [trackSchema],

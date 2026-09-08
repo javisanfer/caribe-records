@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useLayoutEffect } from "react";
 import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { PrivateRoute } from "./guards";
@@ -8,6 +8,7 @@ import Navbar from "./components/ui/navbar.jsx";
 import PageLayout from "./components/layouts/page-layout/page-layout.jsx";
 import PageTransition from "./components/layouts/page-transition/page-transition.jsx";
 import SiteFooter from "./components/layouts/site-footer/site-footer.jsx";
+import SiteBanner from "./components/ui/site-banner.jsx";
 
 // Páginas públicas
 import HomePage from "./pages/home.jsx";
@@ -25,6 +26,7 @@ import AdminDashboardPage from "./pages/admin/admin-dashboard.jsx";
 import NewArtistPage from "./pages/admin/new-artist.jsx";
 import NewReleasePage from "./pages/admin/new-release.jsx";
 import NewEventPage from "./pages/admin/new-event.jsx";
+import NewBannerPage from "./pages/admin/new-banner.jsx";
 const NewEditorialPage = lazy(() => import("./pages/admin/new-editorial.jsx"));
 
 function App() {
@@ -32,9 +34,16 @@ function App() {
   const isHome = location.pathname === "/";
   const isPrivateArea = location.pathname.startsWith("/admin");
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.pathname, location.search]);
+
   return (
     <>
       {!isHome && <Navbar />}
+      {!isPrivateArea && <SiteBanner />}
 
       <AnimatePresence mode="wait">
         <Suspense fallback={<main className="admin-page"><p className="admin-loading-state">Abriendo espacio editorial…</p></main>}>
@@ -181,6 +190,19 @@ function App() {
             }
           />
 
+          <Route
+            path="/admin/new-banner"
+            element={
+              <PrivateRoute>
+                <PageTransition>
+                  <PageLayout>
+                    <NewBannerPage />
+                  </PageLayout>
+                </PageTransition>
+              </PrivateRoute>
+            }
+          />
+
           {/* ===================== */}
           {/*   ADMIN — EDICIÓN     */}
           {/* ===================== */}
@@ -235,6 +257,19 @@ function App() {
                 <PageTransition>
                   <PageLayout>
                     <NewEditorialPage isEditMode />
+                  </PageLayout>
+                </PageTransition>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/admin/edit-banner/:id"
+            element={
+              <PrivateRoute>
+                <PageTransition>
+                  <PageLayout>
+                    <NewBannerPage isEditMode />
                   </PageLayout>
                 </PageTransition>
               </PrivateRoute>

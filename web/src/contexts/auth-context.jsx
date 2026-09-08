@@ -3,7 +3,7 @@ import React, {
   useEffect
 } from "react";
 
-import { profile } from "../services/api-services";
+import { logout as destroySession, profile } from "../services/api-services";
 import { AuthContext } from "./auth-context-instance";
 
 export function AuthProvider({ children }) {
@@ -22,9 +22,40 @@ export function AuthProvider({ children }) {
     setUser(user);
   }
 
-  function logout() {
+  async function logout() {
+    try {
+      await destroySession();
+    } catch {
+      // La sesión también puede haber caducado ya en el servidor.
+    }
     setUser(null);
   }
+
+  useEffect(() => {
+    if (!user) return undefined;
+
+    let inactivityTimer;
+    let lastSessionTouch = Date.now();
+    const expireSession = () => logout();
+    const resetTimer = () => {
+      window.clearTimeout(inactivityTimer);
+      inactivityTimer = window.setTimeout(expireSession, 5 * 60 * 1000);
+      if (Date.now() - lastSessionTouch > 60 * 1000) {
+        lastSessionTouch = Date.now();
+        profile().catch(() => setUser(null));
+      }
+    };
+    const activityEvents = ["pointerdown", "keydown", "scroll", "touchstart"];
+    activityEvents.forEach((eventName) => window.addEventListener(eventName, resetTimer, { passive: true }));
+    window.addEventListener("caribe:session-expired", expireSession);
+    resetTimer();
+
+    return () => {
+      window.clearTimeout(inactivityTimer);
+      activityEvents.forEach((eventName) => window.removeEventListener(eventName, resetTimer));
+      window.removeEventListener("caribe:session-expired", expireSession);
+    };
+  }, [user]);
 
   const contextData = {
     user,

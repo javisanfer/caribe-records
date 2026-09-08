@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 export default function EventItem({ event = {} }) {
   // 🛡️ Normalización de fecha
@@ -26,26 +25,20 @@ export default function EventItem({ event = {} }) {
   const city = event.city || "";
   const country = event.country || "";
   const venue = event.venue || "Por confirmar";
-  const url = event.url && event.url !== "#" ? event.url : null;
+  const url = [event.ticketUrl, event.url].find(
+    (value) => typeof value === "string" && /^https?:\/\//i.test(value)
+  );
 
-  // 👇 NUEVO: slug del artista si existe
-  const artistSlug = event.artistSlug;
+  const EventRoot = url ? "a" : "article";
 
   return (
-    <article
+    <EventRoot
       className="event-row"
       aria-label={`${artist} en ${city}${country ? ", " + country : ""} — ${dateLabel}`}
+      {...(url ? { href: url, target: "_blank", rel: "noopener noreferrer nofollow" } : {})}
     >
       <div className="event-row__artist">
-        {artistSlug ? (
-          <Link
-            to={`/artistas/${artistSlug}`}
-          >
-            {artist}
-          </Link>
-        ) : (
-          <strong>{artist}</strong>
-        )}
+        <strong>{artist}</strong>
         {event.title && <span>{event.title}</span>}
       </div>
 
@@ -59,18 +52,8 @@ export default function EventItem({ event = {} }) {
       </time>
 
       <div className="event-row__ticket">
-        {url ? (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-        >
-          Entradas <span aria-hidden="true">↗</span>
-        </a>
-        ) : (
-          <span>Próximamente</span>
-        )}
+        <span>{url ? <>Entradas <span aria-hidden="true">↗</span></> : "Próximamente"}</span>
       </div>
-    </article>
+    </EventRoot>
   );
 }

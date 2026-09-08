@@ -9,7 +9,7 @@ const slugify = require("slugify");
 // GET /releases
 exports.getReleases = async (req, res) => {
   try {
-    const releases = await Release.find()
+    const releases = await Release.find(req.path.startsWith("/admin/") ? {} : { catalogVisible: { $ne: false } })
       .populate("artist", "name slug")
       .populate("label")
       .sort({ release_date: -1, createdAt: -1 })
@@ -29,7 +29,7 @@ exports.getReleaseById = async (req, res) => {
       .populate("artist", "name slug")
       .populate("label");
 
-    if (!release) return res.status(404).json({ message: "Release not found" });
+    if (!release || (release.catalogVisible === false && !req.path.startsWith("/admin/"))) return res.status(404).json({ message: "Release not found" });
 
     res.json(release);
   } catch (error) {

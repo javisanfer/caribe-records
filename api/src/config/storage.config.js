@@ -11,7 +11,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "iron-records",
+    folder: process.env.NODE_ENV === "test" ? "caribe-records-test" : "iron-records",
     allowed_formats: ["jpg", "png", "jpeg"],
   },
 });

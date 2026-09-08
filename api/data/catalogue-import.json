@@ -1,0 +1,1259 @@
+{
+  "sourceWorkbook": "REFERENCIAS CATÁLOGO.xlsx",
+  "sheet": "Hoja 1",
+  "notes": [
+    "CAR006: single del Excel; enlace a la canción actualmente incluida en espiral. Sin portada verificada del single.",
+    "CAR008: single del Excel; enlace a la canción actualmente incluida en espiral. Sin portada verificada del single.",
+    "CAR023: fecha Excel 2020-03-20; Spotify 2018-01-01. Se usa la fecha original del Excel para Pole.",
+    "CAR033: fecha Excel 2025-05-22; Spotify 2025-06-16. Se mantiene la fecha publicada en Spotify.",
+    "CAR043: fecha Excel 2025-03-23; Spotify 2026-04-23. Se mantiene la fecha publicada en Spotify.",
+    "CAR044: metadatos verificados en https://regorego.bandcamp.com/album/espada-ep"
+  ],
+  "excludedCatalogs": [
+    "CAR042"
+  ],
+  "releases": [
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Recuerdos (cuándo)",
+      "artistName": "Los reels",
+      "format": "single",
+      "release_date": "2024-09-27",
+      "spotifyUrl": "https://open.spotify.com/album/1vIADfW3pdEPTgQ5yeT0Cl",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Recuerdos (cuándo)",
+          "duration": "3:57"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273e4d29cf5eac19059799d4c18",
+      "catalog": "CAR001",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "me sabe fatal",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2024-10-18",
+      "spotifyUrl": "https://open.spotify.com/album/2aUyWKJ7QT5n6CcDD0DeuR",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "me sabe fatal",
+          "duration": "1:41"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27356bb52898f62a512db06d5c9",
+      "catalog": "CAR002",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Mis tres soles",
+      "artistName": "Los reels",
+      "format": "single",
+      "release_date": "2024-10-24",
+      "spotifyUrl": "https://open.spotify.com/album/0sEDEd0WfWvwIPU1ZbPlE9",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Mis tres soles",
+          "duration": "2:41"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273ecd826fbd921056c7ad843a0",
+      "catalog": "CAR003",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Forrest Gump",
+      "artistName": "Los reels",
+      "format": "single",
+      "release_date": "2024-11-28",
+      "spotifyUrl": "https://open.spotify.com/album/1ruqUs3lVOV3JKCr0z51hf",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Forrest Gump",
+          "duration": "1:56"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273b827d2f6e01c39700c1ad814",
+      "catalog": "CAR004",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "title": "Pequeña nota de voz",
+      "format": "single",
+      "release_date": "2024-12-20",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Pequeña nota de voz",
+          "duration": "2:38"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/0pSk4xMSgrrDVTWsPSRFHD",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27360bde35bfe7b0a03eec75502",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/74R9yRGUtJE6ba9qLq5TPn",
+      "artistSlug": "julia-garblan",
+      "artistName": "Julia Garblan",
+      "catalog": "CAR005",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "title": "001",
+      "format": "single",
+      "release_date": "2025-04-09",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "001",
+          "duration": "4:20"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/track/0R0vuZNoouasXuwaGStya8",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/4Y03tuIXjqgcHBPo6IUMnn",
+      "artistSlug": "dtrillo",
+      "artistName": "d.trillo",
+      "catalog": "CAR006",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Sigo necesitando un tiempo",
+      "artistName": "Los reels",
+      "format": "lp",
+      "release_date": "2025-03-28",
+      "spotifyUrl": "https://open.spotify.com/album/5L4C86OjPtpvusYn2Q0v4C",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Sigo necesitando un tiempo",
+          "duration": "1:36"
+        },
+        {
+          "position": 2,
+          "title": "Mis tres soles",
+          "duration": "2:41"
+        },
+        {
+          "position": 3,
+          "title": "Diógenes social",
+          "duration": "2:10"
+        },
+        {
+          "position": 4,
+          "title": "Forrest Gump",
+          "duration": "1:56"
+        },
+        {
+          "position": 5,
+          "title": "Recuerdos (cuándo)",
+          "duration": "3:57"
+        },
+        {
+          "position": 6,
+          "title": "La torre",
+          "duration": "1:59"
+        },
+        {
+          "position": 7,
+          "title": "Aerofrágil",
+          "duration": "4:30"
+        },
+        {
+          "position": 8,
+          "title": "Modo telonio",
+          "duration": "2:16"
+        },
+        {
+          "position": 9,
+          "title": "Medio contrato",
+          "duration": "2:58"
+        },
+        {
+          "position": 10,
+          "title": "Laguna de dios",
+          "duration": "2:36"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2736221411d3845740c40381bc2",
+      "catalog": "CAR007",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "title": "002",
+      "format": "single",
+      "release_date": "2025-05-07",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "002",
+          "duration": "3:20"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/track/4cCTFbLW39AmrhtZnQ3Pe7",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/4Y03tuIXjqgcHBPo6IUMnn",
+      "artistSlug": "dtrillo",
+      "artistName": "d.trillo",
+      "catalog": "CAR008",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "tarde",
+      "artistName": "daddy san, Julia Garblan",
+      "format": "single",
+      "release_date": "2025-04-25",
+      "spotifyUrl": "https://open.spotify.com/album/0P5s15J5Mk4BPuHUUbkcCg",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "tarde",
+          "duration": "1:58"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273c37f853376e6557fa2e7449a",
+      "catalog": "CAR009",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "todo pasará",
+      "artistName": "daddy san",
+      "format": "lp",
+      "release_date": "2025-05-29",
+      "spotifyUrl": "https://open.spotify.com/album/4GHcmukWrSCpGPNb9mYM2v",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "oh bebé",
+          "duration": "2:26"
+        },
+        {
+          "position": 2,
+          "title": "violetas",
+          "duration": "2:18"
+        },
+        {
+          "position": 3,
+          "title": "no hay nadie",
+          "duration": "1:54"
+        },
+        {
+          "position": 4,
+          "title": "me sabe fatal",
+          "duration": "1:41"
+        },
+        {
+          "position": 5,
+          "title": "tarde",
+          "duration": "1:58"
+        },
+        {
+          "position": 6,
+          "title": "oporto",
+          "duration": "2:15"
+        },
+        {
+          "position": 7,
+          "title": "nada en su lugar",
+          "duration": "2:44"
+        },
+        {
+          "position": 8,
+          "title": "todo pasará",
+          "duration": "2:16"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27318ddc77d54ac62219b012b9e",
+      "catalog": "CAR011",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "title": "fantasmas",
+      "format": "single",
+      "release_date": "2025-10-27",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "fantasmas",
+          "duration": "2:41"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/7GuIjhiSh06agoWdUzc3ye",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2736efaba7e18f374723010a357",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/556ng8SA7mZYharvtMSOcw",
+      "artistSlug": "mi-amigo-mac",
+      "artistName": "mi amigo mac",
+      "catalog": "CARBA012",
+      "labelName": "Caribe Records/Buenos Amigos",
+      "catalogType": "distribution",
+      "catalogVisible": true
+    },
+    {
+      "title": "Pluma Fénix",
+      "format": "single",
+      "release_date": "2025-05-29",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Pluma Fénix",
+          "duration": "2:14"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/2IOpyKLPgAIJu6ADaikqWU",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2733c082bca28c9ebffc6380a1d",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/5HVaeEyzaQGe9gjanCzUtq",
+      "artistSlug": "dededede",
+      "artistName": "DeDeDeDe",
+      "catalog": "CARBA013",
+      "labelName": "Caribe Records/Buenos Amigos",
+      "catalogType": "distribution",
+      "catalogVisible": true
+    },
+    {
+      "title": "Soy una Noria",
+      "format": "single",
+      "release_date": "2025-06-19",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Soy una Noria",
+          "duration": "2:15"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/6SemzsYOyJxu56CvdXfTAu",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2730714b6af1abe887775c6e5e7",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/5HVaeEyzaQGe9gjanCzUtq",
+      "artistSlug": "dededede",
+      "artistName": "DeDeDeDe",
+      "catalog": "CARBA014",
+      "labelName": "Caribe Records/Buenos Amigos",
+      "catalogType": "distribution",
+      "catalogVisible": true
+    },
+    {
+      "title": "Misión Secundaria",
+      "format": "lp",
+      "release_date": "2025-07-03",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "El Picor",
+          "duration": "2:01"
+        },
+        {
+          "position": 2,
+          "title": "Soy una Noria",
+          "duration": "2:15"
+        },
+        {
+          "position": 3,
+          "title": "La Despensa",
+          "duration": "2:36"
+        },
+        {
+          "position": 4,
+          "title": "(No Sé) Si Soy Yo",
+          "duration": "2:38"
+        },
+        {
+          "position": 5,
+          "title": "Mañana",
+          "duration": "1:23"
+        },
+        {
+          "position": 6,
+          "title": "Vas a Pudrirte, Idiota",
+          "duration": "2:11"
+        },
+        {
+          "position": 7,
+          "title": "Pluma Fénix",
+          "duration": "2:14"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/1cTQhaRHmcq8raEapaJoc3",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273c2f7c879338cc3b6b857f2b1",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/5HVaeEyzaQGe9gjanCzUtq",
+      "artistSlug": "dededede",
+      "artistName": "DeDeDeDe",
+      "catalog": "CARBA015",
+      "labelName": "Caribe Records/Buenos Amigos",
+      "catalogType": "distribution",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Héroes, Disco, Perfil",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2023-01-18",
+      "spotifyUrl": "https://open.spotify.com/album/00LHadEdvvRHZvJ9knPbe1",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Héroes, Disco, Perfil",
+          "duration": "2:46"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273d7a55d4c09e04913f7925dd4",
+      "catalog": "CAR016",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Servicio de Organización",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2023-02-15",
+      "spotifyUrl": "https://open.spotify.com/album/3j7vZJvy2CdT4uDqqbrXP2",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Servicio de Organización",
+          "duration": "3:22"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273a1abc04aa2d87bc384db880e",
+      "catalog": "CAR017",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Campus Muerte",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2023-03-15",
+      "spotifyUrl": "https://open.spotify.com/album/3LGiJLxos5xZv9AGXisZz6",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Campus Muerte",
+          "duration": "4:25"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273ed13b104481ef18e518dea5d",
+      "catalog": "CAR018",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Sempre Está Chovendo Na Beira Do Mar",
+      "artistName": "Aeronave Adolescente",
+      "format": "lp",
+      "release_date": "2023-03-29",
+      "spotifyUrl": "https://open.spotify.com/album/1DPfSwfbbbThGEZ2FytZPG",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Héroes, Disco, Perfil",
+          "duration": "2:46"
+        },
+        {
+          "position": 2,
+          "title": "Carrera Hacia El Sol",
+          "duration": "5:32"
+        },
+        {
+          "position": 3,
+          "title": "Campus Muerte",
+          "duration": "4:25"
+        },
+        {
+          "position": 4,
+          "title": "Caminos (Y Cómo Estos Se Convierten En Hogar)",
+          "duration": "4:26"
+        },
+        {
+          "position": 5,
+          "title": "Servicio de Organización",
+          "duration": "3:22"
+        },
+        {
+          "position": 6,
+          "title": "Pegadas No Pavimento",
+          "duration": "4:48"
+        },
+        {
+          "position": 7,
+          "title": "La Ayuda Está en Camino",
+          "duration": "5:36"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273afaf95173bfd47c65c8babe4",
+      "catalog": "CAR019",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "los-reels",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/2bB4ObUYYsTRa0U2HKsE2T",
+      "title": "Lo siento",
+      "artistName": "Los reels",
+      "format": "single",
+      "release_date": "2022-10-14",
+      "spotifyUrl": "https://open.spotify.com/album/3vH6jXC2qbZQETZhaZI7fB",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Aeropuertos",
+          "duration": "2:40"
+        },
+        {
+          "position": 2,
+          "title": "Frágil",
+          "duration": "1:31"
+        },
+        {
+          "position": 3,
+          "title": "Mundo extraño",
+          "duration": "3:00"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27324b2a08d8ca510846fef229d",
+      "catalog": "CAR020",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "el mirador de la ría del burgo y otros puntos de inspiración",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-12-05",
+      "spotifyUrl": "https://open.spotify.com/album/0DMn3VD9g4YjI5yb9U5BBr",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Diálogo uno",
+          "duration": "2:16"
+        },
+        {
+          "position": 2,
+          "title": "Ninguna Respuesta Concedida",
+          "duration": "3:42"
+        },
+        {
+          "position": 3,
+          "title": "Nuevas Versiones",
+          "duration": "5:30"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273427c078f1311b698a5c442ec",
+      "catalog": "CAR021",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "Bici Mad",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2018-12-27",
+      "spotifyUrl": "https://open.spotify.com/album/3QLSLtSTWhlmSz1erRQv6r",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Bici Mad",
+          "duration": "2:44"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27375ec184ab79c8cb6039efe23",
+      "catalog": "CAR022",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "Pole",
+      "artistName": "daddy san",
+      "format": "ep",
+      "release_date": "2020-03-20",
+      "spotifyUrl": "https://open.spotify.com/album/4zURoq1RAB7JdAon5l8KqI",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Bici Mad",
+          "duration": "2:44"
+        },
+        {
+          "position": 2,
+          "title": "Línea 5",
+          "duration": "3:08"
+        },
+        {
+          "position": 3,
+          "title": "Romance Romántico (Mujeres)",
+          "duration": "1:45"
+        },
+        {
+          "position": 4,
+          "title": "Uaaatusojos",
+          "duration": "3:28"
+        },
+        {
+          "position": 5,
+          "title": "Lisa",
+          "duration": "2:50"
+        },
+        {
+          "position": 6,
+          "title": "Tarantino",
+          "duration": "4:06"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273a79e054a63c84a199f8458e3",
+      "catalog": "CAR023",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "Mercamadrid",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2022-11-17",
+      "spotifyUrl": "https://open.spotify.com/album/0I67htmj49B6hhw8p3pJO4",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Mercamadrid",
+          "duration": "2:55"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273ee99a095c00573f067af6619",
+      "catalog": "CAR024",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "Teki",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2023-04-14",
+      "spotifyUrl": "https://open.spotify.com/album/4M9bcKqrR7nFKLjCHZOeJZ",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Teki",
+          "duration": "2:46"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2737cf0ac517f4e221e9da825ea",
+      "catalog": "CAR025",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "daddy-san",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/6xpfKZY8cBFeyGRiwfgyPU",
+      "title": "oh bebé",
+      "artistName": "daddy san",
+      "format": "single",
+      "release_date": "2024-02-23",
+      "spotifyUrl": "https://open.spotify.com/album/6ntSFagauWXIKJkYgwaHwF",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "oh bebé",
+          "duration": "2:26"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273386cab1551c1391221535c0a",
+      "catalog": "CAR026",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Montaña",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-03-14",
+      "spotifyUrl": "https://open.spotify.com/album/2embhzmImu3iUclFoDVYPZ",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Montaña",
+          "duration": "3:05"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2735498fbaeea9e59d4c9153d50",
+      "catalog": "CAR027",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Maté",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-04-27",
+      "spotifyUrl": "https://open.spotify.com/album/6UgwsZSpn37pMPNYdgp2dZ",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Maté",
+          "duration": "2:43"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273458ba97229771b67bfce81ba",
+      "catalog": "CAR028",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Cartas de Ida y Vuelta",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-06-27",
+      "spotifyUrl": "https://open.spotify.com/album/314Hs8ruF5VRJCTqMT98nk",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Sombra (Carta de Perdón)",
+          "duration": "3:43"
+        },
+        {
+          "position": 2,
+          "title": "Octavo (Carta de Odio)",
+          "duration": "2:34"
+        },
+        {
+          "position": 3,
+          "title": "Megáfono (Carta de Angustia)",
+          "duration": "4:40"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273c13fffafd79f0c72ae3e85bf",
+      "catalog": "CAR029",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "No Love Lost",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-08-28",
+      "spotifyUrl": "https://open.spotify.com/album/0LOF7kHkeS9CaaicMGqB40",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "No Love Lost",
+          "duration": "4:40"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273b84d8fae0ae8b3606c9cfd84",
+      "catalog": "CAR030",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Cines",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-10-05",
+      "spotifyUrl": "https://open.spotify.com/album/5SOG4WC85oDDHC8lJiza3R",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Cines",
+          "duration": "3:27"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2732d653bd1316bb28492804636",
+      "catalog": "CAR031",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Hello?",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2020-10-21",
+      "spotifyUrl": "https://open.spotify.com/album/0XgkoYQJP3Bp5Z3A6nCoJx",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Hello?",
+          "duration": "4:00"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27352e401d7a96bdcc8a7054077",
+      "catalog": "CAR032",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "title": "espiral",
+      "format": "lp",
+      "release_date": "2025-06-16",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "001",
+          "duration": "4:20"
+        },
+        {
+          "position": 2,
+          "title": "002",
+          "duration": "3:20"
+        },
+        {
+          "position": 3,
+          "title": "7b",
+          "duration": "4:28"
+        },
+        {
+          "position": 4,
+          "title": "entusmr",
+          "duration": "3:36"
+        },
+        {
+          "position": 5,
+          "title": "haddock",
+          "duration": "4:28"
+        },
+        {
+          "position": 6,
+          "title": "espiral (dentro)",
+          "duration": "2:22"
+        },
+        {
+          "position": 7,
+          "title": "traspié",
+          "duration": "3:40"
+        },
+        {
+          "position": 8,
+          "title": "domingo",
+          "duration": "2:58"
+        },
+        {
+          "position": 9,
+          "title": "ayalga",
+          "duration": "3:43"
+        },
+        {
+          "position": 10,
+          "title": "no me deja",
+          "duration": "2:40"
+        },
+        {
+          "position": 11,
+          "title": "ya no te veo",
+          "duration": "3:20"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/6tiOvtLuAqN6CUWLgqorrl",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273ec2b20e157acf002a008190a",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/4Y03tuIXjqgcHBPo6IUMnn",
+      "artistSlug": "dtrillo",
+      "artistName": "d.trillo",
+      "catalog": "CAR033",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "title": "linea de corte",
+      "format": "single",
+      "release_date": "2025-06-17",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "linea de corte",
+          "duration": "1:55"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/44ksZLd28OqyakNiS8oMI9",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273e6231fe6021b974224b7b0dc",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/556ng8SA7mZYharvtMSOcw",
+      "artistSlug": "mi-amigo-mac",
+      "artistName": "mi amigo mac",
+      "catalog": "CARBA034",
+      "labelName": "Caribe Records/Buenos Amigos",
+      "catalogType": "distribution",
+      "catalogVisible": true
+    },
+    {
+      "title": "jugador defensivo del año, Pt. 3",
+      "format": "single",
+      "release_date": "2025-08-22",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "jugador defensivo del año, Pt. 3",
+          "duration": "3:40"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/2FL4cqgqCRR8dM3tCq3c7d",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b27304256e388ab6e77239afe96f",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/556ng8SA7mZYharvtMSOcw",
+      "artistSlug": "mi-amigo-mac",
+      "artistName": "mi amigo mac",
+      "catalog": "CARBA035",
+      "labelName": "Caribe Records/Buenos Amigos",
+      "catalogType": "distribution",
+      "catalogVisible": true
+    },
+    {
+      "title": "no hacía falta que fuera magia...",
+      "format": "single",
+      "release_date": "2025-09-17",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "no hacía falta que fuera magia...",
+          "duration": "3:39"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/6yZWUkcTPZVmjnokCKY14p",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2731ac02c451180844c7920577b",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/556ng8SA7mZYharvtMSOcw",
+      "artistSlug": "mi-amigo-mac",
+      "artistName": "mi amigo mac",
+      "catalog": "CARBA036",
+      "labelName": "Caribe Records/Buenos Amigos",
+      "catalogType": "distribution",
+      "catalogVisible": true
+    },
+    {
+      "title": "la más alta manifestación de la magia",
+      "format": "lp",
+      "release_date": "2025-10-31",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "vacío por dentro",
+          "duration": "3:05"
+        },
+        {
+          "position": 2,
+          "title": "no hacía falta que fuera magia...",
+          "duration": "3:39"
+        },
+        {
+          "position": 3,
+          "title": "fantasmas",
+          "duration": "2:41"
+        },
+        {
+          "position": 4,
+          "title": "loca academia de policía",
+          "duration": "3:20"
+        },
+        {
+          "position": 5,
+          "title": "sangre, autoestima",
+          "duration": "2:53"
+        },
+        {
+          "position": 6,
+          "title": "jugador defensivo del año, Pt. 3",
+          "duration": "3:40"
+        },
+        {
+          "position": 7,
+          "title": "ojalá",
+          "duration": "1:59"
+        },
+        {
+          "position": 8,
+          "title": "mensajes poco esperanzadores",
+          "duration": "2:31"
+        },
+        {
+          "position": 9,
+          "title": "linea de corte",
+          "duration": "1:55"
+        },
+        {
+          "position": 10,
+          "title": "un momento para respirar",
+          "duration": "2:59"
+        }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/3F4VMm1PsWNd0STfzTDAMS",
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2739a4f52d8f6080f280966d772",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/556ng8SA7mZYharvtMSOcw",
+      "artistSlug": "mi-amigo-mac",
+      "artistName": "mi amigo mac",
+      "catalog": "CARBA037",
+      "labelName": "Caribe Records/Buenos Amigos",
+      "catalogType": "distribution",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "V.M.D.",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2025-10-24",
+      "spotifyUrl": "https://open.spotify.com/album/5b3ZHjsV0m8qYzHRdSBSHP",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "V.M.D.",
+          "duration": "3:38"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273247ee80f3c4461109d5d6f9f",
+      "catalog": "CAR038",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "El día de la marmota II",
+      "artistName": "Aeronave Adolescente",
+      "format": "single",
+      "release_date": "2025-11-21",
+      "spotifyUrl": "https://open.spotify.com/album/5lzL8VhZdQ6u8kGDzhN6Ns",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "El día de la marmota II",
+          "duration": "2:52"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2737b4c5d1fd7179f07a053f4e6",
+      "catalog": "CAR039",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "aeronave-adolescente",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+      "title": "Sueño con salones llenos",
+      "artistName": "Aeronave Adolescente",
+      "format": "lp",
+      "release_date": "2026-01-16",
+      "spotifyUrl": "https://open.spotify.com/album/1aLPQIrGlVyiP7sVXhF015",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "La última mota de polvo del mundo",
+          "duration": "2:29"
+        },
+        {
+          "position": 2,
+          "title": "El día de la marmota II",
+          "duration": "2:52"
+        },
+        {
+          "position": 3,
+          "title": "Brilla, brilla",
+          "duration": "4:22"
+        },
+        {
+          "position": 4,
+          "title": "V.M.D.",
+          "duration": "3:38"
+        },
+        {
+          "position": 5,
+          "title": "Salones llenos",
+          "duration": "1:47"
+        },
+        {
+          "position": 6,
+          "title": "Todo lo que tengo",
+          "duration": "4:52"
+        },
+        {
+          "position": 7,
+          "title": "La balada de José y Josefina",
+          "duration": "10:32"
+        },
+        {
+          "position": 8,
+          "title": "Solo gravilla",
+          "duration": "3:04"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273126c82dd4d4171c146bd8d2d",
+      "catalog": "CAR040",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "ferrocentro-club",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/0J3vdISJ1KpsS4rydRges3",
+      "title": "VELOZ",
+      "artistName": "ferrocentro club",
+      "format": "ep",
+      "release_date": "2025-08-29",
+      "spotifyUrl": "https://open.spotify.com/album/1tZBbfuEE4Ye4y8PgZ8gvy",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "pez gato",
+          "duration": "4:26"
+        },
+        {
+          "position": 2,
+          "title": "daguerrotipo",
+          "duration": "4:22"
+        },
+        {
+          "position": 3,
+          "title": "noemí te quiero!",
+          "duration": "3:43"
+        },
+        {
+          "position": 4,
+          "title": "verano en syberia",
+          "duration": "2:16"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b2733abf12da293b8cb14495fc49",
+      "catalog": "CAR041",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "artistSlug": "ferrocentro-club",
+      "artistSpotifyUrl": "https://open.spotify.com/artist/0J3vdISJ1KpsS4rydRges3",
+      "title": "bueño TV",
+      "artistName": "ferrocentro club",
+      "format": "single",
+      "release_date": "2026-04-23",
+      "spotifyUrl": "https://open.spotify.com/album/75eicGeAG0v1GyR817tBzq",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "bueño TV",
+          "duration": "3:40"
+        }
+      ],
+      "cover_image": "https://i.scdn.co/image/ab67616d0000b273f0fe0bb775997a573a9dc4f7",
+      "catalog": "CAR043",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true
+    },
+    {
+      "title": "Espada EP",
+      "format": "ep",
+      "release_date": "2026-05-06",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "Espejo",
+          "duration": "2:52"
+        },
+        {
+          "position": 2,
+          "title": "Mi voz",
+          "duration": "2:01"
+        },
+        {
+          "position": 3,
+          "title": "Mi Cuerpo",
+          "duration": "2:55"
+        },
+        {
+          "position": 4,
+          "title": "30125 (ft. d.trillo)",
+          "duration": "2:06"
+        },
+        {
+          "position": 5,
+          "title": "Espada",
+          "duration": "2:24"
+        }
+      ],
+      "spotifyUrl": "",
+      "artistSlug": "rego",
+      "artistName": "rego",
+      "catalog": "CAR044",
+      "labelName": "Caribe Records",
+      "catalogType": "own",
+      "catalogVisible": true,
+      "cover_image": "https://f4.bcbits.com/img/a3890390314_10.jpg",
+      "bandcampUrl": "https://regorego.bandcamp.com/album/espada-ep",
+      "artistBandcampUrl": "https://regorego.bandcamp.com/",
+      "artistPortraitUrl": "https://f4.bcbits.com/img/0046774737_10.jpg"
+    }
+  ]
+}

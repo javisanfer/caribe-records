@@ -1,28 +1,24 @@
 import React, { useMemo, useState } from "react";
 import ReleaseItem from "../release-item/release-item";
 import AdminEditLink from "../../admin/admin-edit-link";
+import { releaseDate, sortReleases } from "../../../utils/release-order";
 
 export default function ReleaseList({ releases = [] }) {
   const [view, setView] = useState("list"); // "list" | "grid"
+  const [order, setOrder] = useState("newest");
 
   const sorted = useMemo(
-    () =>
-      [...releases].sort((a, b) => {
-        const dA = new Date(a.date || a.releaseDate || a.year || 0);
-        const dB = new Date(b.date || b.releaseDate || b.year || 0);
-        return dB - dA;
-      }),
-    [releases]
+    () => sortReleases(releases, order),
+    [releases, order]
   );
 
   const yearsRange = useMemo(() => {
     if (!sorted.length) return "";
     const years = sorted
       .map((r) => {
-        const d = new Date(r.date || r.releaseDate);
-        return d.getFullYear();
+        return releaseDate(r)?.getFullYear();
       })
-      .filter((y) => !Number.isNaN(y));
+      .filter((y) => Number.isFinite(y));
     if (!years.length) return "";
     return `${Math.min(...years)}–${Math.max(...years)}`;
   }, [sorted]);
@@ -31,6 +27,12 @@ export default function ReleaseList({ releases = [] }) {
     <section className="releases-wrap">
       <header className="index-toolbar">
           <p>{yearsRange || "Archivo completo"}</p>
+          <label className="catalogue-filter">Orden
+            <select value={order} onChange={(event) => setOrder(event.target.value)}>
+              <option value="newest">Más recientes primero</option>
+              <option value="oldest">Más antiguos primero</option>
+            </select>
+          </label>
           <div className="index-toolbar__views" role="group" aria-label="Vista de discografía">
             <button
               className={view === "list" ? "is-active" : ""}

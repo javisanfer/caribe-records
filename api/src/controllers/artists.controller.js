@@ -37,6 +37,7 @@ exports.getArtistById = async (req, res) => {
     const artist = await Artist.findById(req.params.id)
       .populate({
         path: "albums",
+        match: { catalogVisible: { $ne: false } },
         select:
           "title format release_date cover_image cover spotifyUrl catalog serialNumber",
         options: { sort: { release_date: -1, createdAt: -1 } },
@@ -62,6 +63,7 @@ exports.getArtistBySlug = async (req, res) => {
     const artist = await Artist.findOne({ slug: req.params.slug })
       .populate({
         path: "albums",
+        match: { catalogVisible: { $ne: false } },
         select:
           "title format release_date cover_image cover spotifyUrl catalog serialNumber",
         options: { sort: { release_date: -1, createdAt: -1 } },

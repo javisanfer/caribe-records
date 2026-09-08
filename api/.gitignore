@@ -49,6 +49,7 @@ uploads/tmp/
 public/uploads/
 tmp_uploads/
 cloudinary/
+backups/
 *.bak
 
 # -----------------------------

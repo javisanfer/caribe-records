@@ -2,12 +2,14 @@ const Artist = require("../models/artist.model");
 const Release = require("../models/release.model");
 const Event = require("../models/event.model");
 const Editorial = require("../models/editorial.model");
+const Banner = require("../models/banner.model");
 
 const ACTIVITY_SOURCES = [
   { type: "artist", model: Artist, titleField: "name", select: "name slug createdAt updatedAt" },
   { type: "release", model: Release, titleField: "title", select: "title createdAt updatedAt" },
   { type: "event", model: Event, titleField: "title", select: "title slug createdAt updatedAt" },
   { type: "editorial", model: Editorial, titleField: "title", select: "title slug createdAt updatedAt" },
+  { type: "banner", model: Banner, titleField: "title", select: "title createdAt updatedAt" },
 ];
 
 exports.getActivity = async (req, res) => {

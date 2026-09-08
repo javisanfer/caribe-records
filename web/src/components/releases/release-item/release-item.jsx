@@ -37,6 +37,7 @@ export default function ReleaseItem({ release, view = "list" }) {
 
   // Catálogo / label
   const catalog = release.catalog || release.catNo || release.cat || "";
+  const listenUrl = release.bandcampUrl || release.spotifyUrl;
 
   // Fecha: tu API usa release_date
   const date =
@@ -60,6 +61,29 @@ export default function ReleaseItem({ release, view = "list" }) {
   // Enlace de compra (de momento no lo tienes en la API, lo dejamos preparado)
   const buyUrl = release.buyUrl || release.storeUrl || release.shopUrl || "";
 
+  const cover = coverUrl && (
+    <img
+      src={coverUrl}
+      alt={coverAlt}
+      loading="lazy"
+      decoding="async"
+      className="w-100 h-100 object-fit-cover"
+    />
+  );
+
+  const linkedCover = listenUrl ? (
+    <a
+      className="release-cover-link"
+      href={listenUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Escuchar ${title}`}
+    >
+      {cover}
+      <span aria-hidden="true">Escuchar ↗</span>
+    </a>
+  ) : cover;
+
   // Tracklist: tu API usa `tracklist`, con campos { position, title, duration }
   const tracksRaw = release.tracks || release.tracklist || [];
   const tracks = tracksRaw.map((t, idx) => ({
@@ -73,22 +97,14 @@ export default function ReleaseItem({ release, view = "list" }) {
     return (
       <article className="release-card bg-black text-white border border-dark p-2 h-100">
         <div className="ratio ratio-1x1 mb-2">
-          {coverUrl && (
-            <img
-              src={coverUrl}
-              alt={coverAlt}
-              loading="lazy"
-              decoding="async"
-              className="w-100 h-100 object-fit-cover"
-            />
-          )}
+          {linkedCover}
         </div>
         <div className="small text-uppercase text-secondary">
           {artistName}
         </div>
         <h3 className="fs-6 fw-semibold text-white mb-1">{title}</h3>
         <div className="d-flex justify-content-between small text-secondary">
-          <span>{catalog || release.label}</span>
+          <span>{catalog}</span>
           <span>{date ? formatDate(date) : ""}</span>
         </div>
         {buyUrl && (
@@ -121,21 +137,14 @@ export default function ReleaseItem({ release, view = "list" }) {
         </div>
 
         <div className="border border-dark p-2 mb-2">
-          {coverUrl && (
-            <img
-              src={coverUrl}
-              alt={coverAlt}
-              loading="lazy"
-              decoding="async"
-              className="w-100 h-auto d-block"
-            />
-          )}
+          {linkedCover}
         </div>
 
         <div className="d-flex justify-content-between small text-secondary mb-2">
-          <span>{catalog || release.label || "—"}</span>
+          <span>{catalog || "—"}</span>
           <span>{date ? formatDate(date) : ""}</span>
         </div>
+
 
         {buyUrl && (
           <a

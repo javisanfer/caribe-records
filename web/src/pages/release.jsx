@@ -60,8 +60,10 @@ export default function ReleasePage() {
             })),
 
             // label / catálogo
-            label:
-              typeof r.label === "object" ? r.label.name : r.label || null,
+            label: r.labelName || (typeof r.label === "object" ? r.label?.name : r.label) || "",
+            catalogType: r.catalogType || "own",
+            spotifyUrl: r.spotifyUrl || "",
+            bandcampUrl: r.bandcampUrl || "",
             catalog: r.catalog || r.catNo || null,
           };
         });

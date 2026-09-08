@@ -18,6 +18,7 @@ const releaseController = require("../controllers/releases.controller");
 const editorialController = require("../controllers/editorial.controller");
 const eventController = require("../controllers/events.controller");
 const adminController = require("../controllers/admin.controller");
+const bannerController = require("../controllers/banners.controller");
 
 // ======================================================
 // USERS & SESSIONS
@@ -203,6 +204,17 @@ router.delete(
   auth.isAuthenticated,
   editorialController.deleteEditorial
 );
+
+// ======================================================
+// BANNERS
+// ======================================================
+
+router.get("/banners/active", bannerController.getActiveBanner);
+router.get("/admin/banners", auth.isAuthenticated, bannerController.listBanners);
+router.get("/admin/banners/:id", auth.isAuthenticated, bannerController.getBanner);
+router.post("/admin/banners", auth.isAuthenticated, bannerController.createBanner);
+router.patch("/admin/banners/:id", auth.isAuthenticated, bannerController.updateBanner);
+router.delete("/admin/banners/:id", auth.isAuthenticated, bannerController.deleteBanner);
 
 // ======================================================
 // UPLOADS GENERIC
