@@ -42,7 +42,7 @@ Los datos de test no se copian a producción. El contenido real se gestiona en p
 
 Para `main`:
 
-- Exigir pull request y una aprobación.
+- Exigir pull request y resolver las conversaciones antes de fusionar.
 - Exigir `API tests`, `Web lint and build` y `Production source`.
 - Exigir que la rama esté actualizada.
 - Bloquear force push y borrado.
@@ -52,4 +52,3 @@ Para `develop`:
 - Exigir pull request.
 - Exigir `API tests` y `Web lint and build`.
 - Bloquear force push y borrado.
-
