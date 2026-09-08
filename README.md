@@ -1,5 +1,7 @@
 # React + Vite
 
+El proceso de ramas, QA y publicación está documentado en [docs/git-release-process.md](docs/git-release-process.md).
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
