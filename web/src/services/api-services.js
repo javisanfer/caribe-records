@@ -2,12 +2,13 @@
 import axios from "axios";
 
 /**
- * Config base: usa VITE_API_BASE en .env (p.ej. http://localhost:3000/api/v1)
- * Si no existe, cae a 'http://localhost:3000/api/v1' en dev.
+ * Usa una ruta relativa por defecto para que Axios y fetch compartan el proxy
+ * configurado por Vite. Producción puede definir VITE_API_BASE si la API vive
+ * en otro origen.
  */
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
-  "http://localhost:3000/api/v1";
+  "/api/v1";
 
 export const http = axios.create({
   baseURL: API_BASE,
