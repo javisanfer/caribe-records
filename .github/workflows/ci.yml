@@ -1,5 +1,8 @@
 name: CI
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches: [develop, main]
@@ -14,14 +17,15 @@ jobs:
   api-tests:
     name: API tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: api
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Node.js 24
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24.20.0
           cache: npm
@@ -30,18 +34,21 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
 
   web-quality:
     name: Web lint and build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: web
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Node.js 24
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24.20.0
           cache: npm
@@ -52,11 +59,34 @@ jobs:
         run: npm run lint
       - name: Build QA configuration
         run: npm run build -- --mode test
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+  pull-request-policy:
+    name: Pull request policy
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Validate title and branch name
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|ci|test|refactor|chore|perf|build)(\([a-z0-9._/-]+\))?\!?:\ .+ ]]; then
+            echo "Use a Conventional Commit title, for example: fix(auth): reject inactive users"
+            exit 1
+          fi
+          if [[ "$HEAD_REF" != codex/* && "$HEAD_REF" != "develop" ]]; then
+            echo "Branches must use codex/*; production releases come from develop"
+            exit 1
+          fi
 
   production-source:
     name: Production source
     if: github.event_name == 'pull_request' && github.base_ref == 'main'
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
       - name: Accept develop or hotfix branches only
         env:
@@ -66,4 +96,3 @@ jobs:
             echo "Production PRs must come from develop or codex/hotfix-*"
             exit 1
           fi
-
