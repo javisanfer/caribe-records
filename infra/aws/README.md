@@ -27,15 +27,17 @@ aws cloudformation deploy \
   --region eu-west-1 \
   --stack-name caribe-records-bootstrap \
   --template-file infra/aws/bootstrap.yaml \
+  --capabilities CAPABILITY_NAMED_IAM \
   --parameter-overrides BudgetEmail=TU_EMAIL MonthlyBudgetUsd=12
 ```
 
 AWS enviará un correo de confirmación para los avisos del presupuesto.
 
-El stack también crea un rol limitado para GitHub Actions. Copiar el output
-`GitHubProductionDeployRoleArn` a la variable `AWS_DEPLOY_ROLE_ARN` del entorno
-`production` de GitHub. El rol solo puede publicar en este repositorio de ECR y
-actualizar la función Lambda de producción.
+El stack también crea el rol limitado que usa GitHub Actions. Su ARN está
+configurado en el workflow de este repositorio; no contiene credenciales ni
+concede acceso por sí solo. El rol solo acepta tokens OIDC del entorno
+`production`, puede publicar en este repositorio de ECR y actualizar la función
+Lambda de producción.
 
 ## 2. Secretos gratuitos en Parameter Store
 
@@ -54,13 +56,15 @@ La función lee estos parámetros y los descifra durante el arranque. Su rol sol
 
 ## 3. Construir y subir la primera imagen
 
-Ejecutar manualmente el workflow `Deploy production API` con `push_only=true`.
-GitHub construye la imagen del commit seleccionado y la publica con una etiqueta
-inmutable basada en su SHA. La autenticación usa OIDC, sin claves permanentes.
+Crear la primera etiqueta semántica (`v1.0.0`). GitHub construye la imagen del
+commit etiquetado y la publica con una etiqueta inmutable basada en su SHA. La
+autenticación usa OIDC, sin claves permanentes. Si Lambda todavía no existe, el
+workflow deja la imagen lista en ECR y termina correctamente.
 
 Copiar el URI de imagen del resumen de la ejecución para crear inicialmente la
-función. Después de ese primer despliegue, cada etiqueta `v*.*.*` actualiza
-Lambda automáticamente.
+función. A partir de entonces, cada etiqueta `v*.*.*` actualiza Lambda
+automáticamente. El modo manual `push_only` queda disponible para reconstruir
+una imagen sin desplegarla.
 
 ## 4. Crear Lambda
 

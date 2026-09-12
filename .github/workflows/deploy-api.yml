@@ -23,6 +23,7 @@ env:
   AWS_REGION: eu-west-1
   ECR_REPOSITORY: caribe-records-api
   LAMBDA_FUNCTION: caribe-records-api-production
+  AWS_DEPLOY_ROLE_ARN: arn:aws:iam::802854082287:role/caribe-records-github-production
 
 jobs:
   deploy:
@@ -37,7 +38,7 @@ jobs:
       - name: Configure temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v6.2.4
         with:
-          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
           mask-aws-account-id: true
 
@@ -61,12 +62,19 @@ jobs:
         env:
           IMAGE_URI: ${{ steps.image.outputs.uri }}
         run: |
-          aws lambda update-function-code \
+          if aws lambda get-function \
             --function-name "$LAMBDA_FUNCTION" \
-            --image-uri "$IMAGE_URI" \
-            --no-cli-pager
-          aws lambda wait function-updated-v2 \
-            --function-name "$LAMBDA_FUNCTION"
+            --no-cli-pager >/dev/null 2>&1; then
+            aws lambda update-function-code \
+              --function-name "$LAMBDA_FUNCTION" \
+              --image-uri "$IMAGE_URI" \
+              --no-cli-pager
+            aws lambda wait function-updated-v2 \
+              --function-name "$LAMBDA_FUNCTION"
+          else
+            echo "Lambda does not exist yet; image is ready for infrastructure bootstrap." \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Deployment summary
         env:
