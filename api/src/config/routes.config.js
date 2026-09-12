@@ -57,10 +57,9 @@ router.use(
   "/admin",
   auth.isAuthenticated,
   auth.isAdmin,
-  adminRateLimit,
 );
 
-router.get("/admin/activity", adminController.getActivity);
+router.get("/admin/activity", adminRateLimit, adminController.getActivity);
 
 // ======================================================
 // ARTISTS
@@ -76,20 +75,23 @@ router.get("/artists/slug/:slug", artistController.getArtistBySlug);
 router.get("/artists/:id", artistController.getArtistById);
 
 // Admin
-router.post("/admin/artists", artistController.createArtists);
+router.post("/admin/artists", adminRateLimit, artistController.createArtists);
 
 router.get(
   "/admin/artists/slug/:slug",
+  adminRateLimit,
   artistController.getArtistBySlug
 );
 
 router.patch(
   "/admin/artists/slug/:slug",
+  adminRateLimit,
   artistController.updateArtist
 );
 
 router.delete(
   "/admin/artists/slug/:slug",
+  adminRateLimit,
   artistController.deleteArtist
 );
 
@@ -104,26 +106,31 @@ router.get("/releases/:id", releaseController.getReleaseById);
 // Admin
 router.get(
   "/admin/releases",
+  adminRateLimit,
   releaseController.getReleases
 );
 
 router.get(
   "/admin/releases/:id",
+  adminRateLimit,
   releaseController.getReleaseById
 );
 
 router.post(
   "/admin/releases",
+  adminRateLimit,
   releaseController.createRelease
 );
 
 router.patch(
   "/admin/releases/:id",
+  adminRateLimit,
   releaseController.updateRelease
 );
 
 router.delete(
   "/admin/releases/:id",
+  adminRateLimit,
   releaseController.deleteRelease
 );
 
@@ -138,26 +145,31 @@ router.get("/events/slug/:slug", eventController.getEventBySlugPublic);
 // Admin
 router.get(
   "/admin/events",
+  adminRateLimit,
   eventController.getEventsAdmin
 );
 
 router.get(
   "/admin/events/slug/:slug",
+  adminRateLimit,
   eventController.getEventByIdAdmin
 );
 
 router.post(
   "/admin/events",
+  adminRateLimit,
   eventController.createEvent
 );
 
 router.patch(
   "/admin/events/slug/:slug",
+  adminRateLimit,
   eventController.updateEvent
 );
 
 router.delete(
   "/admin/events/slug/:slug",
+  adminRateLimit,
   eventController.deleteEvent
 );
 
@@ -175,28 +187,33 @@ router.get(
 // Admin
 router.get(
   "/admin/editorials",
+  adminRateLimit,
   editorialController.getEditorialsAdmin
 );
 
 router.get(
   "/admin/editorials/slug/:slug",
+  adminRateLimit,
   editorialController.getEditorialBySlugAdmin
 );
 
 router.post(
   "/admin/editorials",
+  adminRateLimit,
   upload.single("heroFile"),
   editorialController.createEditorial
 );
 
 router.patch(
   "/admin/editorials/slug/:slug",
+  adminRateLimit,
   upload.single("heroFile"),
   editorialController.updateEditorial
 );
 
 router.delete(
   "/admin/editorials/slug/:slug",
+  adminRateLimit,
   editorialController.deleteEditorial
 );
 
@@ -205,11 +222,11 @@ router.delete(
 // ======================================================
 
 router.get("/banners/active", bannerController.getActiveBanner);
-router.get("/admin/banners", bannerController.listBanners);
-router.get("/admin/banners/:id", bannerController.getBanner);
-router.post("/admin/banners", bannerController.createBanner);
-router.patch("/admin/banners/:id", bannerController.updateBanner);
-router.delete("/admin/banners/:id", bannerController.deleteBanner);
+router.get("/admin/banners", adminRateLimit, bannerController.listBanners);
+router.get("/admin/banners/:id", adminRateLimit, bannerController.getBanner);
+router.post("/admin/banners", adminRateLimit, bannerController.createBanner);
+router.patch("/admin/banners/:id", adminRateLimit, bannerController.updateBanner);
+router.delete("/admin/banners/:id", adminRateLimit, bannerController.deleteBanner);
 
 // ======================================================
 // UPLOADS GENERIC
