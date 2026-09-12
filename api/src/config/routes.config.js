@@ -69,16 +69,8 @@ router.use(
 
 router.get("/admin/activity", adminRateLimit, adminController.getActivity);
 
-// User management is administrative even though these legacy endpoints do not
-// live below /admin.
-router.post(
-  "/users",
-  auth.isAuthenticated,
-  auth.isAdmin,
-  adminRateLimit,
-  upload.single("avatar"),
-  users.create,
-);
+// Accounts are provisioned with an internal bootstrap command. There is no
+// HTTP endpoint for creating users in any environment.
 router.get(
   "/users",
   auth.isAuthenticated,
