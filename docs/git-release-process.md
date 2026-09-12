@@ -5,7 +5,7 @@
 | Rama | Uso | Entorno | Base de datos |
 | --- | --- | --- | --- |
 | `codex/ticket-*` | Una incidencia o desarrollo | Local | `caribe_records_test` local |
-| `develop` | Integración aprobada | Staging | `caribe_records_staging` |
+| `develop` | Integración aprobada | QA local | `caribe_records_test` |
 | `main` | Versiones publicadas | Producción | `caribe_records` |
 
 `main` y `develop` no reciben trabajo directo. Cada cambio empieza desde `develop` en una rama corta.
@@ -17,18 +17,18 @@
 3. Hacer push y abrir una pull request hacia `develop`.
 4. Esperar a que pasen `API tests` y `Web lint and build`.
    También deben pasar `Pull request policy` y `CodeQL JavaScript`.
-5. Revisar el cambio desplegado en staging.
-6. Cerrar el ticket de Notion cuando QA valide staging.
+5. Revisar el cambio en QA local; crear un entorno público temporal solo cuando aporte valor.
+6. Cerrar el ticket de Notion cuando QA valide el cambio.
 7. Fusionar con squash para mantener un commit claro por ticket.
 
 ## Publicación
 
 1. Abrir una pull request de `develop` hacia `main`.
-2. Revisar conjuntamente los cambios incluidos y el estado de staging.
+2. Revisar conjuntamente los cambios incluidos y la evidencia de QA.
 3. Fusionar la pull request.
 4. Crear una etiqueta anotada con versión semántica, por ejemplo `v1.1.0`.
-5. GitHub verifica de nuevo API y web, crea el artefacto y publica la release con notas automáticas.
-6. Ejecutar una regresión breve en producción.
+5. GitHub verifica de nuevo API y web, publica la release y despliega la imagen de API en Lambda mediante OIDC.
+6. Amplify despliega `main`; ejecutar una regresión breve en producción.
 
 ## Hotfix
 

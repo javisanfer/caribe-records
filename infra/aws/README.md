@@ -9,6 +9,7 @@ La arquitectura mantiene producción pública sin capacidad encendida en reposo:
 - **Imágenes y correo:** las cuentas existentes de Cloudinary y Resend.
 - **Secretos:** AWS Systems Manager Parameter Store (`SecureString`).
 - **Control de coste:** presupuesto mensual de 12 USD con avisos al 80 % previsto y al 100 % real.
+- **Despliegues posteriores:** GitHub Actions usa OIDC y credenciales temporales; no se guardan claves de AWS en GitHub.
 
 No se mantiene un entorno de staging encendido. Para QA se usa el entorno local; si una versión necesita validación pública, se crea un entorno temporal y se elimina al terminar.
 
@@ -31,6 +32,11 @@ aws cloudformation deploy \
 
 AWS enviará un correo de confirmación para los avisos del presupuesto.
 
+El stack también crea un rol limitado para GitHub Actions. Copiar el output
+`GitHubProductionDeployRoleArn` a la variable `AWS_DEPLOY_ROLE_ARN` del entorno
+`production` de GitHub. El rol solo puede publicar en este repositorio de ECR y
+actualizar la función Lambda de producción.
+
 ## 2. Secretos gratuitos en Parameter Store
 
 Crear estos parámetros como `SecureString` desde la consola, evitando que los valores aparezcan en el historial del terminal:
@@ -46,21 +52,15 @@ Crear estos parámetros como `SecureString` desde la consola, evitando que los v
 
 La función lee estos parámetros y los descifra durante el arranque. Su rol solo puede consultar la ruta `/caribe-records/production/*`; los valores no se guardan en Git, CloudFormation ni los logs.
 
-## 3. Construir y subir la API
+## 3. Construir y subir la primera imagen
 
-Consultar el URI de ECR que devuelve el stack y usar el SHA del commit como etiqueta inmutable:
+Ejecutar manualmente el workflow `Deploy production API` con `push_only=true`.
+GitHub construye la imagen del commit seleccionado y la publica con una etiqueta
+inmutable basada en su SHA. La autenticación usa OIDC, sin claves permanentes.
 
-```bash
-AWS_REGION=eu-west-1
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-IMAGE_TAG=$(git rev-parse --short=12 HEAD)
-ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/caribe-records-api"
-
-aws ecr get-login-password --region "$AWS_REGION" | \
-  docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
-docker build --platform linux/amd64 -t "$ECR_URI:$IMAGE_TAG" api
-docker push "$ECR_URI:$IMAGE_TAG"
-```
+Copiar el URI de imagen del resumen de la ejecución para crear inicialmente la
+función. Después de ese primer despliegue, cada etiqueta `v*.*.*` actualiza
+Lambda automáticamente.
 
 ## 4. Crear Lambda
 
@@ -87,6 +87,13 @@ La función usa 512 MB, un timeout de 30 segundos y una concurrencia reservada m
 4. Añadir primero una reescritura de `/api/<*>` a `URL_LAMBDA/api/<*>`, con estado `200`.
 5. Añadir después la regla SPA que reescribe rutas sin extensión a `/index.html`, con estado `200`.
 6. Desplegar, copiar la URL definitiva de Amplify y actualizar `FrontendOrigin` en el stack de Lambda.
+
+## 6. Publicaciones posteriores
+
+Las versiones se publican mediante una etiqueta semántica (`v1.0.1`, `v1.1.0`,
+etc.). El workflow de release verifica y empaqueta la web; el workflow de
+producción construye la API, la sube a ECR y espera a que Lambda termine la
+actualización. Amplify despliega automáticamente el commit de `main`.
 
 El proxy mantiene web y API bajo el mismo dominio desde el punto de vista del navegador, por lo que las sesiones no dependen de cookies de terceros.
 
