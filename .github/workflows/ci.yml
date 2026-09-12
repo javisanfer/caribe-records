@@ -37,6 +37,16 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
+  api-container:
+    name: API container
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Build production image
+        run: docker build --tag caribe-records-api:ci api
+
   web-quality:
     name: Web lint and build
     runs-on: ubuntu-latest
