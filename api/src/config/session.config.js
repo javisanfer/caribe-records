@@ -5,8 +5,6 @@ require("dotenv").config();
 const sessionIdleMinutes = Number.parseInt(process.env.SESSION_IDLE_MINUTES || "5", 10);
 const sessionIdleMs = sessionIdleMinutes * 60 * 1000;
 
-console.log("🔍 Conectando a MongoDB en:", process.env.MONGODB_URI);
-
 if (!process.env.MONGODB_URI) {
   console.error("❌ Error: MONGODB_URI no está definido. Verifica tu archivo .env");
   process.exit(1);
@@ -21,6 +19,7 @@ module.exports = expressSession({ // ✅ Exportamos directamente el middleware
   cookie: {
     httpOnly: true,
     secure: process.env.SESSION_SECURE === "true",
+    sameSite: process.env.SESSION_SAME_SITE || "lax",
     maxAge: sessionIdleMs
   },
   store: MongoStore.create({

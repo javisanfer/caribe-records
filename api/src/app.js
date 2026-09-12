@@ -1,5 +1,4 @@
 require("dotenv").config();
-console.log("Cloudinary Config:", process.env.CLOUDINARY_CLOUD_NAME);
 
 const express = require("express");
 const logger = require("morgan");
@@ -11,6 +10,17 @@ const corsMiddleware = require("./config/cors.config"); // ✅ Corregido
 require("./config/db.config");
 
 const app = express();
+
+// App Runner terminates TLS before forwarding traffic to Express. Trusting its
+// proxy is required for secure session cookies to work in production.
+if (process.env.TRUST_PROXY === "true") {
+  app.set("trust proxy", 1);
+}
+
+// Keep the platform health check independent from sessions and MongoDB reads.
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
 /* Middlewares */
 app.use(express.json()); // ✅ Primero parseamos JSON
