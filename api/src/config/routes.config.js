@@ -8,6 +8,7 @@ const router = express.Router();
 // -------------------- Middlewares --------------------
 const auth = require("../middlewares/session.middleware");
 const upload = require("../config/storage.config");
+const { normalizeUploadError } = require("../config/upload-error.config");
 
 const adminRateLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -273,6 +274,8 @@ router.post(
 router.use((req, res, next) => next(createError(404, "Route not found")));
 
 router.use((error, req, res, next) => {
+  error = normalizeUploadError(error);
+
   if (error instanceof mongoose.Error.CastError && error.message.includes("_id")) {
     error = createError(404, "Resource not found");
   } else if (error instanceof mongoose.Error.ValidationError) {
