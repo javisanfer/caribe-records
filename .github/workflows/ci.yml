@@ -23,7 +23,7 @@ jobs:
         working-directory: api
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Node.js 24
         uses: actions/setup-node@v7
         with:
@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Build production image
         run: docker build --tag caribe-records-api:ci api
 
@@ -56,7 +56,7 @@ jobs:
         working-directory: web
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Node.js 24
         uses: actions/setup-node@v7
         with:
