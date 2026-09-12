@@ -11,8 +11,8 @@ require("./config/db.config");
 
 const app = express();
 
-// App Runner terminates TLS before forwarding traffic to Express. Trusting its
-// proxy is required for secure session cookies to work in production.
+// AWS terminates TLS before forwarding traffic to Express. Trusting its proxy
+// is required for secure session cookies to work in production.
 if (process.env.TRUST_PROXY === "true") {
   app.set("trust proxy", 1);
 }
@@ -45,13 +45,6 @@ const router = require("./config/routes.config");
 console.log("🔍 Verificando router:", typeof router);
 app.use("/api/v1/", router);
 console.log("✅ Router cargado correctamente");
-
-/* Cloudinary */
-const cloudinary = require("cloudinary").v2;
-
-cloudinary.api.ping()
-  .then(response => console.log("✅ Conexión con Cloudinary exitosa:", response))
-  .catch(error => console.error("❌ Error al conectar con Cloudinary:", error));
 
 const port = Number(process.env.PORT || 3000);
 
