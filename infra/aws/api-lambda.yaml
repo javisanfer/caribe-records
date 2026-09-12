@@ -32,7 +32,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: ssm:GetParametersByPath
-                Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ParameterPath}/*
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ParameterPath}
+                  - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ParameterPath}/*
 
   ApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -52,7 +54,6 @@ Resources:
       Role: !GetAtt ApiExecutionRole.Arn
       MemorySize: 512
       Timeout: 30
-      ReservedConcurrentExecutions: 2
       Environment:
         Variables:
           NODE_ENV: production
