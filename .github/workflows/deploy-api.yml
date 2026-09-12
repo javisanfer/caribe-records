@@ -62,12 +62,19 @@ jobs:
         env:
           IMAGE_URI: ${{ steps.image.outputs.uri }}
         run: |
-          aws lambda update-function-code \
+          if aws lambda get-function \
             --function-name "$LAMBDA_FUNCTION" \
-            --image-uri "$IMAGE_URI" \
-            --no-cli-pager
-          aws lambda wait function-updated-v2 \
-            --function-name "$LAMBDA_FUNCTION"
+            --no-cli-pager >/dev/null 2>&1; then
+            aws lambda update-function-code \
+              --function-name "$LAMBDA_FUNCTION" \
+              --image-uri "$IMAGE_URI" \
+              --no-cli-pager
+            aws lambda wait function-updated-v2 \
+              --function-name "$LAMBDA_FUNCTION"
+          else
+            echo "Lambda does not exist yet; image is ready for infrastructure bootstrap." \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Deployment summary
         env:
