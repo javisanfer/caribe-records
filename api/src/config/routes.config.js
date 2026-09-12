@@ -19,6 +19,16 @@ const adminRateLimit = rateLimit({
   },
 });
 
+const authenticationRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message: "Demasiados intentos de acceso. Inténtalo de nuevo en unos minutos.",
+  },
+});
+
 router.use(auth.loadSessionUser);
 
 // -------------------- Controllers --------------------
@@ -36,14 +46,12 @@ const bannerController = require("../controllers/banners.controller");
 // ======================================================
 
 // Usuarios
-router.post("/users", upload.single("avatar"), users.create);
 router.patch("/users/me", auth.isAuthenticated, users.update);
-router.get("/users", users.getAllUsers);
 router.get("/users/me", auth.isAuthenticated, users.profile);
-router.get("/users/:id/validate", users.validate);
+router.get("/users/:id/validate", authenticationRateLimit, users.validate);
 
 // Sesiones
-router.post("/sessions", sessions.create);
+router.post("/sessions", authenticationRateLimit, sessions.create);
 router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
 
 // ======================================================
@@ -60,6 +68,24 @@ router.use(
 );
 
 router.get("/admin/activity", adminRateLimit, adminController.getActivity);
+
+// User management is administrative even though these legacy endpoints do not
+// live below /admin.
+router.post(
+  "/users",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  adminRateLimit,
+  upload.single("avatar"),
+  users.create,
+);
+router.get(
+  "/users",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  adminRateLimit,
+  users.getAllUsers,
+);
 
 // ======================================================
 // ARTISTS

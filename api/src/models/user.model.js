@@ -84,7 +84,7 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", function (next) {
-  if (ADMIN_EMAILS.includes(this.email)) {
+  if (this.isNew && ADMIN_EMAILS.includes(this.email)) {
     this.role = 'admin';
   }
 
