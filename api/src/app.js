@@ -1,5 +1,4 @@
 require("dotenv").config();
-console.log("Cloudinary Config:", process.env.CLOUDINARY_CLOUD_NAME);
 
 const express = require("express");
 const logger = require("morgan");
@@ -11,6 +10,17 @@ const corsMiddleware = require("./config/cors.config"); // ✅ Corregido
 require("./config/db.config");
 
 const app = express();
+
+// AWS terminates TLS before forwarding traffic to Express. Trusting its proxy
+// is required for secure session cookies to work in production.
+if (process.env.TRUST_PROXY === "true") {
+  app.set("trust proxy", 1);
+}
+
+// Keep the platform health check independent from sessions and MongoDB reads.
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
 /* Middlewares */
 app.use(express.json()); // ✅ Primero parseamos JSON
@@ -35,13 +45,6 @@ const router = require("./config/routes.config");
 console.log("🔍 Verificando router:", typeof router);
 app.use("/api/v1/", router);
 console.log("✅ Router cargado correctamente");
-
-/* Cloudinary */
-const cloudinary = require("cloudinary").v2;
-
-cloudinary.api.ping()
-  .then(response => console.log("✅ Conexión con Cloudinary exitosa:", response))
-  .catch(error => console.error("❌ Error al conectar con Cloudinary:", error));
 
 const port = Number(process.env.PORT || 3000);
 

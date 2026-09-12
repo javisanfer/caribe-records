@@ -1,12 +1,33 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const createError = require("http-errors");
+const { rateLimit } = require("express-rate-limit");
 
 const router = express.Router();
 
 // -------------------- Middlewares --------------------
 const auth = require("../middlewares/session.middleware");
 const upload = require("../config/storage.config");
+
+const adminRateLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 120,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message: "Demasiadas peticiones administrativas. Inténtalo de nuevo en unos minutos.",
+  },
+});
+
+const authenticationRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message: "Demasiados intentos de acceso. Inténtalo de nuevo en unos minutos.",
+  },
+});
 
 router.use(auth.loadSessionUser);
 
@@ -25,24 +46,45 @@ const bannerController = require("../controllers/banners.controller");
 // ======================================================
 
 // Usuarios
-router.post("/users", upload.single("avatar"), users.create);
 router.patch("/users/me", auth.isAuthenticated, users.update);
-router.get("/users", users.getAllUsers);
 router.get("/users/me", auth.isAuthenticated, users.profile);
-router.get("/users/:id/validate", users.validate);
+router.get("/users/:id/validate", authenticationRateLimit, users.validate);
 
 // Sesiones
-router.post("/sessions", sessions.create);
+router.post("/sessions", authenticationRateLimit, sessions.create);
 router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
 
 // ======================================================
 // ADMIN OVERVIEW
 // ======================================================
 
-router.get(
-  "/admin/activity",
+// Every current and future /admin route must pass both checks. Keeping this
+// guard in one place prevents a newly added admin endpoint from being exposed
+// by accidentally omitting one of the middlewares.
+router.use(
+  "/admin",
   auth.isAuthenticated,
-  adminController.getActivity
+  auth.isAdmin,
+);
+
+router.get("/admin/activity", adminRateLimit, adminController.getActivity);
+
+// User management is administrative even though these legacy endpoints do not
+// live below /admin.
+router.post(
+  "/users",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  adminRateLimit,
+  upload.single("avatar"),
+  users.create,
+);
+router.get(
+  "/users",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  adminRateLimit,
+  users.getAllUsers,
 );
 
 // ======================================================
@@ -59,27 +101,23 @@ router.get("/artists/slug/:slug", artistController.getArtistBySlug);
 router.get("/artists/:id", artistController.getArtistById);
 
 // Admin
-router.post(
-  "/admin/artists",
-  auth.isAuthenticated,
-  artistController.createArtists
-);
+router.post("/admin/artists", adminRateLimit, artistController.createArtists);
 
 router.get(
   "/admin/artists/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   artistController.getArtistBySlug
 );
 
 router.patch(
   "/admin/artists/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   artistController.updateArtist
 );
 
 router.delete(
   "/admin/artists/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   artistController.deleteArtist
 );
 
@@ -94,31 +132,31 @@ router.get("/releases/:id", releaseController.getReleaseById);
 // Admin
 router.get(
   "/admin/releases",
-  auth.isAuthenticated,
+  adminRateLimit,
   releaseController.getReleases
 );
 
 router.get(
   "/admin/releases/:id",
-  auth.isAuthenticated,
+  adminRateLimit,
   releaseController.getReleaseById
 );
 
 router.post(
   "/admin/releases",
-  auth.isAuthenticated,
+  adminRateLimit,
   releaseController.createRelease
 );
 
 router.patch(
   "/admin/releases/:id",
-  auth.isAuthenticated,
+  adminRateLimit,
   releaseController.updateRelease
 );
 
 router.delete(
   "/admin/releases/:id",
-  auth.isAuthenticated,
+  adminRateLimit,
   releaseController.deleteRelease
 );
 
@@ -133,31 +171,31 @@ router.get("/events/slug/:slug", eventController.getEventBySlugPublic);
 // Admin
 router.get(
   "/admin/events",
-  auth.isAuthenticated,
+  adminRateLimit,
   eventController.getEventsAdmin
 );
 
 router.get(
   "/admin/events/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   eventController.getEventByIdAdmin
 );
 
 router.post(
   "/admin/events",
-  auth.isAuthenticated,
+  adminRateLimit,
   eventController.createEvent
 );
 
 router.patch(
   "/admin/events/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   eventController.updateEvent
 );
 
 router.delete(
   "/admin/events/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   eventController.deleteEvent
 );
 
@@ -175,33 +213,33 @@ router.get(
 // Admin
 router.get(
   "/admin/editorials",
-  auth.isAuthenticated,
+  adminRateLimit,
   editorialController.getEditorialsAdmin
 );
 
 router.get(
   "/admin/editorials/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   editorialController.getEditorialBySlugAdmin
 );
 
 router.post(
   "/admin/editorials",
-  auth.isAuthenticated,
+  adminRateLimit,
   upload.single("heroFile"),
   editorialController.createEditorial
 );
 
 router.patch(
   "/admin/editorials/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   upload.single("heroFile"),
   editorialController.updateEditorial
 );
 
 router.delete(
   "/admin/editorials/slug/:slug",
-  auth.isAuthenticated,
+  adminRateLimit,
   editorialController.deleteEditorial
 );
 
@@ -210,24 +248,31 @@ router.delete(
 // ======================================================
 
 router.get("/banners/active", bannerController.getActiveBanner);
-router.get("/admin/banners", auth.isAuthenticated, bannerController.listBanners);
-router.get("/admin/banners/:id", auth.isAuthenticated, bannerController.getBanner);
-router.post("/admin/banners", auth.isAuthenticated, bannerController.createBanner);
-router.patch("/admin/banners/:id", auth.isAuthenticated, bannerController.updateBanner);
-router.delete("/admin/banners/:id", auth.isAuthenticated, bannerController.deleteBanner);
+router.get("/admin/banners", adminRateLimit, bannerController.listBanners);
+router.get("/admin/banners/:id", adminRateLimit, bannerController.getBanner);
+router.post("/admin/banners", adminRateLimit, bannerController.createBanner);
+router.patch("/admin/banners/:id", adminRateLimit, bannerController.updateBanner);
+router.delete("/admin/banners/:id", adminRateLimit, bannerController.deleteBanner);
 
 // ======================================================
 // UPLOADS GENERIC
 // ======================================================
 
-router.post("/upload", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    return res
-      .status(400)
-      .json({ message: "No se ha subido ninguna imagen" });
-  }
-  res.status(200).json({ imageUrl: req.file.path });
-});
+router.post(
+  "/upload",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  adminRateLimit,
+  upload.single("image"),
+  (req, res) => {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ message: "No se ha subido ninguna imagen" });
+    }
+    res.status(200).json({ imageUrl: req.file.path });
+  },
+);
 
 // ======================================================
 // ERRORES

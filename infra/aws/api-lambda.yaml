@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Caribe Records production API on AWS Lambda
+
+Parameters:
+  ImageIdentifier:
+    Type: String
+    Description: Full ECR image URI, including an immutable tag
+  FrontendOrigin:
+    Type: String
+    Description: Public Amplify or custom-domain origin, without trailing slash
+  ParameterPath:
+    Type: String
+    Default: /caribe-records/production
+
+Resources:
+  ApiExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ReadCaribeProductionParameters
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ssm:GetParametersByPath
+                Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ParameterPath}/*
+
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/caribe-records-api-production
+      RetentionInDays: 14
+
+  ApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: caribe-records-api-production
+      PackageType: Image
+      Architectures:
+        - x86_64
+      Code:
+        ImageUri: !Ref ImageIdentifier
+      Role: !GetAtt ApiExecutionRole.Arn
+      MemorySize: 512
+      Timeout: 30
+      ReservedConcurrentExecutions: 2
+      Environment:
+        Variables:
+          NODE_ENV: production
+          PORT: '3000'
+          CORS_ORIGINS: !Ref FrontendOrigin
+          APP_URL: !Ref FrontendOrigin
+          SESSION_COOKIE_NAME: caribe.sid
+          SESSION_IDLE_MINUTES: '5'
+          SESSION_SECURE: 'true'
+          SESSION_SAME_SITE: lax
+          TRUST_PROXY: 'true'
+          AWS_PARAMETER_PATH: !Ref ParameterPath
+
+  ApiFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      InvokeMode: BUFFERED
+      TargetFunctionArn: !GetAtt ApiFunction.Arn
+
+  ApiFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunctionUrl
+      FunctionName: !Ref ApiFunction
+      FunctionUrlAuthType: NONE
+      Principal: '*'
+
+  ApiFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ApiFunction
+      InvokedViaFunctionUrl: true
+      Principal: '*'
+
+Outputs:
+  ApiFunctionArn:
+    Value: !GetAtt ApiFunction.Arn
+  ApiFunctionUrl:
+    Value: !GetAtt ApiFunctionUrl.FunctionUrl

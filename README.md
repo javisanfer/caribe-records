@@ -1,5 +1,9 @@
 # React + Vite
 
+El proceso de ramas, QA y publicación está documentado en [docs/git-release-process.md](docs/git-release-process.md).
+
+El despliegue económico de producción en AWS está documentado en [infra/aws/README.md](infra/aws/README.md).
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
