@@ -1,12 +1,23 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const createError = require("http-errors");
+const { rateLimit } = require("express-rate-limit");
 
 const router = express.Router();
 
 // -------------------- Middlewares --------------------
 const auth = require("../middlewares/session.middleware");
 const upload = require("../config/storage.config");
+
+const adminRateLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 120,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message: "Demasiadas peticiones administrativas. Inténtalo de nuevo en unos minutos.",
+  },
+});
 
 router.use(auth.loadSessionUser);
 
@@ -42,7 +53,12 @@ router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
 // Every current and future /admin route must pass both checks. Keeping this
 // guard in one place prevents a newly added admin endpoint from being exposed
 // by accidentally omitting one of the middlewares.
-router.use("/admin", auth.isAuthenticated, auth.isAdmin);
+router.use(
+  "/admin",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  adminRateLimit,
+);
 
 router.get("/admin/activity", adminController.getActivity);
 
@@ -203,6 +219,7 @@ router.post(
   "/upload",
   auth.isAuthenticated,
   auth.isAdmin,
+  adminRateLimit,
   upload.single("image"),
   (req, res) => {
     if (!req.file) {
