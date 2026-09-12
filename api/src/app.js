@@ -5,9 +5,7 @@ const logger = require("morgan");
 const sessionMiddleware = require("./config/session.config");
 const { loadSessionUser } = require("./middlewares/session.middleware");
 const corsMiddleware = require("./config/cors.config"); // ✅ Corregido
-
-/* DB init */
-require("./config/db.config");
+const { connectDatabase } = require("./config/db.config");
 
 const app = express();
 
@@ -48,4 +46,11 @@ console.log("✅ Router cargado correctamente");
 
 const port = Number(process.env.PORT || 3000);
 
-app.listen(port, () => console.info(`🚀 Application running at port ${port}`));
+connectDatabase()
+  .then(() => {
+    app.listen(port, () => console.info(`🚀 Application running at port ${port}`));
+  })
+  .catch((error) => {
+    console.error("Unable to connect to MongoDB after retrying", error);
+    process.exit(1);
+  });
