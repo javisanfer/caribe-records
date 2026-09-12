@@ -3,7 +3,7 @@
 La arquitectura mantiene producción pública sin capacidad encendida en reposo:
 
 - **Web:** AWS Amplify Hosting, conectado a `main`.
-- **API:** AWS Lambda con Function URL y un máximo de dos ejecuciones simultáneas.
+- **API:** AWS Lambda con Function URL y capacidad bajo demanda.
 - **Adaptador HTTP:** AWS Lambda Web Adapter `1.0.1`, para ejecutar Express sin reescribir la aplicación.
 - **Datos:** MongoDB Atlas Free en AWS, fuera de CloudFormation.
 - **Imágenes y correo:** las cuentas existentes de Cloudinary y Resend.
@@ -81,7 +81,7 @@ aws cloudformation deploy \
 
 El output `ApiFunctionUrl` será la URL pública de la API. Comprobar `URL/health` antes de conectar la web.
 
-La función usa 512 MB, un timeout de 30 segundos y una concurrencia reservada máxima de dos. Esto limita el gasto accidental y es suficiente para el tráfico inicial.
+La función usa 512 MB y un timeout de 30 segundos. No reserva concurrencia porque las cuentas nuevas de AWS deben conservar al menos diez ejecuciones sin reservar; la cuota de concurrencia de la cuenta y el presupuesto mensual limitan el riesgo de gasto durante esta primera etapa.
 
 ## 5. Conectar Amplify
 
