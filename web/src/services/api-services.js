@@ -40,9 +40,6 @@ const logout = () => http.delete("/sessions");
 // Profile
 const profile = () => http.get("/users/me");
 
-// Registro de usuario (por si lo usas en el futuro)
-const register = (payload) => http.post("/users", payload);
-
 // ----------------------------------------------------------------------------
 // 👩‍🎤 ARTISTS
 // ----------------------------------------------------------------------------
@@ -133,7 +130,6 @@ export {
   login,
   logout,
   profile,
-  register,
 
   // artists
   listArtists,
