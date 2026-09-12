@@ -56,13 +56,15 @@ La función lee estos parámetros y los descifra durante el arranque. Su rol sol
 
 ## 3. Construir y subir la primera imagen
 
-Ejecutar manualmente el workflow `Deploy production API` con `push_only=true`.
-GitHub construye la imagen del commit seleccionado y la publica con una etiqueta
-inmutable basada en su SHA. La autenticación usa OIDC, sin claves permanentes.
+Crear la primera etiqueta semántica (`v1.0.0`). GitHub construye la imagen del
+commit etiquetado y la publica con una etiqueta inmutable basada en su SHA. La
+autenticación usa OIDC, sin claves permanentes. Si Lambda todavía no existe, el
+workflow deja la imagen lista en ECR y termina correctamente.
 
 Copiar el URI de imagen del resumen de la ejecución para crear inicialmente la
-función. Después de ese primer despliegue, cada etiqueta `v*.*.*` actualiza
-Lambda automáticamente.
+función. A partir de entonces, cada etiqueta `v*.*.*` actualiza Lambda
+automáticamente. El modo manual `push_only` queda disponible para reconstruir
+una imagen sin desplegarla.
 
 ## 4. Crear Lambda
 
