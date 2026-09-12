@@ -39,11 +39,12 @@ router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
 // ADMIN OVERVIEW
 // ======================================================
 
-router.get(
-  "/admin/activity",
-  auth.isAuthenticated,
-  adminController.getActivity
-);
+// Every current and future /admin route must pass both checks. Keeping this
+// guard in one place prevents a newly added admin endpoint from being exposed
+// by accidentally omitting one of the middlewares.
+router.use("/admin", auth.isAuthenticated, auth.isAdmin);
+
+router.get("/admin/activity", adminController.getActivity);
 
 // ======================================================
 // ARTISTS
@@ -59,27 +60,20 @@ router.get("/artists/slug/:slug", artistController.getArtistBySlug);
 router.get("/artists/:id", artistController.getArtistById);
 
 // Admin
-router.post(
-  "/admin/artists",
-  auth.isAuthenticated,
-  artistController.createArtists
-);
+router.post("/admin/artists", artistController.createArtists);
 
 router.get(
   "/admin/artists/slug/:slug",
-  auth.isAuthenticated,
   artistController.getArtistBySlug
 );
 
 router.patch(
   "/admin/artists/slug/:slug",
-  auth.isAuthenticated,
   artistController.updateArtist
 );
 
 router.delete(
   "/admin/artists/slug/:slug",
-  auth.isAuthenticated,
   artistController.deleteArtist
 );
 
@@ -94,31 +88,26 @@ router.get("/releases/:id", releaseController.getReleaseById);
 // Admin
 router.get(
   "/admin/releases",
-  auth.isAuthenticated,
   releaseController.getReleases
 );
 
 router.get(
   "/admin/releases/:id",
-  auth.isAuthenticated,
   releaseController.getReleaseById
 );
 
 router.post(
   "/admin/releases",
-  auth.isAuthenticated,
   releaseController.createRelease
 );
 
 router.patch(
   "/admin/releases/:id",
-  auth.isAuthenticated,
   releaseController.updateRelease
 );
 
 router.delete(
   "/admin/releases/:id",
-  auth.isAuthenticated,
   releaseController.deleteRelease
 );
 
@@ -133,31 +122,26 @@ router.get("/events/slug/:slug", eventController.getEventBySlugPublic);
 // Admin
 router.get(
   "/admin/events",
-  auth.isAuthenticated,
   eventController.getEventsAdmin
 );
 
 router.get(
   "/admin/events/slug/:slug",
-  auth.isAuthenticated,
   eventController.getEventByIdAdmin
 );
 
 router.post(
   "/admin/events",
-  auth.isAuthenticated,
   eventController.createEvent
 );
 
 router.patch(
   "/admin/events/slug/:slug",
-  auth.isAuthenticated,
   eventController.updateEvent
 );
 
 router.delete(
   "/admin/events/slug/:slug",
-  auth.isAuthenticated,
   eventController.deleteEvent
 );
 
@@ -175,33 +159,28 @@ router.get(
 // Admin
 router.get(
   "/admin/editorials",
-  auth.isAuthenticated,
   editorialController.getEditorialsAdmin
 );
 
 router.get(
   "/admin/editorials/slug/:slug",
-  auth.isAuthenticated,
   editorialController.getEditorialBySlugAdmin
 );
 
 router.post(
   "/admin/editorials",
-  auth.isAuthenticated,
   upload.single("heroFile"),
   editorialController.createEditorial
 );
 
 router.patch(
   "/admin/editorials/slug/:slug",
-  auth.isAuthenticated,
   upload.single("heroFile"),
   editorialController.updateEditorial
 );
 
 router.delete(
   "/admin/editorials/slug/:slug",
-  auth.isAuthenticated,
   editorialController.deleteEditorial
 );
 
@@ -210,24 +189,30 @@ router.delete(
 // ======================================================
 
 router.get("/banners/active", bannerController.getActiveBanner);
-router.get("/admin/banners", auth.isAuthenticated, bannerController.listBanners);
-router.get("/admin/banners/:id", auth.isAuthenticated, bannerController.getBanner);
-router.post("/admin/banners", auth.isAuthenticated, bannerController.createBanner);
-router.patch("/admin/banners/:id", auth.isAuthenticated, bannerController.updateBanner);
-router.delete("/admin/banners/:id", auth.isAuthenticated, bannerController.deleteBanner);
+router.get("/admin/banners", bannerController.listBanners);
+router.get("/admin/banners/:id", bannerController.getBanner);
+router.post("/admin/banners", bannerController.createBanner);
+router.patch("/admin/banners/:id", bannerController.updateBanner);
+router.delete("/admin/banners/:id", bannerController.deleteBanner);
 
 // ======================================================
 // UPLOADS GENERIC
 // ======================================================
 
-router.post("/upload", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    return res
-      .status(400)
-      .json({ message: "No se ha subido ninguna imagen" });
-  }
-  res.status(200).json({ imageUrl: req.file.path });
-});
+router.post(
+  "/upload",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  upload.single("image"),
+  (req, res) => {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ message: "No se ha subido ninguna imagen" });
+    }
+    res.status(200).json({ imageUrl: req.file.path });
+  },
+);
 
 // ======================================================
 // ERRORES
