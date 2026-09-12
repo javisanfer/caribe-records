@@ -1,6 +1,9 @@
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -34,11 +37,19 @@ const storage = {
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter(req, file, callback) {
-    const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
-    callback(allowedTypes.has(file.mimetype) ? null : new multer.MulterError("LIMIT_UNEXPECTED_FILE"), allowedTypes.has(file.mimetype));
-  },
+  limits: { fileSize: MAX_IMAGE_BYTES },
+  fileFilter: imageFileFilter,
 });
 
+function imageFileFilter(req, file, callback) {
+  const accepted = ALLOWED_IMAGE_TYPES.has(file.mimetype);
+  callback(
+    accepted ? null : new multer.MulterError("LIMIT_UNEXPECTED_FILE"),
+    accepted,
+  );
+}
+
 module.exports = upload;
+module.exports.ALLOWED_IMAGE_TYPES = ALLOWED_IMAGE_TYPES;
+module.exports.MAX_IMAGE_BYTES = MAX_IMAGE_BYTES;
+module.exports.imageFileFilter = imageFileFilter;
