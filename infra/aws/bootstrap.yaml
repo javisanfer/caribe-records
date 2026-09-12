@@ -9,6 +9,10 @@ Parameters:
     Type: Number
     Default: 12
     MinValue: 1
+  GitHubRepository:
+    Type: String
+    Default: javisanfer/caribe-records
+    Description: GitHub repository allowed to deploy from the production environment
 
 Resources:
   ApiRepository:
@@ -32,6 +36,56 @@ Resources:
               "action": { "type": "expire" }
             }]
           }
+
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+
+  GitHubProductionDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: caribe-records-github-production
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubOidcProvider
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubRepository}:environment:production
+      Policies:
+        - PolicyName: PublishCaribeApiImage
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:CompleteLayerUpload
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                Resource: !GetAtt ApiRepository.Arn
+        - PolicyName: DeployCaribeApiFunction
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:GetFunction
+                  - lambda:GetFunctionConfiguration
+                  - lambda:UpdateFunctionCode
+                Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:caribe-records-api-production
 
   MonthlyCostBudget:
     Type: AWS::Budgets::Budget
@@ -67,3 +121,6 @@ Outputs:
     Value: !GetAtt ApiRepository.RepositoryUri
     Export:
       Name: caribe-records-api-repository-uri
+  GitHubProductionDeployRoleArn:
+    Description: Store this value in the GitHub variable AWS_DEPLOY_ROLE_ARN
+    Value: !GetAtt GitHubProductionDeployRole.Arn
