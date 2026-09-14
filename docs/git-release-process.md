@@ -6,6 +6,7 @@
 | --- | --- | --- | --- |
 | `codex/ticket-*` | Una incidencia o desarrollo | Local | `caribe_records_test` local |
 | `develop` | Integración aprobada | QA local | `caribe_records_test` |
+| `codex/release-*` | Publicación preparada desde `main` | Preproducción en CI | No aplica |
 | `main` | Versiones publicadas | Producción | `caribe_records` |
 
 `main` y `develop` no reciben trabajo directo. Cada cambio empieza desde `develop` en una rama corta.
@@ -23,12 +24,13 @@
 
 ## Publicación
 
-1. Abrir una pull request de `develop` hacia `main`.
-2. Revisar conjuntamente los cambios incluidos y la evidencia de QA.
-3. Fusionar la pull request.
-4. Crear una etiqueta anotada con versión semántica, por ejemplo `v1.1.0`.
-5. GitHub verifica de nuevo API y web, publica la release y despliega la imagen de API en Lambda mediante OIDC.
-6. Amplify despliega `main`; ejecutar una regresión breve en producción.
+1. Crear `codex/release-vX.Y.Z` desde `main` e incorporar únicamente los commits aprobados en `develop`.
+2. Abrir una pull request de la rama de release hacia `main`. Esto evita que un historial divergente o cambios todavía no aprobados entren en producción.
+3. Revisar conjuntamente los cambios incluidos y la evidencia de QA.
+4. Fusionar la pull request.
+5. Crear una etiqueta anotada con versión semántica, por ejemplo `v1.1.0`.
+6. GitHub verifica de nuevo API y web, publica la release y despliega la imagen de API en Lambda mediante OIDC.
+7. Amplify despliega `main`; ejecutar una regresión breve en producción.
 
 ## Hotfix
 
