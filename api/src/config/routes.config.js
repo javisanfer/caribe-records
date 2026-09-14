@@ -8,6 +8,7 @@ const router = express.Router();
 // -------------------- Middlewares --------------------
 const auth = require("../middlewares/session.middleware");
 const upload = require("../config/storage.config");
+const { normalizeUploadError } = require("../config/upload-error.config");
 
 const adminRateLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -69,16 +70,8 @@ router.use(
 
 router.get("/admin/activity", adminRateLimit, adminController.getActivity);
 
-// User management is administrative even though these legacy endpoints do not
-// live below /admin.
-router.post(
-  "/users",
-  auth.isAuthenticated,
-  auth.isAdmin,
-  adminRateLimit,
-  upload.single("avatar"),
-  users.create,
-);
+// Accounts are provisioned with an internal bootstrap command. There is no
+// HTTP endpoint for creating users in any environment.
 router.get(
   "/users",
   auth.isAuthenticated,
@@ -281,6 +274,8 @@ router.post(
 router.use((req, res, next) => next(createError(404, "Route not found")));
 
 router.use((error, req, res, next) => {
+  error = normalizeUploadError(error);
+
   if (error instanceof mongoose.Error.CastError && error.message.includes("_id")) {
     error = createError(404, "Resource not found");
   } else if (error instanceof mongoose.Error.ValidationError) {

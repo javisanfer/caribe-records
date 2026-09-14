@@ -98,11 +98,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Accept develop or hotfix branches only
+      - name: Accept integration, release, or hotfix branches
         env:
           HEAD_REF: ${{ github.head_ref }}
         run: |
-          if [[ "$HEAD_REF" != "develop" && "$HEAD_REF" != codex/hotfix-* ]]; then
-            echo "Production PRs must come from develop or codex/hotfix-*"
+          if [[ "$HEAD_REF" != "develop" && "$HEAD_REF" != codex/release-* && "$HEAD_REF" != codex/hotfix-* ]]; then
+            echo "Production PRs must come from develop, codex/release-*, or codex/hotfix-*"
             exit 1
           fi
