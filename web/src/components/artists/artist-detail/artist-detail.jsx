@@ -82,7 +82,6 @@ export default function ArtistDetail({
 
       <header className="artist-detail__hero">
         <div className="artist-detail__identity">
-          <p className="artist-detail__kicker">Artista / Caribe Records</p>
           <h1>{artist.name}<span aria-hidden="true">●</span></h1>
           <div className="artist-detail__facts">
             {artist.genres?.length > 0 && <span>{artist.genres.join(" / ")}</span>}

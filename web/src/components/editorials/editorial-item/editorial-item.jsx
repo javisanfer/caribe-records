@@ -5,6 +5,11 @@ export default function EditorialItem({ editorial, index }) {
   if (!editorial) return null;
 
   const slug = editorial.slug || "#";
+  const authorName =
+    editorial.author?.name ||
+    editorial.authorName ||
+    editorial.credits?.find((credit) => /autor|author/i.test(credit.role || ""))?.name ||
+    "Caribe Records";
 
   return (
     <Link
@@ -25,7 +30,7 @@ export default function EditorialItem({ editorial, index }) {
         )}
       </div>
       <div className="editorial-item__copy">
-        <p>{String(index).padStart(2, "0")} · Caribe Editorial</p>
+        <p>{String(index).padStart(2, "0")} · {authorName}</p>
         <h2>{editorial.title}</h2>
         {editorial.subtitle && (
           <p className="editorial-item__subtitle">{editorial.subtitle}</p>

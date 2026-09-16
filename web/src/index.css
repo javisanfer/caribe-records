@@ -30,7 +30,7 @@
 
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: 0;
   min-height: 100vh;
 }
 
@@ -1055,7 +1055,7 @@ button:focus-visible {
 
 .cr-mobile-links li {
   display: grid;
-  grid-template-columns: 42px 1fr;
+  grid-template-columns: 42px minmax(0, 1fr);
   align-items: start;
   border-bottom: 1px solid rgba(255,255,255,.7);
 }
@@ -1068,9 +1068,11 @@ button:focus-visible {
 
 .cr-mobile-links a {
   display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
   padding: clamp(8px, 1.4vw, 16px) 0;
   color: var(--cr-white);
-  font-size: clamp(2.6rem, 7vw, 6.8rem);
+  font-size: clamp(2.35rem, 6.2vw, 5.8rem);
   font-weight: 600;
   font-kerning: normal;
   font-feature-settings: "kern" 1;
@@ -1144,7 +1146,8 @@ button:focus-visible {
 
   .cr-mobile-menu-inner { padding: 20px 14px; }
   .cr-mobile-links { margin-top: 3vh; }
-  .cr-mobile-links a { font-size: clamp(2.65rem, 14vw, 4.8rem); }
+  .cr-mobile-links li { grid-template-columns: 34px minmax(0, 1fr); }
+  .cr-mobile-links a { font-size: clamp(2.2rem, 10.5vw, 3.75rem); }
 
   .cr-menu-footer {
     flex-direction: column;
@@ -1420,7 +1423,7 @@ button:focus-visible {
 ========================= */
 
 html {
-  scrollbar-gutter: stable;
+  scrollbar-gutter: auto;
   background: var(--cr-paper);
 }
 
@@ -1490,6 +1493,7 @@ body {
 
 .editorial-index > div,
 .release-grid > div {
+  min-width: 0;
   container-type: inline-size;
   content-visibility: auto;
   contain-intrinsic-size: auto 620px;
@@ -2464,7 +2468,7 @@ body {
   .editorial-body__gallery { width: 100%; }
 
   .artist-detail__hero { height: auto; grid-template-columns: 1fr; }
-  .artist-detail__identity { min-height: 48svh; }
+  .artist-detail__identity { min-height: 340px; }
   .artist-detail__visual { min-height: 55svh; border-top: 1px solid var(--cr-ink); border-left: 0; }
   .artist-detail__overview { grid-template-columns: 1fr; }
   .artist-detail__rail { border-top: 1px solid var(--cr-ink); border-left: 0; }
@@ -2478,7 +2482,16 @@ body {
 @media (max-width: 540px) {
   .artist-detail__tabs { display: grid; grid-template-columns: repeat(3, 1fr); }
   .artist-detail__tabs button { padding: 0 8px; }
-  .artist-detail__identity h1 { font-size: clamp(3.7rem, 20vw, 6.5rem); }
+  .artist-detail__identity h1 {
+    overflow-wrap: anywhere;
+    font-size: clamp(2.55rem, 12vw, 3.75rem);
+    hyphens: none;
+    word-break: normal;
+  }
+  .editorial-detail__headline h1 {
+    overflow-wrap: anywhere;
+    font-size: clamp(2.75rem, 13vw, 4.4rem);
+  }
   .artist-detail__facts { flex-direction: column; gap: 5px; }
   .artist-detail__year { grid-template-columns: 84px minmax(0, 1fr); }
   .artist-detail__year h2 { padding: 20px 12px; font-size: 2rem; }
@@ -2669,7 +2682,11 @@ body {
   background: #bd2c20;
 }
 
-.admin-table-wrap { overflow-x: auto; }
+.admin-table-wrap {
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+}
 
 .admin-table {
   width: 100%;
@@ -3001,6 +3018,39 @@ body {
   .admin-create__grid a { min-height: 118px; border-right: 0; }
   .admin-pagination { align-items: start; flex-direction: column; }
   .admin-pagination > div { width: 100%; justify-content: space-between; }
+  .admin-table-wrap { overflow-x: visible; }
+  .admin-table,
+  .admin-table tbody,
+  .admin-table tr,
+  .admin-table td { display: block; width: 100%; }
+  .admin-table { min-width: 0; }
+  .admin-table thead { display: none; }
+  .admin-table tr {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--cr-ink);
+  }
+  .admin-table td,
+  .admin-table td:nth-child(2) {
+    display: grid;
+    grid-template-columns: minmax(84px, 32%) minmax(0, 1fr);
+    gap: 12px;
+    align-items: baseline;
+    width: 100%;
+    padding: 5px 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+  .admin-table td::before {
+    content: attr(data-label);
+    color: var(--cr-blue);
+    font-size: .56rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .admin-table td:last-child { text-align: left; }
+  .admin-table tbody tr:hover { color: var(--cr-ink); background: transparent; }
+  .admin-table tbody tr:hover td:last-child a { color: var(--cr-blue); }
   .admin-form-header { grid-template-columns: auto 1fr; gap: 12px; }
   .admin-form-header > span:last-child { display: none; }
   .admin-form-header > span:nth-child(2) { text-align: right; }
@@ -4100,7 +4150,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: clamp(220px, 25vw, 340px);
+  min-height: clamp(170px, 18vw, 250px);
   padding: clamp(18px, 2.4vw, 34px);
   border-bottom: 1px solid currentColor;
 }
@@ -4127,7 +4177,7 @@ body {
 
 .public-index__title {
   max-width: 100%;
-  margin: auto 0 clamp(14px, 2vw, 26px);
+  margin: auto 0 clamp(12px, 1.6vw, 20px);
   font-size: clamp(3.8rem, 10vw, 9rem);
   font-weight: 760;
   line-height: .76;
@@ -4136,11 +4186,9 @@ body {
 }
 
 .public-index__intro {
-  display: grid;
-  grid-template-columns: minmax(0, 560px) auto;
+  display: flex;
   align-items: end;
-  justify-content: space-between;
-  gap: 32px;
+  justify-content: flex-end;
 }
 
 .public-index__intro > p {
@@ -4309,24 +4357,6 @@ body {
   transition: filter .12s ease;
 }
 
-.release-cover-link span {
-  position: absolute;
-  z-index: 2;
-  left: 14px;
-  bottom: 12px;
-  color: var(--cr-sun);
-  font-size: clamp(1.4rem, 2.8vw, 2.8rem);
-  font-weight: 800;
-  letter-spacing: -.055em;
-  line-height: .82;
-  paint-order: stroke fill;
-  -webkit-text-stroke: 1.5px var(--cr-blue);
-  text-shadow: 4px 4px 0 var(--cr-blue);
-  text-transform: uppercase;
-  opacity: 0;
-  transition: opacity .12s ease;
-}
-
 .release-cover-link:hover,
 .release-cover-link:focus-visible {
   background: var(--cr-blue);
@@ -4336,11 +4366,6 @@ body {
 .release-cover-link:focus-visible img {
   filter: grayscale(1) contrast(2) invert(1);
   mix-blend-mode: screen;
-}
-
-.release-cover-link:hover span,
-.release-cover-link:focus-visible span {
-  opacity: 1;
 }
 
 .release-cover-link:focus-visible {
@@ -4586,7 +4611,7 @@ body {
 
 @media (max-width: 640px) {
   .public-index__hero {
-    min-height: 220px;
+    min-height: 170px;
   }
 
   .public-index__title {
@@ -4594,8 +4619,7 @@ body {
   }
 
   .public-index__intro {
-    grid-template-columns: 1fr;
-    gap: 18px;
+    justify-content: flex-start;
   }
 
   .public-index__count {
@@ -4603,18 +4627,107 @@ body {
   }
 
   .artist-index__link {
-    grid-template-columns: 34px minmax(0, 1fr);
-    min-height: 82px;
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 12px;
+    min-height: 108px;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
 
   .artist-index__action {
     display: none;
   }
 
+  .artist-index__name {
+    overflow: visible;
+    font-size: clamp(2.45rem, 11vw, 3.5rem);
+    line-height: .86;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .artist-index > li:has(.admin-edit-link) .artist-index__link {
+    padding-right: 100px;
+  }
+
   .release-row,
-  .release-grid,
   .editorial-index {
     grid-template-columns: 1fr;
+  }
+
+  .release-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .release-card {
+    min-width: 0;
+    padding: 9px !important;
+  }
+
+  .release-card h3 {
+    overflow-wrap: anywhere;
+    font-size: .95rem !important;
+    line-height: 1.05;
+  }
+
+  .release-card .small {
+    font-size: .65rem;
+  }
+
+  .releases-wrap .index-toolbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0;
+    padding: 0;
+  }
+
+  .releases-wrap .index-toolbar > p {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+  }
+
+  .releases-wrap .catalogue-filter {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    min-width: 0;
+    min-height: 54px;
+    padding-left: 12px;
+    border-left: 1px solid var(--cr-ink);
+  }
+
+  .releases-wrap .catalogue-filter select {
+    width: 100%;
+    min-width: 0;
+    height: 54px;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .releases-wrap .index-toolbar__views {
+    grid-column: 1 / -1;
+    min-height: 46px;
+    border-top: 1px solid var(--cr-ink);
+  }
+
+  .releases-wrap .index-toolbar__views button {
+    flex: 1;
+  }
+
+  .editorial-item,
+  .editorial-item__copy {
+    min-width: 0;
+  }
+
+  .editorial-item__copy {
+    min-height: 190px;
+  }
+
+  .editorial-item__copy h2 {
+    max-width: none;
+    overflow-wrap: anywhere;
+    font-size: clamp(2.15rem, 10.5vw, 3.25rem);
   }
 
   .index-toolbar__views button {

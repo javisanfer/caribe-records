@@ -62,7 +62,6 @@ export default function EventPage() {
     <PublicIndexPage
       className="events-page"
       title="Agenda"
-      description="Próximas fechas, encuentros y directos de la familia Caribe."
       count={loading ? null : events.length}
       countLabel="eventos"
     >

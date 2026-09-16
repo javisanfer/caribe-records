@@ -21,28 +21,16 @@ app.get("/health", (_req, res) => {
 });
 
 /* Middlewares */
-app.use(express.json()); // ✅ Primero parseamos JSON
-console.log("✅ express.json cargado correctamente");
-
-app.use(express.urlencoded({ extended: true })); // ✅ Para manejar formularios
-
-app.use(corsMiddleware); // ✅ Ahora CORS se ejecuta después de express.json()
-console.log("✅ CORS cargado correctamente");
-
-app.use(logger("dev"));
-console.log("✅ Logger cargado correctamente");
-
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(corsMiddleware);
+app.use(logger(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(sessionMiddleware);
-console.log("✅ sessionMiddleware cargado correctamente");
-
 app.use(loadSessionUser);
-console.log("✅ loadSessionUser cargado correctamente");
 
 /* API Routes Configuration */
 const router = require("./config/routes.config");
-console.log("🔍 Verificando router:", typeof router);
 app.use("/api/v1/", router);
-console.log("✅ Router cargado correctamente");
 
 const port = Number(process.env.PORT || 3000);
 

@@ -84,7 +84,6 @@ export default function ReleasePage() {
     <PublicIndexPage
       className="release-page"
       title="Discografía"
-      description="El catálogo completo de Caribe Records: lanzamientos, créditos y escucha."
       count={loading ? null : releases.length}
       countLabel="referencias"
     >

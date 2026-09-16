@@ -62,6 +62,14 @@ function normalizeEditorialBlocks(value) {
   });
 }
 
+function validatePublishableEditorial({ status, publishAt, hero, blocks }) {
+  if (status === "draft") return null;
+  if (!hero?.url) return "Hero image is required before publishing";
+  if (!blocks?.length) return "Content is required before publishing";
+  if (status === "scheduled" && !publishAt) return "Publish date is required when scheduling";
+  return null;
+}
+
 /* ======================================================
    PÚBLICO
 ====================================================== */
@@ -91,6 +99,7 @@ exports.getEditorialsPublic = async (req, res) => {
         .skip(skip)
         .limit(limit)
         .select("-blocks")
+        .populate("author", "name")
         .lean(),
     ]);
 
@@ -120,7 +129,7 @@ exports.getEditorialBySlugPublic = async (req, res) => {
         { status: "published" },
         { status: "scheduled", publishAt: { $lte: now } },
       ],
-    });
+    }).populate("author", "name");
 
     if (!doc) return res.status(404).json({ message: "Editorial not found" });
 
@@ -224,8 +233,6 @@ exports.createEditorial = async (req, res) => {
       payload.hero.url = req.file.path;
     } else if (body.heroUrl) {
       payload.hero.url = body.heroUrl;
-    } else {
-      return res.status(400).json({ message: "Hero image is required" });
     }
 
     payload.hero.alt = body.heroAlt || "";
@@ -247,6 +254,9 @@ exports.createEditorial = async (req, res) => {
         embed: body.embedHtml,
       });
     }
+
+    const publishError = validatePublishableEditorial(payload);
+    if (publishError) return res.status(400).json({ message: publishError });
 
     // Excerpt
     if (body.excerpt) payload.excerpt = body.excerpt;
@@ -343,24 +353,32 @@ exports.updateEditorial = async (req, res) => {
     editorial.publishAt = body.publishAt ?? editorial.publishAt;
 
     // Hero
+    if (!editorial.hero && (req.file || body.heroUrl || body.heroAlt || body.heroCaption || body.heroCredit)) {
+      editorial.hero = {};
+    }
     if (req.file) {
       editorial.hero.url = req.file.path;
     } else if (body.heroUrl) {
       editorial.hero.url = body.heroUrl;
     }
-    editorial.hero.alt = body.heroAlt ?? editorial.hero.alt;
-    editorial.hero.caption = body.heroCaption ?? editorial.hero.caption;
-    editorial.hero.credit = body.heroCredit ?? editorial.hero.credit;
+    if (editorial.hero) {
+      editorial.hero.alt = body.heroAlt ?? editorial.hero.alt;
+      editorial.hero.caption = body.heroCaption ?? editorial.hero.caption;
+      editorial.hero.credit = body.heroCredit ?? editorial.hero.credit;
+    }
 
     // Blocks — reseteamos y regeneramos
     editorial.blocks = body.blocks !== undefined
       ? normalizeEditorialBlocks(body.blocks)
       : body.body
         ? [{ type: "paragraph", text: body.body }]
-        : [];
+        : editorial.blocks;
     if (body.embedHtml) {
       editorial.blocks.push({ type: "embed", embed: body.embedHtml });
     }
+
+    const publishError = validatePublishableEditorial(editorial);
+    if (publishError) return res.status(400).json({ message: publishError });
 
     // Excerpt
     editorial.excerpt = body.excerpt ?? editorial.excerpt;

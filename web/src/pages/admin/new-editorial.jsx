@@ -52,8 +52,12 @@ export default function NewEditorialPage({ isEditMode = false }) {
   const onSubmit = async (data) => {
     try {
       const usableBlocks = blocks.filter((block) => block.type === "separator" || block.text?.replace(/<[^>]*>/g, "").trim() || block.quote?.trim() || block.image?.url?.trim());
-      if (!usableBlocks.length) {
-        alert("Añade al menos un bloque de contenido antes de guardar.");
+      if (data.status !== "draft" && !usableBlocks.length) {
+        alert("Añade al menos un bloque de contenido antes de publicar.");
+        return;
+      }
+      if (data.status !== "draft" && !data.heroFile?.[0] && !data.heroUrl?.trim()) {
+        alert("Añade una imagen principal antes de publicar.");
         return;
       }
       const formData = new FormData();
@@ -64,9 +68,12 @@ export default function NewEditorialPage({ isEditMode = false }) {
       formData.append("blocks", JSON.stringify(usableBlocks.map((block) => block.type === "image" ? { type: "image", image: block.image } : block.type === "quote" ? { type: "quote", quote: block.quote, cite: block.cite } : block.type === "separator" ? { type: "separator" } : { type: "paragraph", text: block.text })));
       if (data.heroFile?.[0]) formData.append("heroFile", data.heroFile[0]);
       const response = await fetch(effectiveEditMode ? `${API_BASE}/admin/editorials/slug/${encodeURIComponent(slug)}` : `${API_BASE}/admin/editorials`, { method: effectiveEditMode ? "PATCH" : "POST", credentials: "include", body: formData });
-      if (!response.ok) throw new Error("Error saving editorial");
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.message || "Error saving editorial");
+      }
       navigate("/admin");
-    } catch (error) { console.error(error); alert("No se pudo guardar la editorial."); }
+    } catch (error) { console.error(error); alert(error.message || "No se pudo guardar la editorial."); }
   };
 
   const handleDelete = async () => {

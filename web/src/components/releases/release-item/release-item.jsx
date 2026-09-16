@@ -80,7 +80,6 @@ export default function ReleaseItem({ release, view = "list" }) {
       aria-label={`Escuchar ${title}`}
     >
       {cover}
-      <span aria-hidden="true">Escuchar ↗</span>
     </a>
   ) : cover;
 
