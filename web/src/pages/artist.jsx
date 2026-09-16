@@ -60,7 +60,6 @@ export default function ArtistsPage() {
       className="artists-page"
       tone="blue"
       title="Artistas"
-      description="Proyectos con voz propia, desde Madrid hacia cualquier lugar."
       count={loading ? null : artists.length}
       countLabel="artistas"
     >

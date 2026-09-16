@@ -38,7 +38,6 @@ export default function EditorialPage() {
     <PublicIndexPage
       className="editorial-page"
       title="Editorial"
-      description="Historias, procesos y conversaciones alrededor de la música que editamos."
       count={loading ? null : editorials.length}
       countLabel="historias"
     >
