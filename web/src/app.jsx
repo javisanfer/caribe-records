@@ -21,12 +21,12 @@ import ReleasePage from "./pages/release.jsx";
 import AboutPage from "./pages/about.jsx";
 import LoginPage from "./pages/login.jsx";
 
-// Admin
-import AdminDashboardPage from "./pages/admin/admin-dashboard.jsx";
-import NewArtistPage from "./pages/admin/new-artist.jsx";
-import NewReleasePage from "./pages/admin/new-release.jsx";
-import NewEventPage from "./pages/admin/new-event.jsx";
-import NewBannerPage from "./pages/admin/new-banner.jsx";
+// Admin: keep the private editing tools out of the public initial download.
+const AdminDashboardPage = lazy(() => import("./pages/admin/admin-dashboard.jsx"));
+const NewArtistPage = lazy(() => import("./pages/admin/new-artist.jsx"));
+const NewReleasePage = lazy(() => import("./pages/admin/new-release.jsx"));
+const NewEventPage = lazy(() => import("./pages/admin/new-event.jsx"));
+const NewBannerPage = lazy(() => import("./pages/admin/new-banner.jsx"));
 const NewEditorialPage = lazy(() => import("./pages/admin/new-editorial.jsx"));
 
 function App() {

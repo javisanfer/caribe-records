@@ -1,6 +1,12 @@
 const Release = require("../models/release.model");
 const Artist  = require("../models/artist.model");
 const slugify = require("slugify");
+const { isSpotifyUrl } = require("../validators/string.validators");
+
+function validateSpotifyUrl(value) {
+  if (value === undefined || value === null || value === "") return;
+  if (!isSpotifyUrl(value)) throw new Error("Spotify URL must be a valid album or track link");
+}
 
 /* ======================================================
    PUBLIC
@@ -68,6 +74,7 @@ exports.getReleaseBySlugAdmin = async (req, res) => {
 exports.createRelease = async (req, res) => {
   try {
     const { artistId, artist, ...rest } = req.body;
+    validateSpotifyUrl(rest.spotifyUrl);
 
     const artistRef = artistId || artist || null;
 
@@ -111,6 +118,7 @@ exports.createRelease = async (req, res) => {
 exports.updateRelease = async (req, res) => {
   try {
     const { artistId, artist, ...rest } = req.body;
+    validateSpotifyUrl(rest.spotifyUrl);
 
     const release = await Release.findById(req.params.id);
     if (!release) return res.status(404).json({ message: "Release not found" });

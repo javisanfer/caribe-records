@@ -12,9 +12,13 @@ if (!process.env.MONGODB_URI) {
   process.exit(1);
 }
 
+if (!process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET is required");
+}
+
 module.exports = expressSession({ // ✅ Exportamos directamente el middleware
   name: sessionCookieName,
-  secret: process.env.SESSION_SECRET || "defaultSecret",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   rolling: true,
