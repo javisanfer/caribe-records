@@ -10,7 +10,7 @@ const creditSchema = new mongoose.Schema({
 }, { _id: false });
 
 const imageSchema = new mongoose.Schema({
-  url: { type: String, required: true },
+  url: { type: String },
   alt: { type: String, trim: true },
   caption: { type: String, trim: true },
   credit: { type: String, trim: true },
@@ -51,7 +51,7 @@ const editorialSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   credits: [creditSchema],
 
-  hero: { type: imageSchema, required: true },
+  hero: { type: imageSchema, default: undefined },
   blocks: { type: [blockSchema], default: [] },
 
   excerpt: { type: String, trim: true },
@@ -78,6 +78,14 @@ editorialSchema.index({ status: 1, publishAt: -1 });
 editorialSchema.index({ title: "text", subtitle: "text", excerpt: "text" });
 
 // ----- Hooks -----
+editorialSchema.pre("validate", function(next) {
+  if (this.status !== "draft") {
+    if (!this.hero?.url) this.invalidate("hero.url", "Hero image is required before publishing");
+    if (!this.blocks?.length) this.invalidate("blocks", "Content is required before publishing");
+  }
+  next();
+});
+
 editorialSchema.pre("save", async function(next) {
   if (!this.slug && this.title) {
     const base = slugify(this.title, { lower: true, strict: true, trim: true });

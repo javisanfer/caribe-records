@@ -95,7 +95,7 @@ export default function NewReleasePage() {
                     <div className="admin-field"><label className="form-label"><input type="checkbox" {...register("catalogVisible")} /> Visible en el catálogo público</label></div>
                     <div className="admin-field"><label className="form-label">Número de serie</label><input className="form-control" placeholder="#023/300" {...register("serialNumber")} /></div>
                     <div className="admin-field"><label className="form-label">País</label><input className="form-control" placeholder="ES" {...register("country")} /></div>
-                    <div className="admin-field"><label className="form-label">Spotify</label><input type="url" className="form-control" placeholder="https://open.spotify.com/album/…" {...register("spotifyUrl")} /></div>
+                    <div className="admin-field"><label className="form-label">Spotify</label><input type="url" className={`form-control ${errors.spotifyUrl ? "is-invalid" : ""}`} placeholder="https://open.spotify.com/album/…" {...register("spotifyUrl", { validate: (value) => !value || /^https:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(?:album|track)\/[A-Za-z0-9]{22}(?:\?.*)?$/i.test(value.trim()) || "Introduce un enlace válido de álbum o canción de Spotify" })} />{errors.spotifyUrl && <div className="invalid-feedback">{errors.spotifyUrl.message}</div>}</div>
                     <div className="admin-field"><label className="form-label">Bandcamp</label><input type="url" className="form-control" placeholder="https://artista.bandcamp.com/album/…" {...register("bandcampUrl")} /></div>
                   </div>
                 </section>

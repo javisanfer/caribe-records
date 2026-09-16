@@ -1,9 +1,7 @@
 import React from "react";
 
 export default function PublicIndexPage({
-  eyebrow = "Caribe Records · Vallecas, Madrid",
   title,
-  description,
   count,
   countLabel = "entradas",
   tone = "paper",
@@ -18,10 +16,8 @@ export default function PublicIndexPage({
       aria-labelledby={titleId}
     >
       <header className="public-index__hero">
-        <p className="public-index__eyebrow">{eyebrow}</p>
         <h1 id={titleId} className="public-index__title">{title}</h1>
         <div className="public-index__intro">
-          <p>{description}</p>
           <p className="public-index__count" aria-label={`${count ?? 0} ${countLabel}`}>
             <strong>{count == null ? "—" : String(count).padStart(2, "0")}</strong>
             <span>{countLabel}</span>

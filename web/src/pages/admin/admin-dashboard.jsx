@@ -139,11 +139,11 @@ export default function AdminDashboardPage() {
                 <tbody>
                   {pageItems.map((item) => (
                     <tr key={`${item.type}-${item.id}`}>
-                      <td><span className={`admin-type admin-type--${item.type}`}>{TYPE_LABELS[item.type]}</span></td>
-                      <td>{item.title}</td>
-                      <td>{formatDateTime(item.createdAt)}</td>
-                      <td>{formatDateTime(item.updatedAt)}</td>
-                      <td><Link to={getEditUrl(item)} aria-label={`Editar ${item.title}`}>Editar ↗</Link></td>
+                      <td data-label="Tipo"><span className={`admin-type admin-type--${item.type}`}>{TYPE_LABELS[item.type]}</span></td>
+                      <td data-label="Título / nombre">{item.title}</td>
+                      <td data-label="Creado">{formatDateTime(item.createdAt)}</td>
+                      <td data-label="Actualizado">{formatDateTime(item.updatedAt)}</td>
+                      <td data-label="Acción"><Link to={getEditUrl(item)} aria-label={`Editar ${item.title}`}>Editar ↗</Link></td>
                     </tr>
                   ))}
                 </tbody>
