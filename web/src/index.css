@@ -1527,6 +1527,137 @@ body {
   }
 }
 
+/* Temporary public gate. Local development and /admin remain fully available. */
+.wip-page {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: clamp(22px, 3vw, 44px);
+  color: var(--cr-white);
+  background: var(--cr-blue);
+  overflow: hidden;
+}
+
+.wip-header,
+.wip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.wip-logo {
+  width: clamp(132px, 16vw, 210px);
+  height: auto;
+}
+
+.wip-content {
+  align-self: center;
+  width: min(100%, 1120px);
+  padding-block: clamp(70px, 12vh, 150px);
+}
+
+.wip-kicker {
+  margin: 0 0 22px;
+  font-size: clamp(.68rem, 1vw, .82rem);
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.wip-content h1 {
+  max-width: 10ch;
+  margin: 0;
+  color: var(--cr-white);
+  font-size: clamp(4rem, 12vw, 10rem);
+  font-weight: 800;
+  line-height: .82;
+  letter-spacing: -.07em;
+}
+
+.wip-copy {
+  max-width: 520px;
+  margin: clamp(30px, 5vw, 56px) 0 0;
+  font-size: clamp(1rem, 1.7vw, 1.35rem);
+  line-height: 1.35;
+}
+
+.wip-progress {
+  width: min(100%, 520px);
+  margin-top: clamp(42px, 8vh, 86px);
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 18px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.wip-progress__line {
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .32);
+}
+
+.wip-progress__line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--cr-sun);
+  transform: translateX(-100%);
+  animation: wip-scan 2.4s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+
+.wip-footer a {
+  color: inherit !important;
+  text-decoration: none;
+}
+
+.wip-footer a:hover {
+  color: var(--cr-sun) !important;
+}
+
+@keyframes wip-scan {
+  0% { transform: translateX(-100%); }
+  48%, 58% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+
+@media (max-width: 560px) {
+  .wip-page {
+    padding: 20px;
+  }
+
+  .wip-header span {
+    display: none;
+  }
+
+  .wip-content h1 {
+    font-size: clamp(4rem, 21vw, 6.5rem);
+  }
+
+  .wip-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wip-progress__line::after {
+    width: 48%;
+    transform: none;
+    animation: none;
+  }
+}
+
 /* =========================
    DETAIL PAGES — EDITORIAL SYSTEM
 ========================= */
