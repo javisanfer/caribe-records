@@ -24,28 +24,16 @@ export default function WorkInProgressPage() {
     <main className="wip-page">
       <header className="wip-header">
         <img src={whiteLogo} alt="Caribe Records" className="wip-logo" />
-        <span>Madrid / 2026</span>
       </header>
 
       <section className="wip-content" aria-labelledby="wip-title">
-        <p className="wip-kicker">Nueva web en proceso</p>
-        <h1 id="wip-title">Estamos afinando.</h1>
-        <p className="wip-copy">
-          Muy pronto: música, artistas, historias y fechas desde Vallecas.
-        </p>
+        <h1 id="wip-title">Estamos trabajando</h1>
 
         <div className="wip-progress" role="status" aria-label="Sitio web en construcción">
           <span className="wip-progress__line" aria-hidden="true" />
-          <span>Work in progress</span>
         </div>
       </section>
 
-      <footer className="wip-footer">
-        <a href="mailto:hola@caribe-records.com">hola@caribe-records.com</a>
-        <a href="https://instagram.com/cariberecords" target="_blank" rel="noreferrer">
-          Instagram ↗
-        </a>
-      </footer>
     </main>
   );
 }
