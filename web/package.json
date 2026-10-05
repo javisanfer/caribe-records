@@ -20,7 +20,7 @@
     "@tiptap/starter-kit": "^3.31.3",
     "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
-    "dompurify": "^3.4.15",
+    "dompurify": "^3.4.16",
     "framer-motion": "^12.23.25",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
