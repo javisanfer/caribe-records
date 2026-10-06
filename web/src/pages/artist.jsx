@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ArtistList from "../components/artists/artist-list/artist-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
+import SiteLoader from "../components/ui/site-loader.jsx";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState([]);
@@ -63,9 +64,7 @@ export default function ArtistsPage() {
       count={loading ? null : artists.length}
       countLabel="artistas"
     >
-        {loading && (
-          <p className="public-index__status">Cargando artistas…</p>
-        )}
+        {loading && <SiteLoader />}
 
         {error && (
           <p className="public-index__status public-index__status--error" role="alert">{error}</p>

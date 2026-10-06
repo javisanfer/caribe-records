@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import EditorialDetail from "../components/editorials/editorial-detail/editorial-detail";
 import AdminEditLink from "../components/admin/admin-edit-link";
+import SiteLoader from "../components/ui/site-loader.jsx";
 
 export default function EditorialDetailPage() {
   const { slug } = useParams();
@@ -46,7 +47,7 @@ export default function EditorialDetailPage() {
     loadEditorial();
   }, [slug]);
 
-  if (loading) return <p className="detail-state">Cargando artículo…</p>;
+  if (loading) return <SiteLoader />;
   if (error) return <p className="detail-state detail-state--error">{error}</p>;
 
   return (
