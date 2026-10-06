@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import runner from "../assets/brand/caribe-runner.png";
+import SiteLoader from "../components/ui/site-loader.jsx";
 
 const homeNavigation = [
   { to: "/artistas", label: "Artistas" },
@@ -9,10 +10,25 @@ const homeNavigation = [
   { to: "/eventos", label: "Eventos" },
 ];
 
+// Reveal the carousel after its first cover is decoded, or after a bounded wait.
+function preloadCover(url) {
+  if (!url) return Promise.resolve();
+  return new Promise((resolve) => {
+    const cover = new Image();
+    const timer = window.setTimeout(resolve, 5000);
+    cover.src = url;
+    cover.decode().catch(() => {}).finally(() => {
+      window.clearTimeout(timer);
+      resolve();
+    });
+  });
+}
+
 export default function HomePage() {
   const [editorials, setEditorials] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -21,11 +37,16 @@ export default function HomePage() {
         if (!response.ok) throw new Error("Editorials unavailable");
         return response.json();
       })
-      .then((json) => {
-        if (active) setEditorials((Array.isArray(json) ? json : json.data || []).slice(0, 5));
+      .then(async (json) => {
+        const items = (Array.isArray(json) ? json : json.data || []).slice(0, 5);
+        await preloadCover(items[0]?.hero?.url);
+        if (active) setEditorials(items);
       })
       .catch(() => {
         if (active) setEditorials([]);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
       });
     return () => {
       active = false;
@@ -41,7 +62,8 @@ export default function HomePage() {
   }, [editorials.length, isPaused]);
 
   return (
-    <div className="home">
+    <div className={`home${loading ? " is-loading" : ""}`}>
+      {loading && <SiteLoader />}
       <header className="home-nav">
         <Link to="/" className="home-brand" aria-label="Caribe Records, inicio">
           <img src={runner} alt="" />
@@ -53,6 +75,7 @@ export default function HomePage() {
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
+        <h1 className="visually-hidden">Caribe Records</h1>
         {editorials.length ? (
           editorials.map((editorial, index) => (
             <Link

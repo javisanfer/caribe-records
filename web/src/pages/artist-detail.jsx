@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ArtistDetail from "../components/artists/artist-detail/artist-detail";
 import AdminEditLink from "../components/admin/admin-edit-link";
+import SiteLoader from "../components/ui/site-loader.jsx";
 
 export default function ArtistDetailPage() {
   const { slug } = useParams();
@@ -91,11 +92,7 @@ export default function ArtistDetailPage() {
 
   // Loading
   if (loading) {
-    return (
-      <div className="text-center text-secondary py-5">
-        Cargando artista…
-      </div>
-    );
+    return <SiteLoader />;
   }
 
   // Error

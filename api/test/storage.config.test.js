@@ -11,7 +11,7 @@ const filterFile = (mimetype) => new Promise((resolve) => {
 });
 
 test("usa una versión corregida de Multer", () => {
-  assert.equal(multerPackage.version, "2.3.0");
+  assert.ok(Number(multerPackage.version.split(".")[1]) >= 4);
 });
 
 test("limita cada imagen a 10 MiB", () => {

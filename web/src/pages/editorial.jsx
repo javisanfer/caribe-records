@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import EditorialList from "../components/editorials/editorial-list/editorial-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
+import SiteLoader from "../components/ui/site-loader.jsx";
 
 export default function EditorialPage() {
   const [editorials, setEditorials] = useState([]);
@@ -41,9 +42,7 @@ export default function EditorialPage() {
       count={loading ? null : editorials.length}
       countLabel="historias"
     >
-        {loading && (
-          <p className="public-index__status">Cargando editorial…</p>
-        )}
+        {loading && <SiteLoader />}
 
         {error && (
           <p className="public-index__status public-index__status--error" role="alert">{error}</p>

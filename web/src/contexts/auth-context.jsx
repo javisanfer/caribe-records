@@ -5,6 +5,7 @@ import React, {
 
 import { logout as destroySession, profile } from "../services/api-services";
 import { AuthContext } from "./auth-context-instance";
+import SiteLoader from "../components/ui/site-loader.jsx";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined); 
@@ -65,11 +66,7 @@ export function AuthProvider({ children }) {
 
   // Mientras user === undefined → aún comprobando sesión
   if (user === undefined) {
-    return (
-      <div className="text-white bg-black min-vh-100 d-flex justify-content-center align-items-center">
-        <span className="text-secondary small">Loading session…</span>
-      </div>
-    );
+    return <SiteLoader />;
   }
 
   return (
