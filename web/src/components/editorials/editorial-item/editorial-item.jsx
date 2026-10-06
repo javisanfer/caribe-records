@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function EditorialItem({ editorial, index }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [editorial?.hero?.url]);
+
   if (!editorial) return null;
 
   const slug = editorial.slug || "#";
@@ -18,12 +24,13 @@ export default function EditorialItem({ editorial, index }) {
       style={{ cursor: slug === "#" ? "default" : "pointer" }}
     >
       <div className="editorial-item__media">
-        {editorial.hero?.url ? (
+        {editorial.hero?.url && !imageFailed ? (
           <img
             src={editorial.hero.url}
             alt={editorial.hero.alt || editorial.title}
             loading="lazy"
             decoding="async"
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <span aria-hidden="true">CR</span>

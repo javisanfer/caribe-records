@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReleaseList from "../components/releases/release-list/release-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
+import SiteLoader from "../components/ui/site-loader.jsx";
 
 export default function ReleasePage() {
   const [releases, setReleases] = useState([]);
@@ -28,7 +29,7 @@ export default function ReleasePage() {
           const artistName =
             typeof artistObj === "string"
               ? artistObj
-              : artistObj?.name || "Unknown Artist";
+              : artistObj?.name || r.artistName || "Unknown Artist";
 
           return {
             id: r._id || idx,
@@ -87,9 +88,7 @@ export default function ReleasePage() {
       count={loading ? null : releases.length}
       countLabel="referencias"
     >
-        {loading && (
-          <p className="public-index__status">Cargando discografía…</p>
-        )}
+        {loading && <SiteLoader />}
 
         {error && (
           <p className="public-index__status public-index__status--error" role="alert">{error}</p>

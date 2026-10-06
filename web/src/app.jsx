@@ -9,6 +9,7 @@ import PageLayout from "./components/layouts/page-layout/page-layout.jsx";
 import PageTransition from "./components/layouts/page-transition/page-transition.jsx";
 import SiteFooter from "./components/layouts/site-footer/site-footer.jsx";
 import SiteBanner from "./components/ui/site-banner.jsx";
+import SiteLoader from "./components/ui/site-loader.jsx";
 
 // Páginas públicas
 import HomePage from "./pages/home.jsx";
@@ -21,6 +22,7 @@ import ReleasePage from "./pages/release.jsx";
 import AboutPage from "./pages/about.jsx";
 import LoginPage from "./pages/login.jsx";
 import WorkInProgressPage from "./pages/work-in-progress.jsx";
+import NotFoundPage from "./pages/not-found.jsx";
 
 // Admin: keep the private editing tools out of the public initial download.
 const AdminDashboardPage = lazy(() => import("./pages/admin/admin-dashboard.jsx"));
@@ -42,6 +44,10 @@ function App() {
     document.body.scrollTop = 0;
   }, [location.pathname, location.search]);
 
+  if (import.meta.env.DEV && location.pathname === "/demo-carga") {
+    return <SiteLoader delay={0} />;
+  }
+
   if (!isPrivateArea && !isPublicSiteEnabled) {
     return <WorkInProgressPage />;
   }
@@ -52,7 +58,7 @@ function App() {
       {!isPrivateArea && <SiteBanner />}
 
       <AnimatePresence mode="wait">
-        <Suspense fallback={<main className="admin-page"><p className="admin-loading-state">Abriendo espacio editorial…</p></main>}>
+        <Suspense fallback={<SiteLoader />}>
           <Routes location={location} key={location.pathname}>
           
           {/* HOME */}
@@ -293,6 +299,15 @@ function App() {
                   </PageLayout>
                 </PageTransition>
               </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <PageTransition>
+                <NotFoundPage />
+              </PageTransition>
             }
           />
 
