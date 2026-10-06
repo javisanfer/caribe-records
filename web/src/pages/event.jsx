@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import EventList from "../components/events/event-list/event-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
+import SiteLoader from "../components/ui/site-loader.jsx";
 
 export default function EventPage() {
   const [events, setEvents] = useState([]);
@@ -65,9 +66,7 @@ export default function EventPage() {
       count={loading ? null : events.length}
       countLabel="eventos"
     >
-        {loading && (
-          <p className="public-index__status">Cargando agenda…</p>
-        )}
+        {loading && <SiteLoader />}
 
         {error && (
           <p className="public-index__status public-index__status--error" role="alert">{error}</p>

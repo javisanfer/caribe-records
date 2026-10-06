@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DOMPurify from "dompurify";
 import { Link } from "react-router-dom";
 import "../../../index.css";
@@ -21,6 +21,12 @@ function getSafeEmbedUrl(value) {
 }
 
 export default function EditorialDetail({ editorial, prevNext }) {
+  const [heroFailed, setHeroFailed] = useState(false);
+
+  useEffect(() => {
+    setHeroFailed(false);
+  }, [editorial?.hero?.url]);
+
   if (!editorial) return null;
 
   const publishedAt = editorial.publishAt || editorial.createdAt;
@@ -37,18 +43,18 @@ export default function EditorialDetail({ editorial, prevNext }) {
   return (
     <article className="editorial-detail">
       <header
-        className={`editorial-detail__masthead ${editorial.hero?.url ? "has-image" : ""}`}
+        className={`editorial-detail__masthead ${editorial.hero?.url && !heroFailed ? "has-image" : ""}`}
       >
-        {editorial.hero?.url && (
+        {editorial.hero?.url && !heroFailed && (
           <img
             src={editorial.hero.url}
             alt={editorial.hero.alt || editorial.title}
             className="editorial-detail__hero-image"
+            onError={() => setHeroFailed(true)}
           />
         )}
         <div className="editorial-detail__veil" aria-hidden="true" />
         <div className="editorial-detail__masthead-top">
-          <span>{section}</span>
           <span>CR / ED</span>
         </div>
         <div className="editorial-detail__headline">
