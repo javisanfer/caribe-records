@@ -14,15 +14,17 @@ export default function EventPage() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch("/api/v1/events", {
-          cache: "no-store",        // 👈 importante
-        });
-
-        if (!res.ok) throw new Error("Error al cargar eventos");
-
-        const json = await res.json();
-
-        const rawEvents = Array.isArray(json) ? json : json.data || [];
+        const rawEvents = [];
+        let page = 1;
+        let totalPages = 1;
+        do {
+          const res = await fetch(`/api/v1/events?limit=50&page=${page}`, { cache: "no-store" });
+          if (!res.ok) throw new Error("Error al cargar eventos");
+          const json = await res.json();
+          rawEvents.push(...(Array.isArray(json) ? json : json.data || []));
+          totalPages = Array.isArray(json) ? 1 : json.totalPages || 1;
+          page += 1;
+        } while (page <= totalPages);
 
         const normalized = rawEvents
           .filter(Boolean)

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { listArtists, adminCreateEvent, uploadImage } from "../../services/api-services";
+import { adminListArtists, adminCreateEvent, uploadImage } from "../../services/api-services";
 import AdminImagePreview from "../../components/admin/admin-image-preview";
 
 const API_BASE = "/api/v1";
@@ -31,7 +31,7 @@ export default function NewEventPage({ isEditMode = false }) {
   useEffect(() => {
     async function loadArtists() {
       try {
-        const res = await listArtists();
+        const res = await adminListArtists();
         const items = Array.isArray(res) ? res : res.data || [];
         setArtists(items);
       } catch (err) {

@@ -27,16 +27,16 @@ exports.getEventsPublic = async (req, res) => {
     const { city, country, q, artist } = req.query;
     const { page, limit, skip } = getPagination(req.query);
 
-    // Rango de fechas: por defecto, desde hoy en adelante
-    const from = parseDate(req.query.from) || new Date();
+    // Sin filtro explícito, incluir también el histórico.
+    const from = parseDate(req.query.from);
     const to = parseDate(req.query.to, true);
 
     const filter = {
       isActive: true,
-      date: {
+      ...(from || to ? { date: {
         ...(from ? { $gte: from } : {}),
         ...(to ? { $lte: to } : {}),
-      },
+      } } : {}),
     };
 
     if (city) filter.city = city;

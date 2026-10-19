@@ -18,7 +18,7 @@ function ensureSlug(artist = {}) {
 ====================================================== */
 exports.getArtists = async (req, res) => {
   try {
-    const artists = await Artist.find()
+    const artists = await Artist.find(req.path.startsWith("/admin/") ? {} : { rosterVisible: { $ne: false } })
       .select("name slug photos")
       .lean();
 
@@ -44,7 +44,7 @@ exports.getArtistById = async (req, res) => {
       })
       .lean();
 
-    if (!artist) {
+    if (!artist || artist.rosterVisible === false) {
       return res.status(404).json({ message: "Artist not found" });
     }
 
@@ -70,7 +70,7 @@ exports.getArtistBySlug = async (req, res) => {
       })
       .lean();
 
-    if (!artist) {
+    if (!artist || (artist.rosterVisible === false && !req.path.startsWith("/admin/"))) {
       return res.status(404).json({ message: "Artist not found" });
     }
 
