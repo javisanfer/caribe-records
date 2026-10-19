@@ -41,6 +41,16 @@ export default function EventList({ events = [] }) {
       });
   }, [events]);
 
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
+  const isPast = (event) => {
+    const date = getDate(event);
+    return date && date.toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" }) < today;
+  };
+  const groups = [
+    { title: "Próximos conciertos", past: false, items: sorted.filter((e) => !isPast(e)) },
+    { title: "Histórico", past: true, items: sorted.filter(isPast).reverse() },
+  ];
+
   return (
     <section className="events-wrap">
       <header className="event-index__labels" aria-hidden="true">
@@ -51,13 +61,16 @@ export default function EventList({ events = [] }) {
       </header>
 
       {sorted.length > 0 ? (
+        groups.filter((group) => group.items.length).map((group) => (
+        <section key={group.title} aria-label={group.title}>
+        <h2 className="event-history-heading">{group.title}</h2>
         <ul className="event-index">
-          {sorted.map((e, idx) => (
+          {group.items.map((e, idx) => (
             <li
               className="admin-edit-context"
               key={e.id || e._id || idx}
             >
-              <EventItem event={e} />
+              <EventItem event={e} past={group.past} />
               <AdminEditLink
                 to={e.slug ? `/admin/edit-event/${e.slug}` : null}
                 label={`el evento ${e.title || e.artist}`}
@@ -65,9 +78,11 @@ export default function EventList({ events = [] }) {
             </li>
           ))}
         </ul>
+        </section>
+        ))
       ) : (
         <div className="public-index__status">
-          No hay eventos programados.
+          No hay eventos publicados.
         </div>
       )}
     </section>

@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function EventItem({ event = {} }) {
+export default function EventItem({ event = {}, past = false }) {
   // 🛡️ Normalización de fecha
   const rawDate =
     event.datetime ||
@@ -29,13 +29,14 @@ export default function EventItem({ event = {} }) {
     (value) => typeof value === "string" && /^https?:\/\//i.test(value)
   );
 
-  const EventRoot = url ? "a" : "article";
+  const ticketUrl = past ? null : url;
+  const EventRoot = ticketUrl ? "a" : "article";
 
   return (
     <EventRoot
       className="event-row"
       aria-label={`${artist} en ${city}${country ? ", " + country : ""} — ${dateLabel}`}
-      {...(url ? { href: url, target: "_blank", rel: "noopener noreferrer nofollow" } : {})}
+      {...(ticketUrl ? { href: ticketUrl, target: "_blank", rel: "noopener noreferrer nofollow" } : {})}
     >
       <div className="event-row__artist">
         <strong>{artist}</strong>
@@ -52,7 +53,7 @@ export default function EventItem({ event = {} }) {
       </time>
 
       <div className="event-row__ticket">
-        <span>{url ? <>Entradas <span aria-hidden="true">↗</span></> : "Próximamente"}</span>
+        <span>{past ? "Finalizado" : ticketUrl ? <>Entradas <span aria-hidden="true">↗</span></> : "Próximamente"}</span>
       </div>
     </EventRoot>
   );
