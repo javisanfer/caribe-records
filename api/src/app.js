@@ -6,6 +6,7 @@ const sessionMiddleware = require("./config/session.config");
 const { loadSessionUser } = require("./middlewares/session.middleware");
 const corsMiddleware = require("./config/cors.config"); // ✅ Corregido
 const { connectDatabase } = require("./config/db.config");
+const { migrateCatalogue } = require("./migrations/catalogue-2026-10");
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/api/v1/", router);
 const port = Number(process.env.PORT || 3000);
 
 connectDatabase()
+  .then((connection) => migrateCatalogue(connection.db))
   .then(() => {
     app.listen(port, () => console.info(`🚀 Application running at port ${port}`));
   })

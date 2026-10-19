@@ -94,6 +94,7 @@ router.get("/artists/slug/:slug", artistController.getArtistBySlug);
 router.get("/artists/:id", artistController.getArtistById);
 
 // Admin
+router.get("/admin/artists", adminRateLimit, artistController.getArtists);
 router.post("/admin/artists", adminRateLimit, artistController.createArtists);
 
 router.get(
