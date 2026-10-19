@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { adminCreateRelease, listArtists, uploadImage } from "../../services/api-services";
+import { adminCreateRelease, adminListArtists, uploadImage } from "../../services/api-services";
 import AdminImagePreview from "../../components/admin/admin-image-preview";
 
 const API_BASE = "/api/v1";
@@ -17,7 +17,7 @@ export default function NewReleasePage() {
   const currentCoverUrl = watch("coverUrl") || "";
 
   useEffect(() => {
-    listArtists().then((response) => setArtists(Array.isArray(response) ? response : response.data || [])).catch((error) => { console.error("No se pudieron cargar los artistas", error); setArtists([]); });
+    adminListArtists().then((response) => setArtists(Array.isArray(response) ? response : response.data || [])).catch((error) => { console.error("No se pudieron cargar los artistas", error); setArtists([]); });
   }, []);
 
   useEffect(() => {
