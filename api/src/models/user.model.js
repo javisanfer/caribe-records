@@ -46,6 +46,7 @@ const userSchema = new mongoose.Schema(
         );
       },
     },
+    activateExpiresAt: { type: Date },
     avatar: {
       type: String,
       default: function () {

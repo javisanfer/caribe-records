@@ -4,12 +4,12 @@ import "../../../index.css";
 import { sortReleases } from "../../../utils/release-order";
 
 const LINK_GROUPS = [
-  ["web", "Web"],
-  ["social", "Social"],
+  ["links", "Enlaces"],
   ["streaming", "Escucha"],
 ];
 
 function humanizeLabel(label) {
+  if (label === "x") return "Twitter";
   return label
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/^./, (character) => character.toUpperCase());
@@ -35,7 +35,7 @@ function releaseFormat(format) {
 }
 
 function releaseUrl(release) {
-  return release.spotifyUrl || release.bandcampUrl || "";
+  return release.spotifyUrl || release.bandcampUrl || release.appleMusicUrl || "";
 }
 
 export default function ArtistDetail({
@@ -47,6 +47,8 @@ export default function ArtistDetail({
 }) {
   const [tab, setTab] = useState("overview");
   const [expandedBio, setExpandedBio] = useState(false);
+  const [heroRatio, setHeroRatio] = useState(4 / 3);
+  const [failedHeroImage, setFailedHeroImage] = useState(null);
   const sortedReleases = useMemo(() => sortReleases(releases), [releases]);
 
   const releasesByYear = useMemo(() => {
@@ -62,10 +64,13 @@ export default function ArtistDetail({
   if (!artist) return null;
 
   const heroImage = artist.photos?.coverUrl || artist.photos?.portraitUrl || artist.image?.url;
+  const hasHeroImage = Boolean(heroImage && failedHeroImage !== heroImage);
   const portraitImage = artist.photos?.portraitUrl || artist.image?.url || artist.photos?.coverUrl;
   const links = {
-    web: Object.entries(artist.web || {}).filter(([, url]) => Boolean(url)),
-    social: Object.entries(artist.social || {}).filter(([, url]) => Boolean(url)),
+    links: [
+      ...Object.entries(artist.social || {}),
+      ...Object.entries(artist.web || {}),
+    ].filter(([, url]) => Boolean(url)),
     streaming: Object.entries(artist.streaming || {}).filter(([, url]) => Boolean(url)),
   };
   const hasAnyLinks = Object.values(links).some((group) => group.length > 0);
@@ -73,13 +78,10 @@ export default function ArtistDetail({
   const location = [artist.city, artist.country].filter(Boolean).join(", ");
 
   return (
-    <main className="artist-detail">
-      <nav className="artist-detail__tabs" aria-label="Contenido del artista">
-        <button className={tab === "overview" ? "is-active" : ""} onClick={() => setTab("overview")}>↳ Perfil</button>
-        <button className={tab === "releases" ? "is-active" : ""} onClick={() => setTab("releases")}>↳ Discografía</button>
-        <button className={tab === "links" ? "is-active" : ""} onClick={() => setTab("links")} disabled={!hasAnyLinks}>↳ Enlaces</button>
-      </nav>
-
+    <main
+      className={`artist-detail artist-detail--${tab} artist-detail--${artist.slug}${hasHeroImage ? " artist-detail--has-photo" : ""}`}
+      style={hasHeroImage ? { "--artist-photo-ratio": heroRatio } : undefined}
+    >
       <header className="artist-detail__hero">
         <div className="artist-detail__identity">
           <h1>{artist.name}<span aria-hidden="true">●</span></h1>
@@ -89,10 +91,26 @@ export default function ArtistDetail({
             {artist.formedYear && <span>Desde {artist.formedYear}</span>}
           </div>
         </div>
-        <div className={`artist-detail__visual ${heroImage ? "" : "is-empty"}`}>
-          {heroImage ? <img src={heroImage} alt={artist.name} /> : <span>CR</span>}
+        <div className={`artist-detail__visual ${hasHeroImage ? "" : "is-empty"}`}>
+          {hasHeroImage ? (
+            <img
+              src={heroImage}
+              alt={artist.name}
+              onLoad={(event) => {
+                const { naturalWidth, naturalHeight } = event.currentTarget;
+                if (naturalWidth && naturalHeight) setHeroRatio(naturalWidth / naturalHeight);
+              }}
+              onError={() => setFailedHeroImage(heroImage)}
+            />
+          ) : <span>CR</span>}
         </div>
       </header>
+
+      <nav className="artist-detail__tabs" aria-label="Contenido del artista">
+        <button className={tab === "overview" ? "is-active" : ""} aria-pressed={tab === "overview"} onClick={() => setTab("overview")}>↳ Perfil</button>
+        <button className={tab === "releases" ? "is-active" : ""} aria-pressed={tab === "releases"} onClick={() => setTab("releases")}>↳ Discografía</button>
+        <button className={tab === "links" ? "is-active" : ""} aria-pressed={tab === "links"} onClick={() => setTab("links")} disabled={!hasAnyLinks}>↳ Enlaces</button>
+      </nav>
 
       {tab === "overview" && (
         <div className="artist-detail__overview">
@@ -190,7 +208,7 @@ export default function ArtistDetail({
             <div className="artist-related-block artist-related-block--events">
               <p className="detail-section-label">Editorial</p>
               {editorials.slice(0, 4).map((editorial) => (
-                <Link to={`/editorial/${editorial.slug}`} key={editorial._id}><span>{editorial.title}</span><small>Leer ↗</small></Link>
+                <Link to={`/editorial/${editorial.slug}`} key={editorial._id || editorial.slug}><span>{editorial.title}</span><small>Leer ↗</small></Link>
               ))}
             </div>
           )}

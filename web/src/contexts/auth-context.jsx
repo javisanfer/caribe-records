@@ -66,7 +66,7 @@ export function AuthProvider({ children }) {
 
   // Mientras user === undefined → aún comprobando sesión
   if (user === undefined) {
-    return <SiteLoader />;
+    return <SiteLoader fullPage />;
   }
 
   return (

@@ -1,0 +1,342 @@
+{
+  "featuredEditorial": {
+    "title": "Sin destino concreto, solo hacia delante",
+    "slug": "sin-destino-concreto-solo-hacia-delante",
+    "subtitle": "Aeronave Adolescente, de la habitación a la aerobanda",
+    "section": "Aeronave Adolescente",
+    "status": "published",
+    "publishAt": "2026-11-24T12:00:00.000Z",
+    "hero": {
+      "url": "/images/editorial/aeronave-en-gira.jpeg",
+      "alt": "La banda y sus acompañantes caminan con los instrumentos por una calle"
+    },
+    "credits": [
+      {
+        "role": "Autor",
+        "name": "Daniel Valcárcel"
+      }
+    ],
+    "tags": [
+      "Aeronave Adolescente",
+      "En gira"
+    ],
+    "readingTime": 3,
+    "blocks": [
+      {
+        "type": "paragraph",
+        "text": "<p>Mientras observo desde la ventana el paisaje ser difuminado por la velocidad, gritos sobre leche condensada me hacen recordar lo mucho que <em>Sueño con salones llenos</em> lleva de recorrido en el mundo. Han cambiado muchas cosas desde su lanzamiento en enero de este año, y una de estas cosas es Aeronave Adolescente. Es decir, sigo siendo yo, sigo presente, pero al llevar el mundillo aeronavesco al directo con banda, todas estas canciones cambian y ya pasan de ser mías a ser de esta banda con la que comparto todos los conciertos.</p>"
+      },
+      {
+        "type": "paragraph",
+        "text": "<p>Desde el inicio de esta gira en formato <em>power trio</em> ya se veía un cambio surgir entre los nuevos derroteros que el bajo de Inés y la batería de Álvaro formaban en las canciones. Había respiros, deslices, susurros y conexiones que elevaban la experiencia de tocar en directo. Para mí significó un nuevo comienzo, una nueva forma de entender la música que hacía en mi habitación y que, hasta ese primer tímido concierto en <em>La Yesería</em> (Murcia), me había guardado para mis adentros sin compartirlo con nadie por miedo a que todo se resquebrajase.</p>"
+      },
+      {
+        "type": "paragraph",
+        "text": "<p>A partir de esa primera fecha la <em>aerobanda</em> se fue consolidando cada vez más y más. Desde celebrar las victorias gritando eufóricos y poniendo a todo volumen en el coche <em>Scary Monsters and Nice Sprites</em> volviendo de Elche por el concierto que habíamos dado hasta disfrutar de lo lindo tocando por primera vez en Barcelona en la <em>Sala Vol</em>. Al acabar la primera mitad de la gira, Pablo, que ya formaba parte de nuestras aventuras ya que era la persona que nos solía llevar más a los sitios en coche (aparte de Javi y Julia) se convirtió en el cuarto miembro de la aerobanda.</p>"
+      },
+      {
+        "type": "paragraph",
+        "text": "<p>De nuevo, las canciones cambiaron. Ganaron músculo y pegada, las bases electrónicas que nos servían de apoyo se volvían cada vez más secundarias y el asalto sonoro del conjunto que formábamos se convertía en el centro de la actuación. Siempre estoy recordando la electricidad que sentía en el ambiente cuando tocamos en el Planta Baja de Granada, en el primer bolo con el nuevo formato. La manera en que <em>Solo Gravilla</em> rompe con violencia, la compenetración tocando <em>Balada</em> aguantando todos la tensión del motorik de Álvaro, dar nueva vida a temas antiguos como <em>Servicio de Organización</em> o explotar con energía cada tema de <em>Sueño con salones llenos</em>; es por esto porque esta experiencia de tocar con banda es fantástica.</p>"
+      },
+      {
+        "type": "paragraph",
+        "text": "<p>Ya hemos pasado por sitios geniales como el festival <em>Observatorio</em>, salas míticas como la <em>Dabadaba</em> y acabamos de venir de una racha de conciertos en Zaragoza, Santander y Bilbao. Me encuentro agotado, pero feliz de poder estar viviendo esto. Y espero poder seguir haciendo esto con esta banda durante un buen rato. En el coche siguen sonando gritos sobre leche condensada, mientras Inés busca en el móvil cuál es la siguiente área de servicio para parar, ya que llevamos un buen rato de trayecto. Sin ningún destino concreto, solo para adelante y con decisión.</p>"
+      }
+    ]
+  },
+  "artists": [
+    {
+      "slug": "aeronave-adolescente",
+      "bio": "Aeronave Adolescente nació en 2020 como el proyecto personal de Daniel Valcárcel en Culleredo (Galicia). Hoy toma forma de banda junto a Inés Jaso (Jøl) al bajo, Álvaro Rodríguez (Baloncesto) a la batería y Pablo Villalba a la guitarra. Con formación clásica en piano y una identidad forjada en la grabación doméstica, Daniel cruza slacker rock, noise pop y electrónica: guitarras abiertas, sintetizadores y melodías luminosas con espíritu DIY noventero.\n\nTras los EP Cartas de Ida y Vuelta y El Mirador de la Ría del Burgo y Otros Puntos de Inspiración, publicados en 2020, llegó su primer álbum en 2023: Sempre está chovendo na beira do mar. Grabado principalmente en una habitación, amplió el sonido lo-fi del proyecto con cajas de ritmos, sintetizadores y paisajes sonoros.\n\nEn enero de 2026, ya junto a Caribe Records, publicó su segundo LP, Sueño con salones llenos. Producido con Pablo Villalba y mezclado y masterizado por Otro, el disco lleva esa intimidad hacia una producción más nítida y expansiva. Sus canciones hablan de precariedad, alquileres imposibles y futuros inciertos, pero encuentran en el ruido, el pop y la vulnerabilidad una forma de permanecer. Los singles “V.M.D.” y “El día de la marmota II” anticiparon ese equilibrio entre cansancio y esperanza. Sobre el escenario, la formación actual convierte el universo doméstico de Aeronave Adolescente en un directo más físico sin perder la honestidad de las canciones.",
+      "social": {
+        "x": "https://x.com/aeronaveadolesc",
+        "instagram": "https://www.instagram.com/aeronaveadolescente/"
+      },
+      "web": {
+        "pressKit": "https://drive.google.com/drive/folders/1pTmcWp1ZQzoNRI3C3FBWTKpEwTsdvD3R?usp=share_link"
+      },
+      "streaming": {
+        "bandcamp": "https://aeronaveadolescente1.bandcamp.com/",
+        "spotify": "https://open.spotify.com/artist/249m4fvXm7lbc0lP6rgfDi",
+        "appleMusic": "https://music.apple.com/us/artist/aeronave-adolescente/1534112934"
+      },
+      "photos": {
+        "portraitUrl": "/images/artist-updates/AA_002.jpg",
+        "coverUrl": "/images/artist-updates/AA_002.jpg"
+      }
+    },
+    {
+      "slug": "ferrocentro-club",
+      "bio": "Ferrocentro Club es un cuarteto de Mieres (Asturias) formado por cuatro amigos de la Facultad de Ciencias de la Universidad de Oviedo. Se llaman a sí mismos «mercenarios del pop» y hacen canciones en las que el indie rock noventero, el noise pop y el slacker conviven con melodías que sobreviven a las guitarras saturadas.\n\nEn Voy a tener suerte, su EP de cinco canciones editado junto a Caribe Records, los problemas cotidianos adquieren dimensiones inesperadas: un saludo que no llega puede desatar una crisis existencial, la escena musical se parece al modo competitivo de un videojuego y un mal día termina en fantasías de destrucción planetaria. Hay humor absurdo, sátira y un punto de surrealismo, pero también una sensibilidad pop muy clara detrás del ruido.\n\nGrabado en el Búnker de San Crispín con Jorge Antequera a cargo de la producción, mezcla y máster, el EP cambia de dirección cuando menos se espera. La banda dice que «Voy a tener suerte es una pregunta sin signos de interrogación»: una manera de avanzar entre dudas, guitarras fuzz y canciones que prefieren confiar un poco en el azar.",
+      "social": {
+        "instagram": "https://www.instagram.com/ferrocentroclub/"
+      },
+      "web": {},
+      "streaming": {
+        "bandcamp": "https://ferrocentroclub.bandcamp.com/",
+        "spotify": "https://open.spotify.com/artist/0J3vdISJ1KpsS4rydRges3",
+        "appleMusic": "https://music.apple.com/us/artist/ferrocentro-club/1816706308"
+      },
+      "photos": {
+        "portraitUrl": "/images/artist-updates/PHOTO-2026-11-02-15-24-58.jpg",
+        "coverUrl": "/images/artist-updates/PHOTO-2026-11-02-15-24-58.jpg"
+      }
+    }
+  ],
+  "releases": [
+    {
+      "_id": "curated-ferrocentro-bola-curva",
+      "title": "bola curva",
+      "artist": {
+        "name": "ferrocentro club",
+        "slug": "ferrocentro-club"
+      },
+      "artistName": "ferrocentro club",
+      "format": "single",
+      "release_date": "2026-10-16T12:00:00Z",
+      "cover": {
+        "url": "/images/artist-updates/IMG_0453.PNG",
+        "alt": "Portada de bola curva"
+      },
+      "appleMusicUrl": "https://music.apple.com/us/album/bola-curva-single/6818077292",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "bola curva",
+          "duration": "2:01"
+        }
+      ]
+    },
+    {
+      "_id": "curated-ferrocentro-voy-a-tener-suerte",
+      "title": "voy a tener suerte",
+      "artist": {
+        "name": "ferrocentro club",
+        "slug": "ferrocentro-club"
+      },
+      "artistName": "ferrocentro club",
+      "format": "ep",
+      "release_date": "2026-11-20T12:00:00Z",
+      "cover": {
+        "url": "/images/artist-updates/ferrocentro%20club%20-%20voy%20a%20tener%20suerte.png",
+        "alt": "Portada de voy a tener suerte"
+      },
+      "appleMusicUrl": "https://music.apple.com/us/album/voy-a-tener-suerte-ep/6828490603",
+      "tracklist": [
+        {
+          "position": 1,
+          "title": "voy a tener suerte",
+          "duration": "2:50"
+        },
+        {
+          "position": 2,
+          "title": "tiramisú",
+          "duration": "2:51"
+        },
+        {
+          "position": 3,
+          "title": "decálogo de buenas prácticas",
+          "duration": "3:36"
+        },
+        {
+          "position": 4,
+          "title": "bola curva",
+          "duration": "2:01"
+        },
+        {
+          "position": 5,
+          "title": "solaris II",
+          "duration": "6:31"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "archivo-2025-05-24-santiago-de-compostela",
+      "artist": "Aeronave Adolescente",
+      "venue": "Sala Moon",
+      "city": "Santiago de Compostela",
+      "title": "Con Los Reels y Monito Dinero",
+      "sourceUrl": "https://www.instagram.com/cariberecords/p/DIRJbiFq_TU/",
+      "country": "ES",
+      "datetime": "2025-05-24T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2025-05-30-madrid",
+      "artist": "Los Reels",
+      "venue": "Hangar 48",
+      "city": "Madrid",
+      "title": "Con Wet Iguanas",
+      "sourceUrl": "https://ticketandroll.com/evento/wet-iguanas-en-sala-hangar-48?lang=es",
+      "country": "ES",
+      "datetime": "2025-05-30T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2025-06-14-oviedo",
+      "artist": "Los Reels",
+      "venue": "Lata de Zinc",
+      "city": "Oviedo",
+      "title": "Con Ferrocentro Club y La Fuente de Duchamp",
+      "sourceUrl": "https://www.instagram.com/cariberecords/p/DKKbawDKFMm/",
+      "country": "ES",
+      "datetime": "2025-06-14T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2025-10-11-sevilla",
+      "artist": "Los Reels",
+      "venue": "Bar Mutante",
+      "city": "Sevilla",
+      "title": "Con Frisbi y Baloncesto",
+      "sourceUrl": "https://www.instagram.com/frisbielgrupo/p/DOx43iqCPFt/",
+      "country": "ES",
+      "datetime": "2025-10-11T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-01-23-santiago-de-compostela",
+      "artist": "Aeronave Adolescente",
+      "venue": "El Muelle",
+      "city": "Santiago de Compostela",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-01-23T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-01-24-a-coru-a",
+      "artist": "Aeronave Adolescente",
+      "venue": "Acéfala",
+      "city": "A Coruña",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-01-24T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-02-12-murcia",
+      "artist": "Aeronave Adolescente",
+      "venue": "La Yesería",
+      "city": "Murcia",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-02-12T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-02-13-elche",
+      "artist": "Aeronave Adolescente",
+      "venue": "FoodHall",
+      "city": "Elche",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-02-13T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-02-20-madrid",
+      "artist": "Aeronave Adolescente",
+      "venue": "Wurlitzer Ballroom",
+      "city": "Madrid",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-02-20T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-02-27-valencia",
+      "artist": "Aeronave Adolescente",
+      "venue": "Lala Karaoke",
+      "city": "Valencia",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-02-27T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-02-28-barcelona",
+      "artist": "Aeronave Adolescente",
+      "venue": "Sala Vol",
+      "city": "Barcelona",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-02-28T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-03-13-vigo",
+      "artist": "Aeronave Adolescente",
+      "venue": "Sala Supersonic",
+      "city": "Vigo",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-03-13T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-03-14-a-coru-a",
+      "artist": "Aeronave Adolescente",
+      "venue": "La Disfrutona del Orzán",
+      "city": "A Coruña",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-03-14T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-03-21-oviedo",
+      "artist": "Aeronave Adolescente",
+      "venue": "Lata de Zinc",
+      "city": "Oviedo",
+      "title": "Salas Vacías",
+      "sourceUrl": "https://www.instagram.com/aeronaveadolescente/p/DdMCNAoiHlc/",
+      "country": "ES",
+      "datetime": "2026-03-21T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-04-24-oviedo",
+      "artist": "A usted le gustará",
+      "venue": "Lata de Zinc",
+      "city": "Oviedo",
+      "title": "Aeronave Adolescente · Cabiria · Ferrocentro Club",
+      "country": "ES",
+      "datetime": "2026-04-24T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-04-25-oviedo",
+      "artist": "A usted le gustará",
+      "venue": "Lata de Zinc",
+      "city": "Oviedo",
+      "title": "Baloncesto · Padre y Esposo · Gúdar · DeDeDeDe · Elena del Frade",
+      "country": "ES",
+      "datetime": "2026-04-25T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-11-20-ourense",
+      "artist": "Aeronave Adolescente",
+      "venue": "Café Pop Torgal",
+      "city": "Ourense",
+      "title": "Con Marcelo Criminal",
+      "country": "ES",
+      "datetime": "2026-11-20T12:00:00+01:00"
+    },
+    {
+      "id": "archivo-2026-11-21-a-coru-a",
+      "artist": "Aeronave Adolescente",
+      "venue": "Acéfala",
+      "city": "A Coruña",
+      "title": "Con Marcelo Criminal",
+      "country": "ES",
+      "datetime": "2026-11-21T12:00:00+01:00"
+    },
+    {
+      "id": "agenda-junio-aeronave-2027-02-07",
+      "artist": "JUNIO · Aeronave Adolescente",
+      "venue": "Sala El Sol",
+      "city": "Madrid",
+      "country": "ES",
+      "title": "Inverfest 2027",
+      "datetime": "2027-02-07T20:00:00+01:00",
+      "ticketUrl": "https://tickets.oneboxtds.com/latrastiendasonora/select/3075693"
+    }
+  ]
+}

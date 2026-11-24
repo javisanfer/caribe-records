@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReleaseList from "../components/releases/release-list/release-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 import SiteLoader from "../components/ui/site-loader.jsx";
+import { withCuratedReleases } from "../data/curated-releases.js";
 
 export default function ReleasePage() {
   const [releases, setReleases] = useState([]);
@@ -23,7 +24,7 @@ export default function ReleasePage() {
         const data = await res.json();
 
         // 🔧 Normalización para adaptarlo a ReleaseList / ReleaseItem
-        const normalized = (data || []).map((r, idx) => {
+        const normalized = withCuratedReleases(data || []).map((r, idx) => {
           const artistObj = r.artist;
 
           const artistName =
@@ -33,6 +34,7 @@ export default function ReleasePage() {
 
           return {
             id: r._id || idx,
+            managed: !String(r._id || "").startsWith("curated-"),
 
             // datos “bonitos” para el front
             artistName,
@@ -42,14 +44,17 @@ export default function ReleasePage() {
                 : undefined,
 
             title: r.title || r.name || "Untitled",
+            format: r.format || "",
 
             // fecha
             date: r.release_date || r.date || null,
 
             // portada
-            cover: r.cover_image
-              ? { url: r.cover_image, alt: r.title || r.name || "Cover" }
-              : null,
+            cover: r.cover?.url
+              ? r.cover
+              : r.cover_image
+                ? { url: r.cover_image, alt: r.title || r.name || "Cover" }
+                : null,
 
             // tracklist
             tracks: (r.tracklist || []).map((t, i) => ({
@@ -65,6 +70,7 @@ export default function ReleasePage() {
             catalogType: r.catalogType || "own",
             spotifyUrl: r.spotifyUrl || "",
             bandcampUrl: r.bandcampUrl || "",
+            appleMusicUrl: r.appleMusicUrl || "",
             catalog: r.catalog || r.catNo || null,
           };
         });

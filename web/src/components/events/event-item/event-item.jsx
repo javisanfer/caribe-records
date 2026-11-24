@@ -17,6 +17,7 @@ export default function EventItem({ event = {}, past = false }) {
           day: "2-digit",
           month: "short",
           year: "numeric",
+          timeZone: "Europe/Madrid",
         })
       : "TBA";
 
@@ -25,18 +26,17 @@ export default function EventItem({ event = {}, past = false }) {
   const city = event.city || "";
   const country = event.country || "";
   const venue = event.venue || "Por confirmar";
-  const url = [event.ticketUrl, event.url].find(
+  const url = (past ? [event.sourceUrl] : [event.ticketUrl, event.url]).find(
     (value) => typeof value === "string" && /^https?:\/\//i.test(value)
   );
 
-  const ticketUrl = past ? null : url;
-  const EventRoot = ticketUrl ? "a" : "article";
+  const EventRoot = url ? "a" : "article";
 
   return (
     <EventRoot
-      className="event-row"
+      className={`event-row${past ? " event-row--past" : ""}`}
       aria-label={`${artist} en ${city}${country ? ", " + country : ""} — ${dateLabel}`}
-      {...(ticketUrl ? { href: ticketUrl, target: "_blank", rel: "noopener noreferrer nofollow" } : {})}
+      {...(url ? { href: url, target: "_blank", rel: "noopener noreferrer nofollow" } : {})}
     >
       <div className="event-row__artist">
         <strong>{artist}</strong>
@@ -53,7 +53,7 @@ export default function EventItem({ event = {}, past = false }) {
       </time>
 
       <div className="event-row__ticket">
-        <span>{past ? "Finalizado" : ticketUrl ? <>Entradas <span aria-hidden="true">↗</span></> : "Próximamente"}</span>
+        <span>{past ? (url ? <>Ver cartel <span aria-hidden="true">↗</span></> : "Finalizado") : url ? <>Entradas <span aria-hidden="true">↗</span></> : "Próximamente"}</span>
       </div>
     </EventRoot>
   );
