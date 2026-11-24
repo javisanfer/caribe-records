@@ -91,7 +91,6 @@ export default function Navbar() {
         aria-hidden={!isOpen}
       >
         <div className="cr-mobile-menu-inner">
-          <p className="cr-menu-kicker">Sello independiente · Vallecas, Madrid</p>
           <ol className="cr-mobile-links">
             {navigation.map((item) => (
               <li key={item.to}>

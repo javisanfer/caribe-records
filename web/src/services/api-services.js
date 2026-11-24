@@ -6,9 +6,9 @@ import axios from "axios";
  * configurado por Vite. Producción puede definir VITE_API_BASE si la API vive
  * en otro origen.
  */
-const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  "/api/v1";
+const API_BASE = import.meta.env.PROD
+  ? "/api/v1"
+  : import.meta.env.VITE_API_BASE || "/api/v1";
 
 export const http = axios.create({
   baseURL: API_BASE,

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import runner from "../../assets/brand/caribe-runner.png";
 
-export default function SiteLoader({ delay = 2000 }) {
+export default function SiteLoader({ delay = 1200, fullPage = false }) {
   const [visible, setVisible] = useState(delay === 0);
 
   useEffect(() => {
@@ -10,15 +8,11 @@ export default function SiteLoader({ delay = 2000 }) {
     return () => window.clearTimeout(timer);
   }, [delay]);
 
-  if (!visible) return null;
-
-  return createPortal(
-    <div className="site-loader" role="status" aria-label="Cargando Caribe Records">
-      <div className="site-loader__mark" aria-hidden="true">
-        <span className="site-loader__symbol" style={{ maskImage: `url(${runner})` }} />
-      </div>
-      <span className="visually-hidden">Cargando Caribe Records…</span>
-    </div>,
-    document.body
+  return (
+    <div className={`site-loader${fullPage ? " site-loader--page" : ""}`} aria-busy="true">
+      <span className="site-loader__status" role="status">
+        {visible && <><span className="site-loader__line" aria-hidden="true" />Cargando…</>}
+      </span>
+    </div>
   );
 }

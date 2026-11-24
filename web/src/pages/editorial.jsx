@@ -1,38 +1,22 @@
 import React, { useEffect, useState } from "react";
 import EditorialList from "../components/editorials/editorial-list/editorial-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
+import { featuredEditorials } from "../data/featured-editorial";
 import SiteLoader from "../components/ui/site-loader.jsx";
 
 export default function EditorialPage() {
   const [editorials, setEditorials] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // 🔁 Carga de datos
   useEffect(() => {
-    async function loadEditorials() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // ✔️ URL correcta
-        const res = await fetch("/api/v1/editorials");
-        if (!res.ok) throw new Error("Error al cargar editoriales");
-
-        // ✔️ El backend NO devuelve un array, sino { data: [...] }
-        const json = await res.json();
-
-        // ✔️ Este es el arreglo real
-        setEditorials(json.data || []);
-      } catch (err) {
-        console.error(err);
-        setError("No se pudieron cargar los artículos editoriales.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadEditorials();
+    fetch("/api/v1/editorials")
+      .then((res) => {
+        if (!res.ok) throw new Error("Editorials unavailable");
+        return res.json();
+      })
+      .then((json) => setEditorials(Array.isArray(json) ? json : json.data || []))
+      .catch(() => setEditorials(featuredEditorials))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -42,15 +26,7 @@ export default function EditorialPage() {
       count={loading ? null : editorials.length}
       countLabel="historias"
     >
-        {loading && <SiteLoader />}
-
-        {error && (
-          <p className="public-index__status public-index__status--error" role="alert">{error}</p>
-        )}
-
-        {!loading && !error && (
-          <EditorialList editorials={editorials} />
-        )}
+      {loading ? <SiteLoader /> : <EditorialList editorials={editorials} />}
     </PublicIndexPage>
   );
 }

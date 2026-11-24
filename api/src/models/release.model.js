@@ -61,6 +61,7 @@ const releaseSchema = new mongoose.Schema(
     // Enlace Spotify del disco
     spotifyUrl:   { type: String, trim: true },
     bandcampUrl:  { type: String, trim: true },
+    appleMusicUrl: { type: String, trim: true },
 
     // Tracklist
     tracklist: [trackSchema],

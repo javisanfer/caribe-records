@@ -2,6 +2,11 @@ import React, { useEffect, useState } from "react";
 import EventList from "../components/events/event-list/event-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 import SiteLoader from "../components/ui/site-loader.jsx";
+import { curatedEvents } from "../data/curated-events.js";
+
+// Registros antiguos de prueba que llegaron a publicarse en el catálogo local.
+const previewSlugs = new Set(["prueba-1", "prueba-2", "aeronave-adolescente-live-at-apolo"]);
+const eventKey = (event) => [event.datetime?.slice(0, 10), event.city?.toLowerCase(), event.venue?.toLowerCase()].join("|");
 
 export default function EventPage() {
   const [events, setEvents] = useState([]);
@@ -27,7 +32,7 @@ export default function EventPage() {
         } while (page <= totalPages);
 
         const normalized = rawEvents
-          .filter(Boolean)
+          .filter((event) => event && !previewSlugs.has(event.slug))
           .map((e, idx) => {
             const mainArtist =
               Array.isArray(e.lineup) && e.lineup.length > 0
@@ -37,7 +42,7 @@ export default function EventPage() {
             return {
               id: e._id || idx,
               slug: e.slug || null,
-              artist: mainArtist?.name || "Caribe Records",
+              artist: e.artistName || mainArtist?.name || "Caribe Records",
               artistId: mainArtist?._id || null,
               artistSlug: mainArtist?.slug || null,
               title: e.title || "",
@@ -45,14 +50,17 @@ export default function EventPage() {
               country: e.country || "",
               venue: e.venue || "",
               datetime: e.date || e.datetime || null,
-              url: e.ticketUrl || e.url || "#",
+              ticketUrl: e.ticketUrl || e.url || null,
+              sourceUrl: e.sourceUrl || null,
             };
           });
 
-        setEvents(normalized);
+        const known = new Set(normalized.map(eventKey));
+        setEvents([...normalized, ...curatedEvents.filter((event) => !known.has(eventKey(event)))]);
       } catch (err) {
         console.error("Error cargando eventos", err);
-        setError("No se pudieron cargar los eventos.");
+        setEvents(curatedEvents);
+        setError("No se pudieron cargar todas las fechas del archivo.");
       } finally {
         setLoading(false);
       }
@@ -64,7 +72,7 @@ export default function EventPage() {
   return (
     <PublicIndexPage
       className="events-page"
-      title="Agenda"
+      title="Eventos"
       count={loading ? null : events.length}
       countLabel="eventos"
     >
@@ -74,7 +82,7 @@ export default function EventPage() {
           <p className="public-index__status public-index__status--error" role="alert">{error}</p>
         )}
 
-        {!loading && !error && (
+        {!loading && (
           <EventList events={events} />
         )}
     </PublicIndexPage>

@@ -69,6 +69,11 @@ export default function EditorialDetail({ editorial, prevNext }) {
       <div className="editorial-detail__layout" id="leer">
         <aside className="editorial-detail__meta" aria-label="Datos del artículo">
           <p className="editorial-detail__eyebrow">{section}</p>
+          {editorial.credits?.find((credit) => /autor|author/i.test(credit.role || ""))?.name && (
+            <p className="editorial-detail__byline">
+              Texto de {editorial.credits.find((credit) => /autor|author/i.test(credit.role || ""))?.name}
+            </p>
+          )}
           {hasMeta && (
             <dl>
               {created && <div><dt>Publicado</dt><dd>{created}</dd></div>}
