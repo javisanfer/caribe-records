@@ -21,7 +21,7 @@ import EventPage from "./pages/event.jsx";
 import ReleasePage from "./pages/release.jsx";
 import AboutPage from "./pages/about.jsx";
 import LoginPage from "./pages/login.jsx";
-import WorkInProgressPage from "./pages/work-in-progress.jsx";
+import ActivateAdminPage from "./pages/activate-admin.jsx";
 import NotFoundPage from "./pages/not-found.jsx";
 
 // Admin: keep the private editing tools out of the public initial download.
@@ -36,7 +36,6 @@ function App() {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isPrivateArea = location.pathname.startsWith("/admin");
-  const isPublicSiteEnabled = !import.meta.env.PROD || import.meta.env.VITE_PUBLIC_SITE_ENABLED === "true";
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
@@ -45,11 +44,7 @@ function App() {
   }, [location.pathname, location.search]);
 
   if (import.meta.env.DEV && location.pathname === "/demo-carga") {
-    return <SiteLoader delay={0} />;
-  }
-
-  if (!isPrivateArea && !isPublicSiteEnabled) {
-    return <WorkInProgressPage />;
+    return <SiteLoader delay={0} fullPage />;
   }
 
   return (
@@ -136,6 +131,7 @@ function App() {
           />
 
           {/* LOGIN */}
+          <Route path="/admin/activar" element={<ActivateAdminPage />} />
           <Route
             path="/admin/login"
             element={

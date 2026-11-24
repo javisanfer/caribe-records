@@ -1,90 +1,84 @@
-// src/components/events/event-list/event-list.jsx
 import React, { useMemo } from "react";
 import EventItem from "../event-item/event-item";
 import AdminEditLink from "../../admin/admin-edit-link";
 
-/**
- * Espera events con forma:
- * {
- *   id: string,
- *   artist: string,
- *   artistId?: string,
- *   artistSlug?: string,
- *   title?: string,
- *   city?: string,
- *   country?: string,
- *   venue?: string,
- *   datetime?: string,  // ISO
- *   url?: string
- * }
- */
-export default function EventList({ events = [] }) {
-  const getDate = (e) => {
-    if (!e) return null;
-    const raw =
-      e.datetime || e.date || e.startDate || e.startsAt || null;
-    if (!raw) return null;
-    const d = new Date(raw);
-    return Number.isNaN(d.getTime()) ? null : d;
-  };
+const madridDate = (date) => new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit",
+}).format(date);
 
-  const sorted = useMemo(() => {
-    const safeEvents = Array.isArray(events) ? events : [];
-    return [...safeEvents]
-      .filter(Boolean)
-      .sort((a, b) => {
-        const da = getDate(a);
-        const db = getDate(b);
-        const ta = da ? da.getTime() : 0;
-        const tb = db ? db.getTime() : 0;
-        return ta - tb;
-      });
+function EventRows({ events, past = false }) {
+  return (
+    <ul className="event-index">
+      {events.map((event) => (
+        <li className="admin-edit-context" key={event.id}>
+          <EventItem event={event} past={past} />
+          <AdminEditLink
+            to={event.slug ? `/admin/edit-event/${event.slug}` : null}
+            label={`el evento ${event.title || event.artist}`}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default function EventList({ events = [] }) {
+  const { upcoming, history } = useMemo(() => {
+    const today = madridDate(new Date());
+    const dated = (Array.isArray(events) ? events : [])
+      .filter((event) => event?.datetime)
+      .map((event) => ({ ...event, parsedDate: new Date(event.datetime) }))
+      .filter((event) => !Number.isNaN(event.parsedDate.getTime()));
+    const upcoming = dated.filter((event) => madridDate(event.parsedDate) >= today)
+      .sort((a, b) => a.parsedDate - b.parsedDate);
+    const past = dated.filter((event) => madridDate(event.parsedDate) < today)
+      .sort((a, b) => b.parsedDate - a.parsedDate);
+    const byYear = new Map();
+    past.forEach((event) => {
+      const year = madridDate(event.parsedDate).slice(0, 4);
+      byYear.set(year, [...(byYear.get(year) || []), event]);
+    });
+    return { upcoming, history: [...byYear] };
   }, [events]);
 
-  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
-  const isPast = (event) => {
-    const date = getDate(event);
-    return date && date.toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" }) < today;
-  };
-  const groups = [
-    { title: "Próximos conciertos", past: false, items: sorted.filter((e) => !isPast(e)) },
-    { title: "Histórico", past: true, items: sorted.filter(isPast).reverse() },
-  ];
+  if (!upcoming.length && !history.length) {
+    return <div className="public-index__status">No hay eventos publicados.</div>;
+  }
 
   return (
-    <section className="events-wrap">
-      <header className="event-index__labels" aria-hidden="true">
-        <span>Artista</span>
-        <span>Lugar</span>
-        <span>Fecha</span>
-        <span>Entradas</span>
-      </header>
+    <div className="events-wrap">
+      <section className="event-section" aria-labelledby="event-upcoming-title">
+        <header className="event-section__heading">
+          <div><span>01 / Agenda</span><h2 id="event-upcoming-title">Próximos conciertos</h2></div>
+          <span>{String(upcoming.length).padStart(2, "0")}</span>
+        </header>
+        {upcoming.length ? (
+          <>
+            <div className="event-index__labels" aria-hidden="true"><span>Artista</span><span>Lugar</span><span>Fecha</span><span>Entradas</span></div>
+            <EventRows events={upcoming} />
+          </>
+        ) : <p className="event-section__empty">Próximas fechas por anunciar.</p>}
+      </section>
 
-      {sorted.length > 0 ? (
-        groups.filter((group) => group.items.length).map((group) => (
-        <section key={group.title} aria-label={group.title}>
-        <h2 className="event-history-heading">{group.title}</h2>
-        <ul className="event-index">
-          {group.items.map((e, idx) => (
-            <li
-              className="admin-edit-context"
-              key={e.id || e._id || idx}
-            >
-              <EventItem event={e} past={group.past} />
-              <AdminEditLink
-                to={e.slug ? `/admin/edit-event/${e.slug}` : null}
-                label={`el evento ${e.title || e.artist}`}
-              />
-            </li>
+      {history.length > 0 && (
+        <section className="event-section event-section--archive" aria-labelledby="event-archive-title">
+          <header className="event-section__heading">
+            <div><span>02 / Archivo</span><h2 id="event-archive-title">Conciertos pasados</h2></div>
+            <span>{String(history.reduce((total, [, items]) => total + items.length, 0)).padStart(2, "0")}</span>
+          </header>
+          <p className="event-section__intro">Abre un año para recorrer las fechas anteriores.</p>
+          {history.map(([year, items]) => (
+            <details className="event-year" key={year}>
+              <summary>
+                <span className="event-year__year">{year}</span>
+                <span className="event-year__count">{items.length} {items.length === 1 ? "concierto" : "conciertos"}</span>
+                <span className="event-year__toggle" aria-hidden="true">↗</span>
+              </summary>
+              <EventRows events={items} past />
+            </details>
           ))}
-        </ul>
         </section>
-        ))
-      ) : (
-        <div className="public-index__status">
-          No hay eventos publicados.
-        </div>
       )}
-    </section>
+    </div>
   );
 }

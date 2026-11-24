@@ -5,11 +5,9 @@ import { releaseDate, sortReleases } from "../../../utils/release-order";
 
 export default function ReleaseList({ releases = [] }) {
   const [view, setView] = useState("list"); // "list" | "grid"
-  const [order, setOrder] = useState("newest");
-
   const sorted = useMemo(
-    () => sortReleases(releases, order),
-    [releases, order]
+    () => sortReleases(releases, "newest"),
+    [releases]
   );
 
   const yearsRange = useMemo(() => {
@@ -27,12 +25,6 @@ export default function ReleaseList({ releases = [] }) {
     <section className="releases-wrap">
       <header className="index-toolbar">
           <p>{yearsRange || "Archivo completo"}</p>
-          <label className="catalogue-filter">Orden
-            <select value={order} onChange={(event) => setOrder(event.target.value)}>
-              <option value="newest">Más recientes primero</option>
-              <option value="oldest">Más antiguos primero</option>
-            </select>
-          </label>
           <div className="index-toolbar__views" role="group" aria-label="Vista de discografía">
             <button
               className={view === "list" ? "is-active" : ""}
@@ -60,10 +52,10 @@ export default function ReleaseList({ releases = [] }) {
           {sorted.map((rel) => (
             <div className="admin-edit-context" key={rel.id || rel._id}>
               <ReleaseItem release={rel} view="grid" />
-              <AdminEditLink
+              {rel.managed !== false && <AdminEditLink
                 to={`/admin/edit-release/${rel.id || rel._id}`}
                 label={`el lanzamiento ${rel.title}`}
-              />
+              />}
             </div>
           ))}
         </div>
@@ -75,10 +67,10 @@ export default function ReleaseList({ releases = [] }) {
               key={rel.id || rel._id}
             >
               <ReleaseItem release={rel} view="list" />
-              <AdminEditLink
+              {rel.managed !== false && <AdminEditLink
                 to={`/admin/edit-release/${rel.id || rel._id}`}
                 label={`el lanzamiento ${rel.title}`}
-              />
+              />}
             </li>
           ))}
         </ul>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ArtistList from "../components/artists/artist-list/artist-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 import SiteLoader from "../components/ui/site-loader.jsx";
+import { withCurrentArtistPhoto } from "../data/artist-media.js";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState([]);
@@ -24,7 +25,8 @@ export default function ArtistsPage() {
         const data = await res.json();
 
         // 🔧 Normalizar para garantizar id y slug
-        const normalized = (data || []).map((a) => {
+        const normalized = (data || []).map((original) => {
+          const a = withCurrentArtistPhoto(original);
           const fallbackSlug = a.name
             ? a.name
                 .toLowerCase()
