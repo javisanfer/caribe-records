@@ -22,6 +22,7 @@ import ReleasePage from "./pages/release.jsx";
 import AboutPage from "./pages/about.jsx";
 import LoginPage from "./pages/login.jsx";
 import ActivateAdminPage from "./pages/activate-admin.jsx";
+import RecoverAdminPage from "./pages/recover-admin.jsx";
 import NotFoundPage from "./pages/not-found.jsx";
 
 // Admin: keep the private editing tools out of the public initial download.
@@ -132,6 +133,7 @@ function App() {
 
           {/* LOGIN */}
           <Route path="/admin/activar" element={<ActivateAdminPage />} />
+          <Route path="/admin/recuperar" element={<RecoverAdminPage />} />
           <Route
             path="/admin/login"
             element={

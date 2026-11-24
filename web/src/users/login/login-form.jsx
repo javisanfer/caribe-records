@@ -128,6 +128,7 @@ export default function LoginForm() {
               <span>{isSubmitting ? "Comprobando…" : "Entrar al panel"}</span>
               <span aria-hidden="true">→</span>
             </button>
+            <Link className="login-recovery-link" to="/admin/recuperar">¿No recuerdas la contraseña? →</Link>
           </form>
         </div>
 
