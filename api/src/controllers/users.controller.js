@@ -48,6 +48,31 @@ module.exports.profile = (req, res, next) => {
   res.json(req.user);
 };
 
+module.exports.completeInvite = async (req, res, next) => {
+  try {
+    const { email, token, password } = req.body;
+    if (typeof email !== "string" || typeof token !== "string" || token.length < 40 ||
+        typeof password !== "string" || password.length < 12) {
+      return res.status(400).json({ message: "Datos de activación no válidos" });
+    }
+    const user = await User.findOne({
+      email: email.trim().toLowerCase(),
+      activateToken: token,
+      activateExpiresAt: { $gt: new Date() },
+      active: false,
+    });
+    if (!user) return res.status(400).json({ message: "Enlace caducado o no válido" });
+    user.password = password;
+    user.active = true;
+    user.activateToken = null;
+    user.activateExpiresAt = null;
+    await user.save();
+    return res.status(204).send();
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // ⭐ Obtener el Carrito del Usuario
 module.exports.getCart = async (req, res, next) => {
   try {

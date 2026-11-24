@@ -50,6 +50,7 @@ const bannerController = require("../controllers/banners.controller");
 router.patch("/users/me", auth.isAuthenticated, users.update);
 router.get("/users/me", auth.isAuthenticated, users.profile);
 router.get("/users/:id/validate", authenticationRateLimit, users.validate);
+router.post("/users/complete-invite", authenticationRateLimit, users.completeInvite);
 
 // Sesiones
 router.post("/sessions", authenticationRateLimit, sessions.create);

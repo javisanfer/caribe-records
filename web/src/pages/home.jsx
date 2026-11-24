@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import runner from "../assets/brand/caribe-runner.png";
 import SiteLoader from "../components/ui/site-loader.jsx";
+import { featuredEditorials } from "../data/featured-editorial";
 
 const homeNavigation = [
   { to: "/artistas", label: "Artistas" },
@@ -33,20 +34,23 @@ export default function HomePage() {
   useEffect(() => {
     let active = true;
     fetch("/api/v1/editorials")
-      .then((response) => {
-        if (!response.ok) throw new Error("Editorials unavailable");
-        return response.json();
+      .then((res) => {
+        if (!res.ok) throw new Error("Editorials unavailable");
+        return res.json();
       })
-      .then(async (json) => {
-        const items = (Array.isArray(json) ? json : json.data || []).slice(0, 5);
+      .then((json) => (Array.isArray(json) ? json : json.data || []).slice(0, 5))
+      .catch(() => featuredEditorials)
+      .then(async (items) => {
         await preloadCover(items[0]?.hero?.url);
+        return items;
+      })
+      .then((items) => {
         if (active) setEditorials(items);
       })
-      .catch(() => {
-        if (active) setEditorials([]);
-      })
       .finally(() => {
-        if (active) setLoading(false);
+      if (active) {
+        setLoading(false);
+      }
       });
     return () => {
       active = false;
@@ -63,7 +67,6 @@ export default function HomePage() {
 
   return (
     <div className={`home${loading ? " is-loading" : ""}`}>
-      {loading && <SiteLoader />}
       <header className="home-nav">
         <Link to="/" className="home-brand" aria-label="Caribe Records, inicio">
           <img src={runner} alt="" />
@@ -76,6 +79,7 @@ export default function HomePage() {
         onMouseLeave={() => setIsPaused(false)}
       >
         <h1 className="visually-hidden">Caribe Records</h1>
+        {loading && <SiteLoader />}
         {editorials.length ? (
           editorials.map((editorial, index) => (
             <Link

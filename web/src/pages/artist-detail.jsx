@@ -4,6 +4,10 @@ import { useParams } from "react-router-dom";
 import ArtistDetail from "../components/artists/artist-detail/artist-detail";
 import AdminEditLink from "../components/admin/admin-edit-link";
 import SiteLoader from "../components/ui/site-loader.jsx";
+import { withCurrentArtistPhoto } from "../data/artist-media.js";
+import { withCurrentArtistProfile } from "../data/artist-profiles.js";
+import { withCuratedReleases } from "../data/curated-releases.js";
+import { featuredEditorials } from "../data/featured-editorial.js";
 
 export default function ArtistDetailPage() {
   const { slug } = useParams();
@@ -29,7 +33,7 @@ export default function ArtistDetailPage() {
         if (!res.ok) {
           throw new Error(`No encontrado: ${res.status}`);
         }
-        const artistData = await res.json();
+        const artistData = withCurrentArtistProfile(withCurrentArtistPhoto(await res.json()));
         setArtist(artistData);
 
         // 2) LISTA PARA PREV / NEXT
@@ -48,34 +52,29 @@ export default function ArtistDetailPage() {
         // 3) RELEASES + EDITORIALS + EVENTS EN PARALELO
         const [relRes, edRes, evRes] = await Promise.all([
           fetch("/api/v1/releases"),
-          fetch("/api/v1/editorials"),
-          fetch(`/api/v1/events?artist=${artistData._id}`), // 👈 aquí filtramos por artista
+          fetch("/api/v1/editorials").catch(() => null),
+          fetch(`/api/v1/events?artist=${artistData._id}&from=${encodeURIComponent(new Date().toISOString())}`),
         ]);
 
         // RELEASES
         const relJson = await relRes.json();
         const allReleases = Array.isArray(relJson) ? relJson : relJson.data || [];
-        const artistReleases = allReleases.filter((r) => {
+        const artistReleases = withCuratedReleases(allReleases).filter((r) => {
           const artistId =
             typeof r.artist === "string" ? r.artist : r.artist?._id;
-          return artistId === artistData._id;
+          return artistId === artistData._id || r.artist?.slug === artistData.slug;
         });
         setReleases(artistReleases);
 
-        // EDITORIALS (si usas un campo "artists" en la editorial)
-        const edJson = await edRes.json();
-        const allEditorials = Array.isArray(edJson) ? edJson : edJson.data || [];
-        const artistEditorials = allEditorials.filter((e) => {
-          if (!Array.isArray(e.artists)) return false;
-          return e.artists.some((a) => {
-            if (!a) return false;
-            if (typeof a === "string") return a === artistData._id;
-            return a._id === artistData._id;
-          });
-        });
-        setEditorials(artistEditorials);
+        const edJson = edRes?.ok ? await edRes.json() : null;
+        const allEditorials = Array.isArray(edJson) ? edJson : edJson?.data || [];
+        setEditorials(edJson ? allEditorials.filter((editorial) =>
+          editorial.relatedArtists?.some((related) =>
+            (typeof related === "string" ? related : related?._id) === artistData._id
+          )
+        ) : artistData.slug === "aeronave-adolescente" ? featuredEditorials : []);
 
-        // EVENTS (ya vienen filtrados por ?artist=)
+        // La ficha solo muestra próximos conciertos; el histórico queda en Eventos.
         const evJson = await evRes.json();
         const artistEvents = Array.isArray(evJson) ? evJson : evJson.data || [];
         setEvents(artistEvents);

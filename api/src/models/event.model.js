@@ -8,6 +8,7 @@ const eventSchema = new mongoose.Schema({
   date:  { type: Date, required: true },
   venue: { type: String, required: true, trim: true },
   city:  { type: String, required: true, trim: true },
+  artistName: { type: String },
   country: { type: String, default: "ES", trim: true },
   address: { type: String },
   geo: {
@@ -17,6 +18,7 @@ const eventSchema = new mongoose.Schema({
   lineup: [{ type: mongoose.Schema.Types.ObjectId, ref: "Artist" }],
   posterUrl: { type: String },
   ticketUrl: { type: String, required: true },
+  sourceUrl: { type: String },
   description: { type: String },
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });

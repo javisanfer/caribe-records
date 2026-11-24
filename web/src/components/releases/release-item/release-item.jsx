@@ -37,7 +37,7 @@ export default function ReleaseItem({ release, view = "list" }) {
 
   // Catálogo / label
   const catalog = release.catalog || release.catNo || release.cat || "";
-  const listenUrl = release.bandcampUrl || release.spotifyUrl;
+  const listenUrl = release.bandcampUrl || release.spotifyUrl || release.appleMusicUrl;
 
   // Fecha: tu API usa release_date
   const date =
@@ -94,15 +94,15 @@ export default function ReleaseItem({ release, view = "list" }) {
   // ================= GRID VIEW =================
   if (view === "grid") {
     return (
-      <article className="release-card bg-black text-white border border-dark p-2 h-100">
-        <div className="ratio ratio-1x1 mb-2">
+      <article className="release-card">
+        <div className="ratio ratio-1x1 release-card__cover">
           {linkedCover}
         </div>
-        <div className="small text-uppercase text-secondary">
+        <div className="release-card__artist">
           {artistName}
         </div>
-        <h3 className="fs-6 fw-semibold text-white mb-1">{title}</h3>
-        <div className="d-flex justify-content-between small text-secondary">
+        <h3 className="release-card__title">{title}</h3>
+        <div className="release-card__details">
           <span>{catalog}</span>
           <span>{date ? formatDate(date) : ""}</span>
         </div>

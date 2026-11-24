@@ -42,7 +42,6 @@ export default function EditorialItem({ editorial, index }) {
         {editorial.subtitle && (
           <p className="editorial-item__subtitle">{editorial.subtitle}</p>
         )}
-        <span>Leer historia <span aria-hidden="true">↗</span></span>
       </div>
     </Link>
   );
