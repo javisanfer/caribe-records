@@ -1,4 +1,5 @@
 const { ObjectId } = require("mongodb");
+const slugify = require("slugify");
 const content = require("../data/launch-content.json");
 
 async function migrateLaunchContent(db) {
@@ -80,11 +81,20 @@ async function migrateLaunchContent(db) {
     const date = new Date(entry.datetime);
     const existingEvent = await events.findOne({ date, city: entry.city, venue: entry.venue });
     if (existingEvent) continue;
+    const baseSlug = slugify(`${entry.title}-${date.toISOString().slice(0, 10)}-${entry.city}-${entry.venue}`, {
+      lower: true, strict: true, trim: true,
+    });
+    let slug = baseSlug;
+    let suffix = 2;
+    while (await events.findOne({ slug }, { projection: { _id: 1 } })) {
+      slug = `${baseSlug}-${suffix++}`;
+    }
     const lineup = entry.artist?.includes("Aeronave")
       ? [artist._id]
       : entry.artist?.includes("Ferrocentro") ? [ferro._id] : [];
     const result = await events.insertOne({
       title: entry.title,
+      slug,
       date,
       venue: entry.venue,
       city: entry.city,
