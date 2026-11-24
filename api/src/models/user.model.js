@@ -47,6 +47,8 @@ const userSchema = new mongoose.Schema(
       },
     },
     activateExpiresAt: { type: Date },
+    passwordResetTokenHash: { type: String, select: false },
+    passwordResetExpiresAt: { type: Date, select: false },
     avatar: {
       type: String,
       default: function () {
@@ -76,6 +78,8 @@ const userSchema = new mongoose.Schema(
         delete ret._id;
         delete ret.password;
         delete ret.activateToken;
+        delete ret.passwordResetTokenHash;
+        delete ret.passwordResetExpiresAt;
 
         ret.id = doc.id;
         return ret;

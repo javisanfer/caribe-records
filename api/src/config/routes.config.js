@@ -51,6 +51,14 @@ router.patch("/users/me", auth.isAuthenticated, users.update);
 router.get("/users/me", auth.isAuthenticated, users.profile);
 router.get("/users/:id/validate", authenticationRateLimit, users.validate);
 router.post("/users/complete-invite", authenticationRateLimit, users.completeInvite);
+const passwordResetRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+router.post("/users/password-reset/request", passwordResetRateLimit, users.requestPasswordReset);
+router.post("/users/password-reset/complete", authenticationRateLimit, users.completePasswordReset);
 
 // Sesiones
 router.post("/sessions", authenticationRateLimit, sessions.create);
