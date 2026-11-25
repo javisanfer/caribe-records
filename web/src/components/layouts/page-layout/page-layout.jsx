@@ -4,9 +4,9 @@ import "../../../index.css";
 export default function PageLayout({ children }) {
   return (
     <div className="page-layout-shell">
-      <main className="page-layout">
+      <div className="page-layout">
         {children}
-      </main>
+      </div>
     </div>
   );
 }

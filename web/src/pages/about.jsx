@@ -1,30 +1,22 @@
-import React from "react";
-
-const photographs = [
-  ["archivo-475520.jpg", "Público en una sala de conciertos, en blanco y negro"],
-  ["archivo-141414_003.jpg", "Díptico de una guitarra y una cámara en el local"],
-  ["archivo-475519.jpg", "Retrato de grupo con un disco en el pasillo de una sala"],
-  ["archivo-141413_018.jpg", "Músicos sobre el escenario bajo luces azules"],
-  ["archivo-141413_009.jpg", "Pegatinas de sellos y bandas en una pared"],
-  ["archivo-475518.jpg", "Tres personas compartiendo la cabina de DJ"],
-  ["133672_003.jpg", "Sesión de grabación de Aeronave Adolescente"],
-  ["archivo-141414_014.jpg", "Díptico de un encuentro frente a una ferretería"],
-  ["archivo-101_4529.jpg", "Los Reels tocando en Maravillas"],
-  ["archivo-img_9609.jpg", "Concierto entre las estanterías de una tienda de discos"],
-  ["archivo-img_9617.jpg", "Guitarristas en un concierto"],
-  ["archivo-img_9596.jpg", "Actuación con teclado y micrófono"],
-  ["archivo-img_9643.jpg", "Un concierto visto desde el público"],
-];
-
-const links = [
-  { number: "01", label: "Escríbenos", detail: "hola@caribe-records.com", href: "mailto:hola@caribe-records.com" },
-  { number: "02", label: "Instagram", detail: "@cariberecords", href: "https://www.instagram.com/cariberecords/" },
-  { number: "03", label: "X", detail: "@caribe_records", href: "https://x.com/caribe_records" },
-];
+import React, { useEffect, useState } from "react";
+import defaults from "../data/about.json";
+import sizes from "../data/about-images.json";
+import AdminEditLink from "../components/admin/admin-edit-link";
 
 export default function AboutPage() {
+  const [content, setContent] = useState(defaults);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/v1/about", { signal: controller.signal })
+      .then((res) => res.ok ? res.json() : null)
+      .then((result) => { if (result?.content && !controller.signal.aborted) setContent(result.content); })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+  const { photographs, links } = content;
   return (
     <main className="about-page about-studio">
+      <AdminEditLink to="/admin/about" label="la página About" />
       <header className="about-studio__intro">
         <div className="about-studio__meta">
           <span>Caribe Records / Est. Madrid</span>
@@ -33,15 +25,14 @@ export default function AboutPage() {
         <div className="about-studio__opening">
           <div>
             <p className="about-studio__eyebrow">Sobre nosotros</p>
-            <h1>Música popular<br />independiente<span className="about-studio__period">.</span></h1>
+            <h1>{content.heading.split("\n").map((line, index) => <React.Fragment key={index}>{index > 0 && <br />}{line}</React.Fragment>)}<span className="about-studio__period">.</span></h1>
           </div>
           <span className="about-studio__mark" aria-hidden="true" />
         </div>
         <div className="about-studio__statement">
           <span className="about-studio__index">01 / El sello</span>
           <div>
-            <p>Somos un sello discográfico nacido en la periferia de Madrid.</p>
-            <p>Nos atraen los proyectos con una voz propia y todo lo que puede crecer alrededor de su música. Trabajamos cerca de cada artista y dejamos espacio para explorar.</p>
+            {content.statement.split(/\n\s*\n/).map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </div>
         </div>
       </header>
@@ -55,9 +46,9 @@ export default function AboutPage() {
           <span>Fotografías · {String(photographs.length).padStart(2, "0")}</span>
         </div>
         <div className="about-studio__gallery">
-          {photographs.map(([name, alt], index) => (
-            <figure key={name} className={index % 4 === 1 || index % 4 === 2 ? "about-studio__photo--small" : "about-studio__photo--large"}>
-              <img src={`/images/about/${name}`} alt={alt} loading={index < 2 ? "eager" : "lazy"} decoding="async" />
+          {photographs.map(({ url, alt }, index) => (
+            <figure key={index} className={index % 4 === 1 || index % 4 === 2 ? "about-studio__photo--small" : "about-studio__photo--large"}>
+              <picture>{sizes[url] && <source media="(max-width: 767px)" type="image/webp" srcSet={sizes[url].mobile} />}<img width={sizes[url]?.width} height={sizes[url]?.height} src={url} alt={alt} loading={index < 2 ? "eager" : "lazy"} decoding="async" /></picture>
               <figcaption>{String(index + 1).padStart(2, "0")} / {String(photographs.length).padStart(2, "0")}</figcaption>
             </figure>
           ))}
@@ -73,9 +64,9 @@ export default function AboutPage() {
           <span>Madrid, España</span>
         </div>
         <div className="about-studio__links">
-          {links.map(({ number, label, detail, href }) => (
-            <a key={number} href={href} {...(href.startsWith("https:") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-              <span className="about-studio__link-number">{number}</span>
+          {links.map(({ label, detail, href }, index) => (
+            <a key={index} href={href} {...(href.startsWith("https:") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+              <span className="about-studio__link-number">{String(index + 1).padStart(2, "0")}</span>
               <span className="about-studio__link-label">{label}</span>
               <span className="about-studio__link-detail">{detail}</span>
               <span className="about-studio__link-arrow" aria-hidden="true">↗</span>

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import React from "react";
 
 function formatDate(d) {
@@ -28,6 +29,7 @@ export default function ReleaseItem({ release, view = "list" }) {
 
   // Nombre de artista: viene ya normalizado desde ReleasePage,
   // pero por si acaso usamos varios fallbacks
+  const titleLink = release.managed ? <Link className="content-permalink" to={`/releases/${release.id}`}>{title}</Link> : title;
   const artistName =
     release.artistName ||
     (typeof release.artist === "string"
@@ -101,7 +103,7 @@ export default function ReleaseItem({ release, view = "list" }) {
         <div className="release-card__artist">
           {artistName}
         </div>
-        <h3 className="release-card__title">{title}</h3>
+        <h3 className="release-card__title">{titleLink}</h3>
         <div className="release-card__details">
           <span>{catalog}</span>
           <span>{date ? formatDate(date) : ""}</span>
@@ -130,7 +132,7 @@ export default function ReleaseItem({ release, view = "list" }) {
           {title && (
             <>
               {" "}
-              • <span className="text-white">{title}</span>
+              • <span className="text-white">{titleLink}</span>
             </>
           )}
         </div>

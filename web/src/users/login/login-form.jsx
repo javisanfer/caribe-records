@@ -35,7 +35,7 @@ export default function LoginForm() {
           setServerError("El correo o la contraseña no son correctos.");
         }
       } else {
-        console.error(error);
+
         setServerError("No se ha podido iniciar sesión. Inténtalo de nuevo.");
       }
     }

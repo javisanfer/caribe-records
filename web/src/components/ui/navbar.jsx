@@ -22,7 +22,7 @@ export default function Navbar() {
   useEffect(() => {
     document.body.classList.toggle("menu-open", isOpen);
     const closeOnEscape = (event) => {
-      if (event.key === "Escape") {
+      if (isOpen && event.key === "Escape") {
         setIsOpen(false);
         toggleRef.current?.focus();
       }
@@ -102,7 +102,7 @@ export default function Navbar() {
               <span>05</span>
               <a href="https://cariberecords.bigcartel.com/" target="_blank" rel="noreferrer" tabIndex={isOpen ? 0 : -1}>Tienda ↗</a>
             </li>
-            {user && (
+            {user?.role === "admin" && (
               <li>
                 <span>06</span>
                 <NavLink to="/admin" tabIndex={isOpen ? 0 : -1}>Admin</NavLink>

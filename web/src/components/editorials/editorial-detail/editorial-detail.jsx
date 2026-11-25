@@ -89,7 +89,7 @@ export default function EditorialDetail({ editorial, prevNext }) {
               if (!image?.url) return null;
               return (
                 <figure key={key} className="editorial-body__media">
-                  <img src={image.url} alt={image.alt || ""} />
+                  <img loading="lazy" decoding="async" width={image.width} height={image.height} src={image.url} alt={image.alt || ""} />
                   {(image.caption || image.credit) && (
                     <figcaption>
                       {image.caption}{image.caption && image.credit ? " · " : ""}{image.credit}
@@ -112,7 +112,7 @@ export default function EditorialDetail({ editorial, prevNext }) {
                 <div key={key} className="editorial-body__gallery">
                   {block.gallery.map((image, imageIndex) => (
                     <figure key={`${image.url}-${imageIndex}`}>
-                      <img src={image.url} alt={image.alt || ""} />
+                      <img loading="lazy" decoding="async" width={image.width} height={image.height} src={image.url} alt={image.alt || ""} />
                       {(image.caption || image.credit) && <figcaption>{image.caption || image.credit}</figcaption>}
                     </figure>
                   ))}

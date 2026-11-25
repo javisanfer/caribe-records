@@ -3,12 +3,7 @@ const Editorial = require("../models/editorial.model");
 const Artist = require("../models/artist.model"); // 👈 NUEVO
 
 // -------------------- Utilidad de paginación --------------------
-function getPagination(query) {
-  const page = Math.max(1, parseInt(query.page || "1", 10));
-  const limit = Math.min(50, Math.max(1, parseInt(query.limit || "12", 10)));
-  const skip = (page - 1) * limit;
-  return { page, limit, skip };
-}
+const { getPagination } = require("../utils/pagination");
 
 const slugify = require("slugify");
 const generateSlug = (title) =>
@@ -95,10 +90,7 @@ exports.getEditorialsPublic = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching editorials",
-      error: error.message,
-    });
+    throw error;
   }
 };
 
@@ -119,10 +111,7 @@ exports.getEditorialBySlugPublic = async (req, res) => {
 
     res.json(doc);
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching editorial",
-      error: error.message,
-    });
+    throw error;
   }
 };
 
@@ -161,10 +150,7 @@ exports.getEditorialsAdmin = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching admin editorials",
-      error: error.message,
-    });
+    throw error;
   }
 };
 
@@ -177,10 +163,7 @@ exports.getEditorialBySlugAdmin = async (req, res) => {
 
     res.json(doc);
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching editorial",
-      error: error.message,
-    });
+    throw error;
   }
 };
 
@@ -296,12 +279,12 @@ exports.createEditorial = async (req, res) => {
     if (error.code === 11000) {
       return res
         .status(409)
-        .json({ message: "Duplicate slug", error: error.keyValue });
+        .json({ message: "Duplicate slug", fields: Object.keys(error.keyValue || {}) });
     }
 
     res.status(400).json({
       message: "Error creating editorial",
-      error: error.message,
+      fields: Object.keys(error.errors || {}),
     });
   }
 };
@@ -429,7 +412,7 @@ exports.updateEditorial = async (req, res) => {
   } catch (error) {
     res.status(400).json({
       message: "Error updating editorial",
-      error: error.message,
+      fields: Object.keys(error.errors || {}),
     });
   }
 };
@@ -451,9 +434,6 @@ exports.deleteEditorial = async (req, res) => {
 
     res.json({ message: "Editorial deleted successfully" });
   } catch (error) {
-    res.status(500).json({
-      message: "Error deleting editorial",
-      error: error.message,
-    });
+    throw error;
   }
 };

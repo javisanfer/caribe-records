@@ -2,9 +2,10 @@ import React, { useMemo } from "react";
 import EventItem from "../event-item/event-item";
 import AdminEditLink from "../../admin/admin-edit-link";
 
-const madridDate = (date) => new Intl.DateTimeFormat("en-CA", {
+const formatter = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit",
-}).format(date);
+});
+const madridDate = (date) => formatter.format(date);
 
 function EventRows({ events, past = false }) {
   return (
@@ -36,7 +37,8 @@ export default function EventList({ events = [] }) {
     const byYear = new Map();
     past.forEach((event) => {
       const year = madridDate(event.parsedDate).slice(0, 4);
-      byYear.set(year, [...(byYear.get(year) || []), event]);
+      if (!byYear.has(year)) byYear.set(year, []);
+      byYear.get(year).push(event);
     });
     return { upcoming, history: [...byYear] };
   }, [events]);

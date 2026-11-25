@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import runner from "../assets/brand/caribe-runner.png";
+import runner from "../assets/brand/caribe-runner.webp";
 import SiteLoader from "../components/ui/site-loader.jsx";
 
 const homeNavigation = [
@@ -9,20 +9,6 @@ const homeNavigation = [
   { to: "/editoriales", label: "Editorial" },
   { to: "/eventos", label: "Eventos" },
 ];
-
-// Reveal the carousel after its first cover is decoded, or after a bounded wait.
-function preloadCover(url) {
-  if (!url) return Promise.resolve();
-  return new Promise((resolve) => {
-    const cover = new Image();
-    const timer = window.setTimeout(resolve, 5000);
-    cover.src = url;
-    cover.decode().catch(() => {}).finally(() => {
-      window.clearTimeout(timer);
-      resolve();
-    });
-  });
-}
 
 export default function HomePage() {
   const [editorials, setEditorials] = useState([]);
@@ -39,10 +25,6 @@ export default function HomePage() {
       })
       .then((json) => (Array.isArray(json) ? json : json.data || []).filter((item) => item.featured).slice(0, 5))
       .catch(() => [])
-      .then(async (items) => {
-        await preloadCover(items[0]?.hero?.url);
-        return items;
-      })
       .then((items) => {
         if (active) setEditorials(items);
       })
@@ -92,6 +74,8 @@ export default function HomePage() {
               {editorial.hero?.url && (
                 <img
                   src={editorial.hero.url}
+                  fetchPriority={index === 0 ? "high" : "auto"}
+                  loading={index === 0 ? "eager" : "lazy"}
                   alt={editorial.hero.alt || ""}
                   onError={(event) => { event.currentTarget.hidden = true; }}
                 />

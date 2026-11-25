@@ -1,3 +1,4 @@
+import { usePageMeta } from "../utils/page-meta";
 // src/pages/artist-detail.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -18,23 +19,32 @@ export default function ArtistDetailPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function loadArtistAndRelated() {
       try {
         setLoading(true);
         setError(null);
 
         // 1) ARTISTA POR SLUG
-        const res = await fetch(`/api/v1/artists/slug/${slug}`);
-        if (!res.ok) {
-          throw new Error(`No encontrado: ${res.status}`);
-        }
-        const artistData = await res.json();
+        const read = async (url) => {
+          const res = await fetch(url, { signal: controller.signal });
+          if (!res.ok) throw new Error(String(res.status));
+          return res.json();
+        };
+        const profile = read(`/api/v1/artists/slug/${encodeURIComponent(slug)}`);
+        const related = profile.then((item) => {
+          const id = encodeURIComponent(item._id);
+          return Promise.all([
+            read(`/api/v1/releases?artist=${id}`),
+            read(`/api/v1/editorials?artist=${id}`),
+            read(`/api/v1/events?artist=${id}&from=${encodeURIComponent(new Date().toISOString())}`),
+          ]);
+        });
+        const [artistData, list, [records, articles, dates]] = await Promise.all([
+          profile, read("/api/v1/artists"), related,
+        ]);
+        if (controller.signal.aborted) return;
         setArtist(artistData);
-
-        // 2) LISTA PARA PREV / NEXT
-        const resList = await fetch("/api/v1/artists");
-        const list = await resList.json();
-
         const ordered = list.sort((a, b) =>
           a.name.localeCompare(b.name, "es", { sensitivity: "base" })
         );
@@ -44,41 +54,23 @@ export default function ArtistDetailPage() {
           next: ordered[index + 1] || null,
         });
 
-        // 3) RELEASES + EDITORIALS + EVENTS EN PARALELO
-        const [relRes, edRes, evRes] = await Promise.all([
-          fetch("/api/v1/releases"),
-          fetch(`/api/v1/editorials?artist=${artistData._id}`),
-          fetch(`/api/v1/events?artist=${artistData._id}&from=${encodeURIComponent(new Date().toISOString())}`),
-        ]);
-
-        // RELEASES
-        const relJson = await relRes.json();
-        const allReleases = Array.isArray(relJson) ? relJson : relJson.data || [];
-        const artistReleases = allReleases.filter((r) => {
-          const artistId =
-            typeof r.artist === "string" ? r.artist : r.artist?._id;
-          return artistId === artistData._id || r.artist?.slug === artistData.slug;
-        });
-        setReleases(artistReleases);
-
-        const edJson = edRes?.ok ? await edRes.json() : null;
-        const allEditorials = Array.isArray(edJson) ? edJson : edJson?.data || [];
-        setEditorials(allEditorials);
-
-        // La ficha solo muestra próximos conciertos; el histórico queda en Eventos.
-        const evJson = await evRes.json();
-        const artistEvents = Array.isArray(evJson) ? evJson : evJson.data || [];
-        setEvents(artistEvents);
+        setReleases(records);
+        setEditorials(articles.data || []);
+        setEvents(dates.data || []);
       } catch (err) {
+        if (controller.signal.aborted) return;
         console.error("Error en ArtistDetailPage:", err);
         setError("No se pudo cargar el artista.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     loadArtistAndRelated();
+    return () => controller.abort();
   }, [slug]);
+
+  usePageMeta(`/artistas/${encodeURIComponent(slug)}`, artist?.name, artist?.bio?.slice(0, 180), artist?.photos?.coverUrl);
 
   // Loading
   if (loading) {

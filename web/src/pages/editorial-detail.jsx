@@ -1,3 +1,4 @@
+import { usePageMeta } from "../utils/page-meta";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import EditorialDetail from "../components/editorials/editorial-detail/editorial-detail";
@@ -20,6 +21,8 @@ export default function EditorialDetailPage() {
       .catch(() => setEditorial(null))
       .finally(() => setLoading(false));
   }, [slug]);
+
+  usePageMeta(`/editorial/${encodeURIComponent(slug)}`, editorial?.seo?.title || editorial?.title, editorial?.seo?.description || editorial?.excerpt || editorial?.subtitle, editorial?.seo?.ogImage || editorial?.hero?.url, "article");
 
   if (loading) return <SiteLoader />;
   if (!editorial) {

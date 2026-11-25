@@ -78,7 +78,7 @@ export default function AdminDashboardPage() {
       <header className="admin-dashboard__hero">
         <p>Caribe Records · Gestión</p>
         <div>
-          <h1>Panel</h1>
+          <h1>Panel</h1><Link to="/admin/about">Editar About</Link>
           <span>{String(totalItems).padStart(2, "0")} registros</span>
         </div>
       </header>

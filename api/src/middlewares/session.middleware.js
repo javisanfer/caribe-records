@@ -9,7 +9,7 @@ const loadSessionUser = (req, res, next) => {
   }
   User.findById(userId)
     .then((user) => {
-      if (!user?.active) {
+      if (!user?.active || (user.sessionVersion || 0) !== (req.session.version || 0)) {
         req.user = undefined;
         return req.session.destroy(next);
       }

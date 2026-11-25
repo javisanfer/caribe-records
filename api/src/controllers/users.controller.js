@@ -23,6 +23,7 @@ module.exports.update = (req, res, next) => {
 
   // merge body into req.user object
   Object.assign(req.user, permittedBody);
+  if (req.user.isModified("password")) req.user.$inc("sessionVersion", 1);
 
   req.user
     .save()
@@ -73,11 +74,11 @@ module.exports.completeInvite = async (req, res, next) => {
       active: false,
     });
     if (!user) return res.status(400).json({ message: "Enlace caducado o no válido" });
-    user.password = password;
-    user.active = true;
-    user.activateToken = null;
-    user.activateExpiresAt = null;
-    await user.save();
+    const passwordHash = await bcrypt.hash(password, 10);
+    const claimed = await User.updateOne({
+      _id: user._id, active: false, activateToken: token, activateExpiresAt: { $gt: new Date() },
+    }, { $set: { password: passwordHash, active: true, activateToken: null, activateExpiresAt: null } });
+    if (!claimed.matchedCount) return res.status(400).json({ message: "Enlace caducado o no válido" });
     return res.status(204).send();
   } catch (error) {
     return next(error);
@@ -132,6 +133,7 @@ module.exports.completePasswordReset = async (req, res, next) => {
       passwordResetExpiresAt: { $gt: new Date() },
     }, {
       $set: { password: passwordHash },
+      $inc: { sessionVersion: 1 },
       $unset: { passwordResetTokenHash: "", passwordResetExpiresAt: "" },
     });
     if (!result.matchedCount) return res.status(400).json({ message: "El enlace ha caducado o no es válido" });

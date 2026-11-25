@@ -9,8 +9,6 @@ export default function ReleasePage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const previousTitle = document.title;
-    document.title = "Catálogo · Caribe Records";
     async function loadReleases() {
       try {
         setLoading(true);
@@ -84,7 +82,6 @@ export default function ReleasePage() {
     }
 
     loadReleases();
-    return () => { document.title = previousTitle; };
   }, []);
 
   return (
