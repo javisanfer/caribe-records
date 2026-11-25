@@ -71,6 +71,7 @@ export default function ArtistDetail({
   const hasAnyLinks = Object.values(links).some((group) => group.length > 0);
   const validEvents = events.filter((event) => event && (event.title || event.city || event.venue));
   const location = [artist.city, artist.country].filter(Boolean).join(", ");
+  const members = artist.members || [];
 
   return (
     <main
@@ -121,16 +122,13 @@ export default function ArtistDetail({
                 )}
               </>
             ) : <p className="artist-detail__empty-copy">Biografía próximamente.</p>}
-            {artist.members?.length > 0 && <p>{artist.members.join(" · ")}</p>}
+            {members.length > 1 && <p>{members.join(" · ")}</p>}
             {artist.gallery?.length > 0 && <div className="artist-profile-gallery">
               {artist.gallery.map((image, index) => <figure key={index}>
                 <img src={image.url} alt={image.alt || ""} loading="lazy" />
                 {image.caption && <figcaption>{image.caption}</figcaption>}
               </figure>)}
             </div>}
-            {artist.videos?.length > 0 && <section><h2 className="detail-section-label">Vídeos</h2>
-              {artist.videos.map((video, index) => <p key={index}><a href={video.url} target="_blank" rel="noreferrer">{video.title}{video.year && ` · ${video.year}`}</a></p>)}
-            </section>}
           </section>
 
           <aside className="artist-detail__rail">

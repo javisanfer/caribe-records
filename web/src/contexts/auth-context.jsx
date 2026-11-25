@@ -37,13 +37,17 @@ export function AuthProvider({ children }) {
 
     let inactivityTimer;
     let lastSessionTouch = Date.now();
-    const expireSession = () => logout();
+    // El servidor controla la caducidad compartida. Una pestaña inactiva
+    // solo debe bloquear su vista, porque otra puede estar guardando cambios.
+    const expireSession = () => setUser(null);
     const resetTimer = () => {
       window.clearTimeout(inactivityTimer);
       inactivityTimer = window.setTimeout(expireSession, 5 * 60 * 1000);
       if (Date.now() - lastSessionTouch > 60 * 1000) {
         lastSessionTouch = Date.now();
-        profile().then((current) => { if (!current) setUser(null); }).catch(() => setUser(null));
+        profile().then((current) => { if (!current) expireSession(); }).catch(() => {
+          // El interceptor comunica los 401. Un fallo de red permite reintentar.
+        });
       }
     };
     const activityEvents = ["pointerdown", "keydown", "scroll", "touchstart"];
