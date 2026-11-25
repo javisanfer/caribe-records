@@ -2,7 +2,7 @@
 
 ## Punto de partida
 
-El catálogo de Amplify y el de https://caribe-records.com/releases mostraron 42 referencias y el anuncio de Ferrocentro. El dominio indicado inicialmente, cariberecords.es, devolvió NXDOMAIN en Google Public DNS. El dominio canónico propuesto es https://caribe-records.com. La comprobación pública fue de lectura.
+El catálogo de Amplify y el de https://caribe-records.com/releases mostraron 42 referencias y el anuncio de Ferrocentro. El dominio indicado inicialmente, cariberecords.es, devolvió NXDOMAIN en Google Public DNS. El dominio canónico propuesto es https://caribe-records.com. Las 13 imágenes de About se cargaron en el dominio activo al recorrer la galería. La comprobación pública fue de lectura.
 
 La base de la propuesta es el commit b10af59 de main. Se reconstruyó en un checkout independiente y se contrastó el hash del árbol completo con GitHub. La rama local del equipo contenía trabajo previo. La propuesta conserva las correcciones publicadas de banners, fotografías, biografías y recuperación de contraseña.
 
@@ -17,13 +17,13 @@ La base de la propuesta es el commit b10af59 de main. Se reconstruyó en un chec
 | Media | El perfil de artista descargaba todo el catálogo. Las peticiones de perfil y lista eran consecutivas. | Filtro de artista aplicado en MongoDB y carga paralela de datos independientes. Se cancelan las lecturas al salir. |
 | Media | Cada petición autenticada consultaba dos veces el usuario. Las sesiones abrían su propio cliente MongoDB. | Un solo middleware de identidad y un cliente compartido con el pool existente. |
 | Media | El archivo fotográfico enviaba imágenes de escritorio a móviles. El logotipo utilizaba un PNG de 537.183 bytes para mostrar su silueta. | Variantes WebP para pantallas pequeñas, dimensiones explícitas y silueta WebP de 102.396 bytes. El canal alfa se comparó píxel por píxel. Se conservan las imágenes originales. |
-| Media | About requería editar el código. Varios controles del panel carecían de asociación explícita con sus etiquetas. | Editor de textos, fotografías, orden y enlaces. Una comprobación de versión evita sobrescribir ediciones simultáneas. Los contenidos originales son el valor inicial. Se han vinculado las etiquetas de los campos estáticos identificados. |
+| Media | About requería editar el código. Varios controles del panel carecían de asociación explícita con sus etiquetas. | Editor de textos, fotografías, orden y enlaces. Una comprobación de versión evita sobrescribir ediciones simultáneas. Los contenidos originales son el valor inicial. Se han vinculado las etiquetas de los campos estáticos identificados. En móvil, el título de About dispone de todo el ancho tras detectar desbordamiento a 375 píxeles. |
 
 El CSS de Bootstrap se mantiene por su uso en listas, retículas y formularios. Los reproductores existentes tienen carga diferida y validación de proveedor. Las imágenes dentro del cuerpo de los artículos se cargan también bajo demanda. La nueva ruta de detalle reutiliza los componentes de catálogo y conserva los enlaces de escucha y de entradas. La interfaz pública mantiene colores, tipografías y composición.
 
 ## Mediciones reproducibles
 
-Node 24.20.0, build de producción de Vite, mismo equipo y dependencias. El cálculo de gzip usa nivel 6 en ambas versiones. JavaScript y CSS corresponden a los ficheros iniciales de index.html. El total de la galería suma las 13 fotos originales o sus variantes móviles, no representa una única visita.
+Node 24.20.0 y build de producción de Vite 8.2.2 en el mismo equipo. La tabla aísla el efecto de los cambios de código antes de actualizar las herramientas. La prueba de navegador imprime los tamaños exactos del build de cada commit con su lockfile. El cálculo de gzip usa nivel 6 en ambas versiones. JavaScript y CSS corresponden a los ficheros iniciales de index.html. El total de la galería suma las 13 fotos originales o sus variantes móviles, no representa una única visita.
 
 | Indicador | Base | Propuesta aproximada |
 |---|---:|---:|
@@ -37,9 +37,15 @@ El indicador de fichero de Vite y gzip nivel 6 usan parámetros diferentes. Ning
 
 ## Medición de la portada publicada
 
-PageSpeed Insights midió la portada el 25 de noviembre a las 23:56 CET con Lighthouse 13.6 y 4G lenta. La puntuación móvil fue 75, FCP 1,1 s, LCP 12,0 s, TBT 0 ms y CLS 0. La muestra de usuarios reales fue insuficiente para obtener INP. El elemento LCP era la imagen de Cloudinary del banner, de 4.800 × 2.997 píxeles y 1.498,5 KiB. Lighthouse estimó un ahorro potencial de 1.454,8 KiB para esa imagen. Es una estimación sobre la versión publicada. [Informe de la medición](https://pagespeed.web.dev/analysis/https-caribe-records-com/a8d7w664s0fzivfeevmfpe?form_factor=mobile)
+PageSpeed Insights midió la portada el 25 de noviembre a las 23:56 CET con Lighthouse 13.6 y 4G lenta. La puntuación móvil fue 75, FCP 1,1 s, LCP 12,0 s, TBT 0 ms y CLS 0. En escritorio la puntuación fue 100, FCP 0,3 s, LCP 0,6 s, TBT 0 ms y CLS 0. La muestra de usuarios reales fue insuficiente para obtener INP. El elemento LCP era la imagen de Cloudinary del banner, de 4.800 × 2.997 píxeles y 1.498,5 KiB. Lighthouse estimó un ahorro potencial de 1.454,8 KiB para esa imagen. Es una estimación sobre la versión publicada. [Informe de la medición](https://pagespeed.web.dev/analysis/https-caribe-records-com/a8d7w664s0fzivfeevmfpe?form_factor=mobile)
 
 El banner solicita versiones de 480, 800 o 1.200 píxeles con el servicio Cloudinary existente y vuelve al original si falla la transformación. El logotipo de la cabecera usa una variante de 384 píxeles. La portada editorial de Aeronave conserva su JPEG original. La conversión probada en alta calidad crecía de 169.130 a 210.722 bytes. Se han retirado tres dependencias directas del backend sin referencias en el código, bcrypt nativo, cookie-parser y jsonwebtoken. bcryptjs sigue verificando las contraseñas.
+
+## Dependencias y pruebas
+
+Los primeros audits de CI detectaron tres avisos de gravedad alta en el árbol de herramientas web y dos de gravedad moderada en el de desarrollo de la API. La auditoría limitada a dependencias de producción devolvía cero en ambos. Se actualizaron los lockfiles mediante las correcciones compatibles calculadas por npm en el runner. CI revisa también las dependencias de desarrollo.
+
+Las pruebas de integración usan una base exclusiva y aleatoria en MongoDB 7. Comprueban la autenticación y las altas, ediciones, lecturas públicas y bajas de los cinco recursos de gestión. Las pruebas en navegador usan el build servido por Vite, la API real y almacenamiento de imágenes local al runner. El estado de cada ejecución queda en la pestaña Checks de la propuesta.
 
 ## Activación y vuelta atrás
 

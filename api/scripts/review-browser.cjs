@@ -7,6 +7,8 @@ const { resolve } = require("node:path");
 const { setTimeout: delay } = require("node:timers/promises");
 const assert = require("node:assert/strict");
 const bcrypt = require("bcryptjs");
+const { readFileSync } = require("node:fs");
+const { gzipSync } = require("node:zlib");
 const { checkPersistence } = require("./review-persistence");
 const launch = require("../src/data/launch-content.json");
 
@@ -14,6 +16,12 @@ async function main() {
   if (process.env.GITHUB_ACTIONS !== "true") throw new Error("Esta prueba usa el servicio MongoDB desechable de GitHub Actions.");
   const { chromium, firefox, webkit } = require("playwright");
   const root = resolve(__dirname, "../..");
+  const dist = root + "/web/dist";
+  const html = readFileSync(dist + "/index.html", "utf8");
+  for (const match of html.matchAll(/(?:src|href)="(\/assets\/[^"]+\.(js|css))"/g)) {
+    const asset = readFileSync(dist + match[1]);
+    console.log("Entrada del build", match[2], asset.length, "bytes;", gzipSync(asset, { level: 6 }).length, "bytes gzip nivel 6");
+  }
   const base = "http://127.0.0.1:5185";
   const api = "http://127.0.0.1:3015";
   const dbUrl = "mongodb://127.0.0.1:27017/qa_" + randomUUID().replaceAll("-", "");
@@ -46,6 +54,7 @@ async function main() {
     const article = launch.featuredEditorial.slug;
     const sitemap = await fetch(api + "/api/v1/pages/sitemap.xml").then((r) => r.text());
     assert.ok(sitemap.includes("/editorial/" + article));
+    const layoutFailures = [];
     for (const [engine, driver] of Object.entries({ chromium, firefox, webkit })) {
       const browser = await driver.launch();
       try {
@@ -69,7 +78,14 @@ async function main() {
             await page.goto(base + path);
             await page.locator("h1").first().waitFor({ state: "attached" });
             const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
-            assert.equal(overflow, false, engine + " " + width + " " + path);
+            if (overflow) {
+              const elements = await page.evaluate(() => Array.from(document.querySelectorAll("main *"))
+                .filter((el) => el.getBoundingClientRect().right > innerWidth + 1)
+                .slice(0, 6).map((el) => el.tagName + "." + el.className));
+              const detail = [engine, width, path, ...elements].join(" ");
+              console.log("Desbordamiento", detail);
+              layoutFailures.push(detail);
+            }
           }
         }
         if (engine === "chromium") {
@@ -115,6 +131,7 @@ async function main() {
         console.log(engine, "OK: 17 rutas a 375 y 1280 px, About y banner con archivo");
       } finally { await browser.close(); }
     }
+    assert.deepEqual(layoutFailures, [], "Desbordamientos horizontales");
   } finally {
     await Promise.all(children.filter((p) => p.exitCode === null && !p.signalCode).map((p) => {
       const closed = once(p, "exit"); p.kill(); return closed;
