@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import mark from "../assets/brand/caribe-mark.webp";
 import runner from "../assets/brand/caribe-runner.webp";
 import SiteLoader from "../components/ui/site-loader.jsx";
 
@@ -50,7 +51,7 @@ export default function HomePage() {
     <div className={`home${loading ? " is-loading" : ""}`}>
       <header className="home-nav">
         <Link to="/" className="home-brand" aria-label="Caribe Records, inicio">
-          <img src={runner} alt="" />
+          <img src={mark} alt="" />
         </Link>
       </header>
 
@@ -83,7 +84,7 @@ export default function HomePage() {
               <span className="home-slide-label">{editorial.title}</span>
             </Link>
           ))
-        ) : (
+        ) : !loading && (
           <section className="home-empty-state">
             <img src={runner} alt="" />
             <p>Caribe Records</p>

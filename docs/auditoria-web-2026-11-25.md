@@ -27,13 +27,19 @@ Node 24.20.0, build de producción de Vite, mismo equipo y dependencias. El cál
 
 | Indicador | Base | Propuesta aproximada |
 |---|---:|---:|
-| JavaScript inicial sin compresión | 515,08 kB | 373,25 kB |
-| JavaScript inicial gzip | 167,39 kB | 122,53 kB |
+| JavaScript inicial sin compresión | 515,08 kB | 373,70 kB |
+| JavaScript inicial gzip | 167,39 kB | 122,77 kB |
 | CSS inicial gzip | 52,64 kB | 52,67 kB |
 | Archivo fotográfico de About en móvil | 6,48 MB | 1,01 MB |
 | Consultas de usuario por petición autenticada en el código | 2 | 1 |
 
 El indicador de fichero de Vite y gzip nivel 6 usan parámetros diferentes. Ninguno mide LCP, INP ni CLS de visitantes reales.
+
+## Medición de la portada publicada
+
+PageSpeed Insights midió la portada el 25 de noviembre a las 23:56 CET con Lighthouse 13.6 y 4G lenta. La puntuación móvil fue 75, FCP 1,1 s, LCP 12,0 s, TBT 0 ms y CLS 0. La muestra de usuarios reales fue insuficiente para obtener INP. El elemento LCP era la imagen de Cloudinary del banner, de 4.800 × 2.997 píxeles y 1.498,5 KiB. Lighthouse estimó un ahorro potencial de 1.454,8 KiB para esa imagen. Es una estimación sobre la versión publicada. [Informe de la medición](https://pagespeed.web.dev/analysis/https-caribe-records-com/a8d7w664s0fzivfeevmfpe?form_factor=mobile)
+
+El banner solicita versiones de 480, 800 o 1.200 píxeles con el servicio Cloudinary existente y vuelve al original si falla la transformación. El logotipo de la cabecera usa una variante de 384 píxeles. La portada editorial de Aeronave conserva su JPEG original. La conversión probada en alta calidad crecía de 169.130 a 210.722 bytes. Se han retirado tres dependencias directas del backend sin referencias en el código, bcrypt nativo, cookie-parser y jsonwebtoken. bcryptjs sigue verificando las contraseñas.
 
 ## Activación y vuelta atrás
 
