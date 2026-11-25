@@ -38,8 +38,8 @@ function renderPage({ title, description, image, type, url, missing = false }) {
   const imageUrl = /^https?:$/.test(picture.protocol) ? picture.href : origin() + "/favicon.png";
   const schema = { "@context": "https://schema.org", "@type": type, name: title, url, description: summary, image: imageUrl };
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>${name}</title><meta name="description" content="${escape(summary)}"><link rel="canonical" href="${escape(url)}">
-<meta property="og:title" content="${name}"><meta property="og:description" content="${escape(summary)}"><meta property="og:url" content="${escape(url)}">
+<title>${name}</title><meta name="description" content="${escape(summary)}">${url ? '<link rel="canonical" href="' + escape(url) + '">' : ''}
+<meta property="og:title" content="${name}"><meta property="og:description" content="${escape(summary)}">${url ? '<meta property="og:url" content="' + escape(url) + '">' : ''}
 <meta property="og:image" content="${escape(imageUrl)}"><meta property="og:site_name" content="Caribe Records"><meta property="og:locale" content="es_ES">
 <meta property="og:type" content="${type === "Article" ? "article" : "website"}"><meta name="twitter:card" content="summary_large_image">
 ${missing ? '<meta name="robots" content="noindex">' : '<script id="page-schema" type="application/ld+json">' + JSON.stringify(schema).replaceAll("<", "\\u003c") + '</script>'}
@@ -59,12 +59,13 @@ pages.get("/sitemap.xml", async (_req, res) => {
 });
 pages.get("/:section/:key", async (req, res) => {
   const { section, key } = req.params;
-  const spec = Object.hasOwn(types, section) && types[section];
-  if (!spec) return res.sendStatus(404);
-  const url = origin() + "/" + section + "/" + encodeURIComponent(key);
+  const route = Object.entries(types).find(([name]) => name === section);
+  if (!route) return res.sendStatus(404);
+  const [name, spec] = route;
   const valid = spec.key !== "_id" || /^[a-f\d]{24}$/i.test(key);
-  const doc = valid && await spec.model.findOne({ ...spec.visible(), [spec.key]: key }).select(spec.fields).lean();
-  if (!doc) return res.status(404).type("html").send(renderPage({ title: "Página no encontrada", url, missing: true }));
+  const doc = valid && await spec.model.findOne({ ...spec.visible(), [spec.key]: key }).select(spec.fields + " " + spec.key).lean();
+  if (!doc) return res.status(404).type("html").send(renderPage({ title: "Página no encontrada", missing: true }));
+  const url = origin() + "/" + name + "/" + encodeURIComponent(doc[spec.key]);
   const [title, description, image, type] = spec.meta(doc);
   res.type("html").set("Cache-Control", "public, max-age=0, must-revalidate").send(renderPage({ title, description, image, type, url }));
 });

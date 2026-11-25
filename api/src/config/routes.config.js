@@ -85,7 +85,8 @@ router.use(
 );
 
 const about = require("../controllers/about.controller");
-router.get("/about", about.get);
+const aboutReadLimit = rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false });
+router.get("/about", aboutReadLimit, about.get);
 router.get("/admin/about", adminRateLimit, about.get);
 router.put("/admin/about", adminRateLimit, about.update);
 

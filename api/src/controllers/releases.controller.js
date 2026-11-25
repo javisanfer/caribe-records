@@ -25,7 +25,7 @@ exports.getReleases = async (req, res) => {
     const filter = req.path.startsWith("/admin/") ? {} : { catalogVisible: { $ne: false } };
     if (req.query.artist !== undefined) {
       if (!mongoose.isObjectIdOrHexString(req.query.artist)) return res.status(400).json({ message: "Artista no válido" });
-      filter.artist = req.query.artist;
+      filter.artist = new mongoose.Types.ObjectId(req.query.artist);
     }
     const releases = await Release.find(filter)
       .populate("artist", "name slug")
