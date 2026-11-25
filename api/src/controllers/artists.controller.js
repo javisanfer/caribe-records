@@ -24,8 +24,8 @@ exports.getArtists = async (req, res) => {
 
     res.json(artists);
   } catch (error) {
-    console.error("Error obteniendo artistas:", error);
-    res.status(500).json({ error: "Error interno obteniendo artistas" });
+    console.error("Error obteniendo artistas:", error.name);
+    throw error;
   }
 };
 
@@ -50,8 +50,8 @@ exports.getArtistById = async (req, res) => {
 
     res.json(artist);
   } catch (error) {
-    console.error("Error obteniendo artista por ID:", error);
-    res.status(500).json({ error: "Error interno obteniendo artista" });
+    console.error("Error obteniendo artista por ID:", error.name);
+    throw error;
   }
 };
 
@@ -76,8 +76,8 @@ exports.getArtistBySlug = async (req, res) => {
 
     res.json(artist);
   } catch (error) {
-    console.error("Error obteniendo artista por slug:", error);
-    res.status(500).json({ error: "Error interno obteniendo artista" });
+    console.error("Error obteniendo artista por slug:", error.name);
+    throw error;
   }
 };
 
@@ -105,10 +105,10 @@ exports.createArtists = async (req, res) => {
 
     return res.status(201).json(Array.isArray(req.body) ? created : created[0]);
   } catch (error) {
-    console.error("Error al crear artistas:", error);
+    console.error("Error al crear artistas:", error.name);
     res.status(error.code === 11000 ? 409 : 400).json({
       message: "Error al crear artistas",
-      error: error.message,
+      fields: Object.keys(error.errors || {}),
     });
   }
 };
@@ -127,7 +127,7 @@ exports.updateArtist = async (req, res) => {
 
     const updatedArtist = await Artist.findOneAndUpdate(
       { slug: req.params.slug },
-      updates,
+      { $set: updates },
       { new: true, runValidators: true }
     );
 
@@ -137,8 +137,8 @@ exports.updateArtist = async (req, res) => {
 
     res.json(updatedArtist);
   } catch (error) {
-    console.error("Error actualizando artista:", error);
-    res.status(400).json({ error: error.message });
+    console.error("Error actualizando artista:", error.name);
+    res.status(400).json({ message: "Comprueba los datos del artista", fields: Object.keys(error.errors || {}) });
   }
 };
 
@@ -157,7 +157,7 @@ exports.deleteArtist = async (req, res) => {
 
     res.json({ message: "Artist deleted successfully" });
   } catch (error) {
-    console.error("Error eliminando artista:", error);
-    res.status(500).json({ error: "Error interno eliminando artista" });
+    console.error("Error eliminando artista:", error.name);
+    throw error;
   }
 };

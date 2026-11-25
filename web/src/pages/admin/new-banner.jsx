@@ -83,8 +83,12 @@ export default function NewBannerPage({ isEditMode = false }) {
 
   const remove = async () => {
     if (!window.confirm("¿Seguro que quieres borrar este banner?")) return;
-    await adminDeleteBanner(id);
-    navigate("/admin");
+    try {
+      await adminDeleteBanner(id);
+      navigate("/admin");
+    } catch {
+      setSaveError("No se ha podido borrar el banner. Comprueba tu sesión y vuelve a intentarlo.");
+    }
   };
 
   return (
@@ -98,9 +102,9 @@ export default function NewBannerPage({ isEditMode = false }) {
       {loadError && <p className="admin-status admin-status--error">{loadError}</p>}
       {loading && <p>Cargando banner…</p>}
       {!loading && !loadError && <form className="admin-form row g-0" onSubmit={handleSubmit(onSubmit)}>
-        <div className="col-12"><label className="form-label">Título</label><input className="form-control" {...register("title", { required: true })} />{errors.title && <span className="invalid-feedback d-block">Es obligatorio.</span>}</div>
-        <div className="col-12"><label className="form-label">Texto</label><textarea className="form-control" rows="3" {...register("message")} /></div>
-        <div className="col-md-8"><label className="form-label">Imagen</label><input className="form-control" {...imageUrlInput} placeholder="https://…" {...register("imageUrl")} /></div>
+        <div className="col-12"><label htmlFor="new-banner-title" className="form-label">Título</label><input id="new-banner-title" className="form-control" {...register("title", { required: true })} />{errors.title && <span className="invalid-feedback d-block">Es obligatorio.</span>}</div>
+        <div className="col-12"><label htmlFor="new-banner-message" className="form-label">Texto</label><textarea id="new-banner-message" className="form-control" rows="3" {...register("message")} /></div>
+        <div className="col-md-8"><label htmlFor="new-banner-imageUrl" className="form-label">Imagen</label><input id="new-banner-imageUrl" className="form-control" {...imageUrlInput} placeholder="https://…" {...register("imageUrl")} /></div>
         <div className="col-md-4"><label className="form-label" htmlFor="banner-image-file">O subir archivo</label><input id="banner-image-file" className="form-control" type="file" accept="image/jpeg,image/png,image/webp" {...register("imageFile", {
           validate: (files) => {
             const file = files?.[0];
@@ -109,10 +113,10 @@ export default function NewBannerPage({ isEditMode = false }) {
             return file.size <= 10 * 1024 * 1024 || "La imagen supera el límite de 10 MiB.";
           },
         })} />{errors.imageFile && <span className="invalid-feedback d-block" role="alert">{errors.imageFile.message}</span>}</div>
-        <div className="col-md-8"><label className="form-label">Enlace</label><input className="form-control" type="url" placeholder="https://…" {...register("linkUrl")} /></div>
-        <div className="col-md-4"><label className="form-label">Texto del enlace</label><input className="form-control" {...register("linkLabel")} /></div>
-        <div className="col-md-6"><label className="form-label">Visible desde</label><input className="form-control" type="datetime-local" step="1" {...register("startAt")} /></div>
-        <div className="col-md-6"><label className="form-label">Visible hasta</label><input className="form-control" type="datetime-local" step="1" {...register("endAt")} /></div>
+        <div className="col-md-8"><label htmlFor="new-banner-linkUrl" className="form-label">Enlace</label><input id="new-banner-linkUrl" className="form-control" type="url" placeholder="https://…" {...register("linkUrl")} /></div>
+        <div className="col-md-4"><label htmlFor="new-banner-linkLabel" className="form-label">Texto del enlace</label><input id="new-banner-linkLabel" className="form-control" {...register("linkLabel")} /></div>
+        <div className="col-md-6"><label htmlFor="new-banner-startAt" className="form-label">Visible desde</label><input id="new-banner-startAt" className="form-control" type="datetime-local" step="1" {...register("startAt")} /></div>
+        <div className="col-md-6"><label htmlFor="new-banner-endAt" className="form-label">Visible hasta</label><input id="new-banner-endAt" className="form-control" type="datetime-local" step="1" {...register("endAt")} /></div>
         <div className="col-12"><label className="form-check"><input className="form-check-input" type="checkbox" {...register("active")} /><span>Banner activo</span></label></div>
         {saveError && <p className="admin-status admin-status--error" role="alert">{saveError}</p>}
         <div className="col-12"><button className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : "Guardar banner"}</button></div>

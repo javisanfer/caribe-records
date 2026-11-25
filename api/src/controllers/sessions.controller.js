@@ -6,9 +6,12 @@ const {
 } = require("../config/session-options.config");
 
 module.exports.create = (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body || {};
+  if (typeof email !== "string" || !email.trim() || typeof password !== "string" || !password) {
+    return next(createError(400, "Introduce un correo y una contraseña válidos"));
+  }
 
-  User.findOne({ email })
+  User.findOne({ email: email.trim().toLowerCase() })
     .then((user) => {
       if (user) {
         user
@@ -28,6 +31,7 @@ module.exports.create = (req, res, next) => {
               req.session.regenerate((error) => {
                 if (error) return next(error);
                 req.session.userId = user.id;
+                req.session.version = user.sessionVersion || 0;
                 return req.session.save((saveError) => {
                   if (saveError) return next(saveError);
                   return res.status(201).json(user);

@@ -1,3 +1,4 @@
+import BannerImage from "./banner-image";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getActiveBanner } from "../../services/api-services";
 
@@ -43,7 +44,7 @@ export default function SiteBanner() {
       </div>
       {banner.imageUrl && (
         <div className="site-banner__media">
-          <img src={banner.imageUrl} alt="" />
+          <BannerImage key={banner.imageUrl} src={banner.imageUrl} />
         </div>
       )}
       <div className="site-banner__body">

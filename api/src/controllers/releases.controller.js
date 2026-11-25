@@ -22,7 +22,12 @@ function validateSpotifyUrl(value) {
 // GET /releases
 exports.getReleases = async (req, res) => {
   try {
-    const releases = await Release.find(req.path.startsWith("/admin/") ? {} : { catalogVisible: { $ne: false } })
+    const filter = req.path.startsWith("/admin/") ? {} : { catalogVisible: { $ne: false } };
+    if (req.query.artist !== undefined) {
+      if (!mongoose.isObjectIdOrHexString(req.query.artist)) return res.status(400).json({ message: "Artista no válido" });
+      filter.artist = new mongoose.Types.ObjectId(req.query.artist);
+    }
+    const releases = await Release.find(filter)
       .populate("artist", "name slug")
       .populate({ path: "label", model: Label, select: "name" })
       .sort({ release_date: -1, createdAt: -1 })
@@ -30,8 +35,8 @@ exports.getReleases = async (req, res) => {
 
     res.json(releases);
   } catch (error) {
-    console.error("Error obteniendo releases:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error obteniendo releases:", error.name);
+    throw error;
   }
 };
 
@@ -46,8 +51,8 @@ exports.getReleaseById = async (req, res) => {
 
     res.json(release);
   } catch (error) {
-    console.error("Error obteniendo release por ID:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error obteniendo release por ID:", error.name);
+    throw error;
   }
 };
 
@@ -68,8 +73,8 @@ exports.getReleaseBySlugAdmin = async (req, res) => {
 
     res.json(release);
   } catch (error) {
-    console.error("Error fetching release:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching release:", error.name);
+    throw error;
   }
 };
 
@@ -114,8 +119,8 @@ exports.createRelease = async (req, res) => {
 
     res.status(201).json(populated);
   } catch (error) {
-    console.error("Error creando release:", error);
-    res.status(400).json({ error: error.message });
+    console.error("Error creando release:", error.name);
+    res.status(400).json({ message: "Comprueba los datos enviados" });
   }
 };
 
@@ -160,8 +165,8 @@ exports.updateRelease = async (req, res) => {
 
     res.json(updated);
   } catch (error) {
-    console.error("Error actualizando release:", error);
-    res.status(400).json({ error: error.message });
+    console.error("Error actualizando release:", error.name);
+    res.status(400).json({ message: "Comprueba los datos enviados" });
   }
 };
 
@@ -187,7 +192,7 @@ exports.deleteRelease = async (req, res) => {
 
     res.json({ message: "Release deleted successfully" });
   } catch (error) {
-    console.error("Error eliminando release:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error eliminando release:", error.name);
+    throw error;
   }
 };

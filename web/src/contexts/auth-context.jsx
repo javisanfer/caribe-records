@@ -5,7 +5,7 @@ import React, {
 
 import { logout as destroySession, profile } from "../services/api-services";
 import { AuthContext } from "./auth-context-instance";
-import SiteLoader from "../components/ui/site-loader.jsx";
+
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined); 
@@ -14,9 +14,11 @@ export function AuthProvider({ children }) {
   // objeto usuario → logueado
 
   useEffect(() => {
+    let active = true;
     profile()
-      .then((data) => setUser(data || null))
-      .catch(() => setUser(null)); 
+      .then((data) => { if (active) setUser((current) => current === undefined ? data || null : current); })
+      .catch(() => { if (active) setUser((current) => current === undefined ? null : current); });
+    return () => { active = false; };
   }, []);
 
   function login(user) {
@@ -67,11 +69,6 @@ export function AuthProvider({ children }) {
     login,
     logout,
   };
-
-  // Mientras user === undefined → aún comprobando sesión
-  if (user === undefined) {
-    return <SiteLoader fullPage />;
-  }
 
   return (
     <AuthContext.Provider value={contextData}>

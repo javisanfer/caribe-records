@@ -6190,7 +6190,7 @@ html:has(.home), body:has(.home) { background: #050505; }
   aspect-ratio: 1610 / 977;
   flex: none;
   background-color: var(--cr-blue);
-  mask: url("./assets/brand/caribe-runner.png") center / contain no-repeat;
+  mask: url("./assets/brand/caribe-mark.webp") center / contain no-repeat;
 }
 
 .about-studio__statement {
@@ -6305,8 +6305,9 @@ html:has(.home), body:has(.home) { background: #050505; }
 
 @media (max-width: 520px) {
   .about-studio__meta span:last-child { display: none; }
-  .about-studio__opening { align-items: start; }
-  .about-studio__mark { width: 46px; margin-top: 4px; }
+  .about-studio__opening { display: block; position: relative; }
+  .about-studio__opening h1 { font-size: clamp(2.8rem, 13vw, 3.5rem); overflow-wrap: anywhere; }
+  .about-studio__mark { position: absolute; right: 0; top: 64px; width: 46px; }
   .about-studio__section-heading { flex-direction: column; gap: 12px; }
   .about-studio__gallery { display: block; }
   .about-studio__gallery figure { width: 100%; margin-bottom: 64px; }
@@ -6371,3 +6372,6 @@ html:has(.home), body:has(.home) { background: #050505; }
 .home-editorial-carousel.is-empty .home-empty-state { color: var(--cr-white); }
 .home-editorial-carousel.is-empty .home-empty-state img { filter: brightness(0) invert(1); }
 .home-editorial-carousel.is-empty ~ .home-section-nav a:hover { color: var(--cr-sun); }
+
+.content-permalink { color: inherit; text-decoration: inherit; }
+.content-permalink:hover, .content-permalink:focus-visible { text-decoration: underline; }

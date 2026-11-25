@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useLayoutEffect } from "react";
 import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { usePageMeta } from "./utils/page-meta";
 import { PrivateRoute } from "./guards";
 
 // UI
@@ -13,32 +14,37 @@ import SiteLoader from "./components/ui/site-loader.jsx";
 
 // Páginas públicas
 import HomePage from "./pages/home.jsx";
-import ArtistPage from "./pages/artist.jsx";
-import ArtistDetailPage from "./pages/artist-detail.jsx";
-import EditorialPage from "./pages/editorial.jsx";
-import EditorialDetailPage from "./pages/editorial-detail.jsx";
-import EventPage from "./pages/event.jsx";
-import ReleasePage from "./pages/release.jsx";
-import AboutPage from "./pages/about.jsx";
-import LoginPage from "./pages/login.jsx";
-import ActivateAdminPage from "./pages/activate-admin.jsx";
-import RecoverAdminPage from "./pages/recover-admin.jsx";
-import NotFoundPage from "./pages/not-found.jsx";
+const ArtistPage = lazy(() => import("./pages/artist.jsx"));
+const ArtistDetailPage = lazy(() => import("./pages/artist-detail.jsx"));
+const EditorialPage = lazy(() => import("./pages/editorial.jsx"));
+const EditorialDetailPage = lazy(() => import("./pages/editorial-detail.jsx"));
+const EventPage = lazy(() => import("./pages/event.jsx"));
+const ReleasePage = lazy(() => import("./pages/release.jsx"));
+const AboutPage = lazy(() => import("./pages/about.jsx"));
+const LoginPage = lazy(() => import("./pages/login.jsx"));
+const ActivateAdminPage = lazy(() => import("./pages/activate-admin.jsx"));
+const RecoverAdminPage = lazy(() => import("./pages/recover-admin.jsx"));
+const NotFoundPage = lazy(() => import("./pages/not-found.jsx"));
 
 // Admin: keep the private editing tools out of the public initial download.
 const AdminDashboardPage = lazy(() => import("./pages/admin/admin-dashboard.jsx"));
 const NewArtistPage = lazy(() => import("./pages/admin/new-artist.jsx"));
 const NewReleasePage = lazy(() => import("./pages/admin/new-release.jsx"));
 const NewEventPage = lazy(() => import("./pages/admin/new-event.jsx"));
+const CatalogueDetail = lazy(() => import("./pages/catalogue-detail.jsx"));
+const EditAboutPage = lazy(() => import("./pages/admin/edit-about.jsx"));
 const NewBannerPage = lazy(() => import("./pages/admin/new-banner.jsx"));
 const NewEditorialPage = lazy(() => import("./pages/admin/new-editorial.jsx"));
 
 function App() {
   const location = useLocation();
+  usePageMeta(location.pathname);
   const isHome = location.pathname === "/";
   const isPrivateArea = location.pathname.startsWith("/admin");
 
   useLayoutEffect(() => {
+    const schema = document.getElementById("page-schema");
+    if (schema && document.querySelector('link[rel="canonical"]')?.pathname !== location.pathname) schema.remove();
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -130,6 +136,9 @@ function App() {
               </PageTransition>
             }
           />
+
+          <Route path="/eventos/:key" element={<PageTransition><CatalogueDetail event /></PageTransition>} />
+          <Route path="/releases/:key" element={<PageTransition><CatalogueDetail /></PageTransition>} />
 
           {/* LOGIN */}
           <Route path="/admin/activar" element={<ActivateAdminPage />} />
@@ -286,6 +295,7 @@ function App() {
             }
           />
 
+          <Route path="/admin/about" element={<PrivateRoute><PageLayout><EditAboutPage /></PageLayout></PrivateRoute>} />
           {/* ADMIN DASHBOARD */}
           <Route
             path="/admin"

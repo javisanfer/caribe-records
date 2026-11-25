@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import React from "react";
 
 export default function EventItem({ event = {}, past = false }) {
@@ -30,16 +31,15 @@ export default function EventItem({ event = {}, past = false }) {
     (value) => typeof value === "string" && /^https?:\/\//i.test(value)
   );
 
-  const EventRoot = url ? "a" : "article";
+
 
   return (
-    <EventRoot
+    <article
       className={`event-row${past ? " event-row--past" : ""}`}
       aria-label={`${artist} en ${city}${country ? ", " + country : ""} — ${dateLabel}`}
-      {...(url ? { href: url, target: "_blank", rel: "noopener noreferrer nofollow" } : {})}
     >
       <div className="event-row__artist">
-        <strong>{artist}</strong>
+        <strong>{event.slug ? <Link className="content-permalink" to={`/eventos/${encodeURIComponent(event.slug)}`}>{artist}</Link> : artist}</strong>
         {event.title && <span>{event.title}</span>}
       </div>
 
@@ -53,8 +53,8 @@ export default function EventItem({ event = {}, past = false }) {
       </time>
 
       <div className="event-row__ticket">
-        <span>{past ? (url ? <>Ver cartel <span aria-hidden="true">↗</span></> : "Finalizado") : url ? <>Entradas <span aria-hidden="true">↗</span></> : "Próximamente"}</span>
+        {url ? <a className="content-permalink" href={url} target="_blank" rel="noopener noreferrer nofollow">{past ? "Ver cartel" : "Entradas"} <span aria-hidden="true">↗</span></a> : <span>{past ? "Finalizado" : "Próximamente"}</span>}
       </div>
-    </EventRoot>
+    </article>
   );
 }

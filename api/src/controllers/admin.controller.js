@@ -45,7 +45,7 @@ exports.getActivity = async (req, res) => {
     const total = result.counts.reduce((sum, group) => sum + group.count, 0);
     return res.json({ data: result.data, total, counts });
   } catch (error) {
-    console.error("Error fetching admin activity:", error);
-    return res.status(500).json({ message: "Error fetching admin activity" });
+    console.error("Error fetching admin activity:", error.name);
+    throw error;
   }
 };

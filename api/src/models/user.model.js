@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    sessionVersion: { type: Number, default: 0 },
     activateToken: {
       type: String,
       default: () => randomBytes(32).toString("hex"),
@@ -72,6 +73,7 @@ const userSchema = new mongoose.Schema(
         delete ret.__v;
         delete ret._id;
         delete ret.password;
+        delete ret.sessionVersion;
         delete ret.activateToken;
         delete ret.passwordResetTokenHash;
         delete ret.passwordResetExpiresAt;

@@ -7,12 +7,7 @@ function adminEventFilter(value) {
 }
 
 // -------- Utils --------
-function getPagination(query) {
-  const page = Math.max(1, parseInt(query.page || "1", 10));
-  const limit = Math.min(50, Math.max(1, parseInt(query.limit || "12", 10)));
-  const skip = (page - 1) * limit;
-  return { page, limit, skip };
-}
+const { getPagination } = require("../utils/pagination");
 
 function parseDate(value, endOfDay = false) {
   if (!value) return null;
@@ -67,9 +62,7 @@ exports.getEventsPublic = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching events", error: error.message });
+    throw error;
   }
 };
 
@@ -84,9 +77,7 @@ exports.getEventBySlugPublic = async (req, res) => {
     if (!doc) return res.status(404).json({ message: "Event not found" });
     res.json(doc);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching event", error: error.message });
+    throw error;
   }
 };
 
@@ -134,9 +125,7 @@ exports.getEventsAdmin = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching admin events", error: error.message });
+    throw error;
   }
 };
 
@@ -151,9 +140,7 @@ exports.getEventByIdAdmin = async (req, res) => {
     if (!doc) return res.status(404).json({ message: "Event not found" });
     res.json(doc);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching event", error: error.message });
+    throw error;
   }
 };
 
@@ -202,12 +189,12 @@ exports.createEvent = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({
         message: "Duplicate key (slug must be unique)",
-        error: error.keyValue,
+        fields: Object.keys(error.keyValue || {}),
       });
     }
     res
       .status(400)
-      .json({ message: "Error creating event", error: error.message });
+      .json({ message: "Error creating event", fields: Object.keys(error.errors || {}) });
   }
 };
 
@@ -285,12 +272,12 @@ exports.updateEvent = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({
         message: "Duplicate key (slug must be unique)",
-        error: error.keyValue,
+        fields: Object.keys(error.keyValue || {}),
       });
     }
     res
       .status(400)
-      .json({ message: "Error updating event", error: error.message });
+      .json({ message: "Error updating event", fields: Object.keys(error.errors || {}) });
   }
 };
 
@@ -312,8 +299,6 @@ exports.deleteEvent = async (req, res) => {
 
     res.json({ message: "Event deleted successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting event", error: error.message });
+    throw error;
   }
 };

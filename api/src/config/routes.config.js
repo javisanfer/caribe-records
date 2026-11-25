@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const createError = require("http-errors");
 const { rateLimit } = require("express-rate-limit");
 
@@ -8,7 +7,6 @@ const router = express.Router();
 // -------------------- Middlewares --------------------
 const auth = require("../middlewares/session.middleware");
 const upload = require("../config/storage.config");
-const { normalizeUploadError } = require("../config/upload-error.config");
 
 const adminRateLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -30,6 +28,12 @@ const authenticationRateLimit = rateLimit({
   },
 });
 
+router.use((req, res, next) => {
+  if (Object.values(req.query).some((value) => typeof value !== "string")) {
+    return res.status(400).json({ message: "Los filtros deben ser valores individuales" });
+  }
+  next();
+});
 router.use(auth.loadSessionUser);
 
 // -------------------- Controllers --------------------
@@ -79,6 +83,12 @@ router.use(
   auth.isAuthenticated,
   auth.isAdmin,
 );
+
+const about = require("../controllers/about.controller");
+const aboutReadLimit = rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false });
+router.get("/about", aboutReadLimit, about.get);
+router.get("/admin/about", adminRateLimit, about.get);
+router.put("/admin/about", adminRateLimit, about.update);
 
 router.get("/admin/activity", adminRateLimit, adminController.getActivity);
 
@@ -296,29 +306,5 @@ router.post(
 // ======================================================
 
 router.use((req, res, next) => next(createError(404, "Route not found")));
-
-router.use((error, req, res, next) => {
-  error = normalizeUploadError(error);
-
-  if (error instanceof mongoose.Error.CastError && error.message.includes("_id")) {
-    error = createError(404, "Resource not found");
-  } else if (error instanceof mongoose.Error.ValidationError) {
-    error = createError(400, error.message);
-  } else if (!error.status) {
-    error = createError(500, error.message);
-  }
-
-  console.error(error);
-
-  const data = { message: error.message };
-  if (error.errors) {
-    data.errors = Object.keys(error.errors).reduce((errors, key) => {
-      errors[key] = error.errors[key]?.message || error.errors[key];
-      return errors;
-    }, {});
-  }
-
-  res.status(error.status).json(data);
-});
 
 module.exports = router;
