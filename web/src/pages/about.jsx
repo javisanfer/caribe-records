@@ -1,19 +1,19 @@
 import React from "react";
 
 const photographs = [
-  ["475520.JPG", "Público en una sala de conciertos, en blanco y negro"],
-  ["141414_003.JPG", "Díptico de una guitarra y una cámara en el local"],
-  ["475519.JPG", "Retrato de grupo con un disco en el pasillo de una sala"],
-  ["141413_018.JPG", "Músicos sobre el escenario bajo luces azules"],
-  ["141413_009.JPG", "Pegatinas de sellos y bandas en una pared"],
-  ["475518.JPG", "Tres personas compartiendo la cabina de DJ"],
+  ["archivo-475520.jpg", "Público en una sala de conciertos, en blanco y negro"],
+  ["archivo-141414_003.jpg", "Díptico de una guitarra y una cámara en el local"],
+  ["archivo-475519.jpg", "Retrato de grupo con un disco en el pasillo de una sala"],
+  ["archivo-141413_018.jpg", "Músicos sobre el escenario bajo luces azules"],
+  ["archivo-141413_009.jpg", "Pegatinas de sellos y bandas en una pared"],
+  ["archivo-475518.jpg", "Tres personas compartiendo la cabina de DJ"],
   ["133672_003.jpg", "Sesión de grabación de Aeronave Adolescente"],
-  ["141414_014.JPG", "Díptico de un encuentro frente a una ferretería"],
-  ["101_4529.JPG", "Los Reels tocando en Maravillas"],
-  ["IMG_9609.JPG", "Concierto entre las estanterías de una tienda de discos"],
-  ["IMG_9617.JPG", "Guitarristas en un concierto"],
-  ["IMG_9596.JPG", "Actuación con teclado y micrófono"],
-  ["IMG_9643.JPG", "Un concierto visto desde el público"],
+  ["archivo-141414_014.jpg", "Díptico de un encuentro frente a una ferretería"],
+  ["archivo-101_4529.jpg", "Los Reels tocando en Maravillas"],
+  ["archivo-img_9609.jpg", "Concierto entre las estanterías de una tienda de discos"],
+  ["archivo-img_9617.jpg", "Guitarristas en un concierto"],
+  ["archivo-img_9596.jpg", "Actuación con teclado y micrófono"],
+  ["archivo-img_9643.jpg", "Un concierto visto desde el público"],
 ];
 
 const links = [
