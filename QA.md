@@ -8,7 +8,7 @@ Con MongoDB local activo y las dependencias de `api` y `web` instaladas, ejecuta
 node api/scripts/review-local.js
 ```
 
-Abre [la web de revisión](http://127.0.0.1:5185/) o [el panel](http://127.0.0.1:5185/admin/login). La terminal muestra las credenciales locales y el resultado de las pruebas de escritura y relectura de las cinco secciones. Deja esa terminal abierta durante la revisión.
+Abre [la web de revisión](http://127.0.0.1:5185/) o [el panel](http://127.0.0.1:5185/admin/login). El programa solicita la contraseña local sin mostrarla (en ejecución desatendida usa `CARIBE_LOCAL_ADMIN_PASSWORD`). La terminal muestra el usuario y el resultado de las pruebas de escritura y relectura de las cinco secciones. Deja esa terminal abierta durante la revisión.
 
 El primer arranque prepara `caribe_web_review_20261125` desde las colecciones de contenido de `caribe_records` en MongoDB de loopback. Si la copia es anterior a la publicación de noviembre, se incorporan las dos fichas de referencia y el contenido de lanzamiento del repositorio. Los siguientes arranques conservan las ediciones de revisión. Las imágenes que subas se guardan en `api/uploads/dev`. La API escucha en el puerto 3015 y Vite en el 5185.
 

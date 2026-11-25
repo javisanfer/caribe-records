@@ -1,6 +1,6 @@
 // Issue credentials for the development panel on port 5173.
 const { MongoClient } = require("mongodb");
-const { randomBytes } = require("node:crypto");
+const localPassword = require("./local-password");
 const bcrypt = require("bcryptjs");
 
 async function main() {
@@ -8,7 +8,7 @@ async function main() {
     serverSelectionTimeoutMS: 3000,
   });
   const email = "desarrollo-5173@caribe.local";
-  const password = randomBytes(18).toString("base64url");
+  const password = await localPassword();
   try {
     await client.connect();
     const users = client.db("caribe_records").collection("users");
@@ -21,7 +21,7 @@ async function main() {
       $set: { password: await bcrypt.hash(password, 10), active: true, role: "admin", updatedAt: now },
       $setOnInsert: { name: "Desarrollo local", createdAt: now },
     }, { upsert: true });
-    console.log("http://localhost:5173/admin/login\nUsuario:", email, "\nContraseña:", password);
+    console.log("http://localhost:5173/admin/login\nUsuario:", email);
   } finally {
     await client.close();
   }

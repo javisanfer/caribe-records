@@ -5,6 +5,11 @@ const Label = mongoose.models.Label || mongoose.model("Label", new mongoose.Sche
 const slugify = require("slugify");
 const { isSpotifyUrl } = require("../validators/string.validators");
 
+function artistObjectId(value) {
+  if (typeof value !== "string" || !/^[a-f0-9]{24}$/i.test(value)) throw new Error("Identificador de artista no válido");
+  return new mongoose.Types.ObjectId(value);
+}
+
 function validateSpotifyUrl(value) {
   if (value === undefined || value === null || value === "") return;
   if (!isSpotifyUrl(value)) throw new Error("Spotify URL must be a valid album or track link");
@@ -80,7 +85,7 @@ exports.createRelease = async (req, res) => {
 
     const artistRef = artistId || artist || null;
 
-    if (artistRef && !await Artist.exists({ _id: artistRef })) return res.status(400).json({ error: "Artista desconocido" });
+    if (artistRef && !await Artist.exists({ _id: artistObjectId(artistRef) })) return res.status(400).json({ error: "Artista desconocido" });
 
     // Generamos slug si no viene
     let slug = rest.slug;
@@ -130,7 +135,7 @@ exports.updateRelease = async (req, res) => {
     const prevArtist = release.artist?.toString() || null;
     const newArtist = artistId !== undefined || artist !== undefined ? artistId || artist || null : prevArtist;
 
-    if (newArtist && newArtist !== prevArtist && !await Artist.exists({ _id: newArtist })) return res.status(400).json({ error: "Artista desconocido" });
+    if (newArtist && newArtist !== prevArtist && !await Artist.exists({ _id: artistObjectId(newArtist) })) return res.status(400).json({ error: "Artista desconocido" });
 
     // Actualizamos cuerpo
     Object.assign(release, rest);

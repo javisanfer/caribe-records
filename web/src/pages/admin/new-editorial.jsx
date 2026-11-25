@@ -1,4 +1,5 @@
 import { imageUrlInput } from "../../components/admin/image-url-input";
+import DOMPurify from "dompurify";
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -71,7 +72,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
         alert("Selecciona una imagen para cada fotografía de la galería.");
         return;
       }
-      const usableBlocks = blocks.filter((block) => block.type === "separator" || block.text?.replace(/<[^>]*>/g, "").trim() || block.quote?.trim() || block.image?.url?.trim() || block.gallery?.some((image) => image.url) || block.embed?.trim());
+      const usableBlocks = blocks.filter((block) => block.type === "separator" || block.text && DOMPurify.sanitize(block.text, { RETURN_DOM_FRAGMENT: true }).textContent.trim() || block.quote?.trim() || block.image?.url?.trim() || block.gallery?.some((image) => image.url) || block.embed?.trim());
       if (data.status !== "draft" && !usableBlocks.length) {
         alert("Añade al menos un bloque de contenido antes de publicar.");
         return;

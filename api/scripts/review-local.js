@@ -6,6 +6,7 @@ const { join, resolve } = require("node:path");
 const { setTimeout: delay } = require("node:timers/promises");
 const { createServer } = require("node:net");
 const bcrypt = require("bcryptjs");
+const localPassword = require("./local-password");
 const { checkPersistence } = require("./review-persistence");
 const launch = require("../src/data/launch-content.json");
 
@@ -73,7 +74,7 @@ async function checkPort(port) {
 async function main() {
   await Promise.all([checkPort(3015), checkPort(5185)]);
   const client = new MongoClient(mongo, { serverSelectionTimeoutMS: 3000 });
-  const password = randomBytes(15).toString("base64url");
+  const password = await localPassword();
   try {
     await client.connect();
     const db = client.db(database);
@@ -104,7 +105,7 @@ async function main() {
     console.error("Comprobación de persistencia pendiente:", error.message);
   }
   start(join(web, "node_modules/vite/bin/vite.js"), ["--host", "127.0.0.1", "--port", "5185", "--strictPort"], web, env);
-  console.log("\nRevisión local:", url, "\nPanel:", url + "/admin/login", "\nUsuario:", email, "\nContraseña local para este arranque:", password);
+  console.log("\nRevisión local:", url, "\nPanel:", url + "/admin/login", "\nUsuario:", email);
 }
 
 process.once("SIGINT", () => stop(0));
