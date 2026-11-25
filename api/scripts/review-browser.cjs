@@ -34,7 +34,7 @@ async function main() {
   };
   try {
     await db.connect();
-    await db.db().collection("artists").insertMany(launch.artists.map((a) => ({ ...a })));
+    await db.db().collection("artists").insertMany(launch.artists.map((a) => ({ name: a.slug.replaceAll("-", " "), ...a })));
     await db.db().collection("users").insertOne({ name: "QA", email, password: await bcrypt.hash(password, 10), role: "admin", active: true });
     run("src/app.js", [], root + "/api", { NODE_ENV: "test", PORT: "3015", HOST: "127.0.0.1", CORS_ORIGINS: base, SESSION_SECRET: randomUUID(), MONGODB_URI: dbUrl, LOCAL_IMAGE_UPLOADS: "true" });
     await ready(api + "/health");
@@ -54,6 +54,7 @@ async function main() {
         const errors = [];
         page.on("pageerror", (err) => errors.push(err.name));
         await page.goto(base + "/admin");
+        page.setDefaultTimeout(12000);
         await page.locator('input[type="email"]').fill(email);
         await page.locator('input[type="password"]').fill(password);
         await page.locator('button[type="submit"]').click();
@@ -64,11 +65,35 @@ async function main() {
         for (const width of [375, 1280]) {
           await page.setViewportSize({ width, height: 850 });
           for (const path of paths) {
+            console.log(engine, width, path);
             await page.goto(base + path);
             await page.locator("h1").first().waitFor({ state: "attached" });
             const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
             assert.equal(overflow, false, engine + " " + width + " " + path);
           }
+        }
+        if (engine === "chromium") {
+          const edits = [
+            ["artist", "ferrocentro-club", "city", "artists/slug/ferrocentro-club"],
+            ["release", releases[0]._id, "country", "releases/" + releases[0]._id],
+            ["event", event.slug, "venue", "events/slug/" + event.slug],
+            ["editorial", article, "subtitle", "editorials/slug/" + article],
+          ];
+          for (const [kind, id, field, endpoint] of edits) {
+            console.log("Formulario", kind);
+            await page.goto(base + "/admin/edit-" + kind + "/" + id);
+            const input = page.locator('[name="' + field + '"]');
+            const disclosure = input.locator("xpath=ancestor::details[not(@open)][1]/summary");
+            if (await disclosure.count()) await disclosure.click();
+            const value = kind === "release" ? "PT" : "Revisión de " + kind;
+            await input.fill(value);
+            const form = input.locator("xpath=ancestor::form");
+            await form.getByRole("button", { name: /^Actualizar/ }).click();
+            await page.getByRole("heading", { name: "Panel", exact: true }).waitFor();
+            const published = await fetch(api + "/api/v1/" + endpoint).then((r) => r.json());
+            assert.equal(published[field], value, kind + " debe reflejar la edición del formulario");
+          }
+          await page.goto(base + "/admin/about");
         }
         await page.getByLabel("Título", { exact: true }).fill("Música independiente · QA");
         await page.getByRole("button", { name: "Guardar cambios" }).click();

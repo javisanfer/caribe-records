@@ -34,6 +34,13 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test
+      - name: Review development advisories and compatible lockfile fixes
+        run: |
+          npm audit || true
+          mkdir -p "$RUNNER_TEMP/lock-review-${GITHUB_JOB}"
+          cp package.json package-lock.json "$RUNNER_TEMP/lock-review-${GITHUB_JOB}/"
+          (cd "$RUNNER_TEMP/lock-review-${GITHUB_JOB}" && npm audit fix --package-lock-only --ignore-scripts) || true
+          diff -u package-lock.json "$RUNNER_TEMP/lock-review-${GITHUB_JOB}/package-lock.json" || true
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
@@ -69,6 +76,13 @@ jobs:
         run: npm run lint
       - name: Build QA configuration
         run: npm run build -- --mode test
+      - name: Review development advisories and compatible lockfile fixes
+        run: |
+          npm audit || true
+          mkdir -p "$RUNNER_TEMP/lock-review-${GITHUB_JOB}"
+          cp package.json package-lock.json "$RUNNER_TEMP/lock-review-${GITHUB_JOB}/"
+          (cd "$RUNNER_TEMP/lock-review-${GITHUB_JOB}" && npm audit fix --package-lock-only --ignore-scripts) || true
+          diff -u package-lock.json "$RUNNER_TEMP/lock-review-${GITHUB_JOB}/package-lock.json" || true
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
