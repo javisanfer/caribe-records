@@ -72,7 +72,6 @@ export default function ArtistDetail({
   const validEvents = events.filter((event) => event && (event.title || event.city || event.venue));
   const location = [artist.city, artist.country].filter(Boolean).join(", ");
   const members = artist.members || [];
-  const showMembers = members.length > 0 && !(members.length === 1 && artist.bio?.includes(members[0]));
 
   return (
     <main
@@ -123,7 +122,7 @@ export default function ArtistDetail({
                 )}
               </>
             ) : <p className="artist-detail__empty-copy">Biografía próximamente.</p>}
-            {showMembers && <p>{members.join(" · ")}</p>}
+            {members.length > 1 && <p>{members.join(" · ")}</p>}
             {artist.gallery?.length > 0 && <div className="artist-profile-gallery">
               {artist.gallery.map((image, index) => <figure key={index}>
                 <img src={image.url} alt={image.alt || ""} loading="lazy" />
