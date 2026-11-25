@@ -12,9 +12,8 @@ export default function EditorialItem({ editorial, index }) {
 
   const slug = editorial.slug || "#";
   const authorName =
-    editorial.author?.name ||
-    editorial.authorName ||
-    editorial.credits?.find((credit) => /autor|author/i.test(credit.role || ""))?.name ||
+    editorial.credits?.filter((credit) => /autor|author/i.test(credit.role)).map((credit) => credit.name).filter(Boolean).join(", ") ||
+    editorial.author?.name || editorial.authorName ||
     "Caribe Records";
 
   return (

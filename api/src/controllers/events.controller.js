@@ -1,6 +1,11 @@
 const Event = require("../models/event.model");
 const Artist = require("../models/artist.model");
 
+// Events imported before slugs existed can be edited using their original ID.
+function adminEventFilter(value) {
+  return /^[a-f0-9]{24}$/i.test(value) ? { $or: [{ slug: value }, { _id: value }] } : { slug: value };
+}
+
 // -------- Utils --------
 function getPagination(query) {
   const page = Math.max(1, parseInt(query.page || "1", 10));
@@ -138,7 +143,7 @@ exports.getEventsAdmin = async (req, res) => {
 // GET /api/admin/events/slug/:slug
 exports.getEventByIdAdmin = async (req, res) => {
   try {
-    const doc = await Event.findOne({ slug: req.params.slug }).populate({
+    const doc = await Event.findOne(adminEventFilter(req.params.slug)).populate({
       path: "lineup",
       select: "name slug",
     });
@@ -213,7 +218,7 @@ exports.createEvent = async (req, res) => {
 // PATCH /api/admin/events/slug/:slug
 exports.updateEvent = async (req, res) => {
   try {
-    const doc = await Event.findOne({ slug: req.params.slug });
+    const doc = await Event.findOne(adminEventFilter(req.params.slug));
     if (!doc) return res.status(404).json({ message: "Event not found" });
 
     // Guardamos el lineup previo para sincronizar luego
@@ -296,7 +301,7 @@ exports.updateEvent = async (req, res) => {
 // DELETE /api/admin/events/slug/:slug
 exports.deleteEvent = async (req, res) => {
   try {
-    const deleted = await Event.findOneAndDelete({ slug: req.params.slug });
+    const deleted = await Event.findOneAndDelete(adminEventFilter(req.params.slug));
     if (!deleted) return res.status(404).json({ message: "Event not found" });
 
     // 👇 NUEVO: limpiar Artist.events

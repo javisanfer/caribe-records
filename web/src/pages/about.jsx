@@ -1,5 +1,4 @@
 import React from "react";
-import runner from "../assets/brand/caribe-runner.png";
 
 const photographs = [
   ["475520.JPG", "Público en una sala de conciertos, en blanco y negro"],
@@ -29,14 +28,14 @@ export default function AboutPage() {
       <header className="about-studio__intro">
         <div className="about-studio__meta">
           <span>Caribe Records / Est. Madrid</span>
-          <span>Sello independiente · 2026</span>
+          <span>Sello independiente · 2024</span>
         </div>
         <div className="about-studio__opening">
           <div>
             <p className="about-studio__eyebrow">Sobre nosotros</p>
             <h1>Música popular<br />independiente<span className="about-studio__period">.</span></h1>
           </div>
-          <img className="about-studio__mark" src={runner} alt="" aria-hidden="true" />
+          <span className="about-studio__mark" aria-hidden="true" />
         </div>
         <div className="about-studio__statement">
           <span className="about-studio__index">01 / El sello</span>

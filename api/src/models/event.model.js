@@ -17,7 +17,7 @@ const eventSchema = new mongoose.Schema({
   },
   lineup: [{ type: mongoose.Schema.Types.ObjectId, ref: "Artist" }],
   posterUrl: { type: String },
-  ticketUrl: { type: String, required: true },
+  ticketUrl: { type: String, trim: true },
   sourceUrl: { type: String },
   description: { type: String },
   isActive: { type: Boolean, default: true }
@@ -37,7 +37,7 @@ eventSchema.index(
   {
     unique: true,
     partialFilterExpression: {
-      slug: { $exists: true, $type: "string", $ne: "" }
+      slug: { $type: "string", $gt: "" }
     }
   }
 );

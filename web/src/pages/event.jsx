@@ -2,11 +2,6 @@ import React, { useEffect, useState } from "react";
 import EventList from "../components/events/event-list/event-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 import SiteLoader from "../components/ui/site-loader.jsx";
-import { curatedEvents } from "../data/curated-events.js";
-
-// Registros antiguos de prueba que llegaron a publicarse en el catálogo local.
-const previewSlugs = new Set(["prueba-1", "prueba-2", "aeronave-adolescente-live-at-apolo"]);
-const eventKey = (event) => [event.datetime?.slice(0, 10), event.city?.toLowerCase(), event.venue?.toLowerCase()].join("|");
 
 export default function EventPage() {
   const [events, setEvents] = useState([]);
@@ -32,7 +27,7 @@ export default function EventPage() {
         } while (page <= totalPages);
 
         const normalized = rawEvents
-          .filter((event) => event && !previewSlugs.has(event.slug))
+          .filter(Boolean)
           .map((e, idx) => {
             const mainArtist =
               Array.isArray(e.lineup) && e.lineup.length > 0
@@ -55,11 +50,10 @@ export default function EventPage() {
             };
           });
 
-        const known = new Set(normalized.map(eventKey));
-        setEvents([...normalized, ...curatedEvents.filter((event) => !known.has(eventKey(event)))]);
+        setEvents(normalized);
       } catch (err) {
         console.error("Error cargando eventos", err);
-        setEvents(curatedEvents);
+        setEvents([]);
         setError("No se pudieron cargar todas las fechas del archivo.");
       } finally {
         setLoading(false);

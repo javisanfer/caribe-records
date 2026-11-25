@@ -1,15 +1,15 @@
+import { imageUrlInput } from "../../components/admin/image-url-input";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { adminCreateBanner, adminDeleteBanner, adminGetBanner, adminUpdateBanner, uploadImage } from "../../services/api-services";
 
-function localDateTime(value) {
-  return value ? new Date(value).toISOString().slice(0, 16) : "";
-}
+import { localDateTime } from "../../utils/local-datetime";
 
 export default function NewBannerPage({ isEditMode = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(isEditMode);
   const [loadError, setLoadError] = useState("");
   const [saveError, setSaveError] = useState("");
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
@@ -29,7 +29,8 @@ export default function NewBannerPage({ isEditMode = false }) {
         startAt: localDateTime(banner.startAt),
         endAt: localDateTime(banner.endAt),
       }))
-      .catch(() => setLoadError("No se ha podido cargar el banner."));
+      .catch(() => setLoadError("No se ha podido cargar el banner."))
+      .finally(() => setLoading(false));
   }, [id, isEditMode, reset]);
 
   const onSubmit = async (values) => {
@@ -74,18 +75,19 @@ export default function NewBannerPage({ isEditMode = false }) {
       </section>
       {loadError && <p className="admin-status admin-status--error">{loadError}</p>}
       {saveError && <p className="admin-status admin-status--error">{saveError}</p>}
-      <form className="admin-form row g-0" onSubmit={handleSubmit(onSubmit)}>
+      {loading && <p>Cargando banner…</p>}
+      {!loading && !loadError && <form className="admin-form row g-0" onSubmit={handleSubmit(onSubmit)}>
         <div className="col-12"><label className="form-label">Título</label><input className="form-control" {...register("title", { required: true })} />{errors.title && <span className="invalid-feedback d-block">Es obligatorio.</span>}</div>
         <div className="col-12"><label className="form-label">Texto</label><textarea className="form-control" rows="3" {...register("message")} /></div>
-        <div className="col-md-8"><label className="form-label">Imagen</label><input className="form-control" type="url" placeholder="https://…" {...register("imageUrl")} /></div>
+        <div className="col-md-8"><label className="form-label">Imagen</label><input className="form-control" {...imageUrlInput} placeholder="https://…" {...register("imageUrl")} /></div>
         <div className="col-md-4"><label className="form-label">O subir archivo</label><input className="form-control" type="file" accept="image/*" {...register("imageFile")} /></div>
         <div className="col-md-8"><label className="form-label">Enlace</label><input className="form-control" type="url" placeholder="https://…" {...register("linkUrl")} /></div>
         <div className="col-md-4"><label className="form-label">Texto del enlace</label><input className="form-control" {...register("linkLabel")} /></div>
-        <div className="col-md-6"><label className="form-label">Visible desde</label><input className="form-control" type="datetime-local" {...register("startAt")} /></div>
-        <div className="col-md-6"><label className="form-label">Visible hasta</label><input className="form-control" type="datetime-local" {...register("endAt")} /></div>
+        <div className="col-md-6"><label className="form-label">Visible desde</label><input className="form-control" type="datetime-local" step="1" {...register("startAt")} /></div>
+        <div className="col-md-6"><label className="form-label">Visible hasta</label><input className="form-control" type="datetime-local" step="1" {...register("endAt")} /></div>
         <div className="col-12"><label className="form-check"><input className="form-check-input" type="checkbox" {...register("active")} /><span>Banner activo</span></label></div>
         <div className="col-12"><button className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : "Guardar banner"}</button></div>
-      </form>
+      </form>}
     </main>
   );
 }

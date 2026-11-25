@@ -72,7 +72,7 @@ const editorialSchema = new mongoose.Schema({
 // ----- Índices -----
 editorialSchema.index(
   { slug: 1 },
-  { unique: true, partialFilterExpression: { slug: { $exists: true, $type: "string", $ne: "" } } }
+  { unique: true, partialFilterExpression: { slug: { $type: "string", $gt: "" } } }
 );
 editorialSchema.index({ status: 1, publishAt: -1 });
 editorialSchema.index({ title: "text", subtitle: "text", excerpt: "text" });

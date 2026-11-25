@@ -61,6 +61,9 @@ router.post("/users/password-reset/request", passwordResetRateLimit, users.reque
 router.post("/users/password-reset/complete", authenticationRateLimit, users.completePasswordReset);
 
 // Sesiones
+router.get("/sessions/current", (req, res) => {
+  res.set("Cache-Control", "no-store").json(req.user || null);
+});
 router.post("/sessions", authenticationRateLimit, sessions.create);
 router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
 
@@ -261,6 +264,17 @@ router.delete("/admin/banners/:id", adminRateLimit, bannerController.deleteBanne
 // UPLOADS GENERIC
 // ======================================================
 
+if (upload.localDirectory) {
+  router.use("/uploads", express.static(upload.localDirectory, {
+    index: false,
+    redirect: false,
+    setHeaders: (res) => {
+      res.set("X-Content-Type-Options", "nosniff");
+      res.set("Content-Security-Policy", "default-src 'none'");
+    },
+  }));
+}
+
 router.post(
   "/upload",
   auth.isAuthenticated,
@@ -273,7 +287,7 @@ router.post(
         .status(400)
         .json({ message: "No se ha subido ninguna imagen" });
     }
-    res.status(200).json({ imageUrl: req.file.path });
+    res.status(200).json({ imageUrl: upload.imageUrlFor(req.file) });
   },
 );
 

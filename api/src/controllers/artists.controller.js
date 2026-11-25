@@ -106,7 +106,7 @@ exports.createArtists = async (req, res) => {
     return res.status(201).json(Array.isArray(req.body) ? created : created[0]);
   } catch (error) {
     console.error("Error al crear artistas:", error);
-    res.status(500).json({
+    res.status(error.code === 11000 ? 409 : 400).json({
       message: "Error al crear artistas",
       error: error.message,
     });
@@ -128,7 +128,7 @@ exports.updateArtist = async (req, res) => {
     const updatedArtist = await Artist.findOneAndUpdate(
       { slug: req.params.slug },
       updates,
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!updatedArtist) {

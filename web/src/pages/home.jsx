@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import runner from "../assets/brand/caribe-runner.png";
 import SiteLoader from "../components/ui/site-loader.jsx";
-import { featuredEditorials } from "../data/featured-editorial";
 
 const homeNavigation = [
   { to: "/artistas", label: "Artistas" },
-  { to: "/releases", label: "Discografía" },
+  { to: "/releases", label: "Catálogo" },
   { to: "/editoriales", label: "Editorial" },
   { to: "/eventos", label: "Eventos" },
 ];
@@ -33,13 +32,13 @@ export default function HomePage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/v1/editorials")
+    fetch("/api/v1/editorials?featured=true&limit=5")
       .then((res) => {
         if (!res.ok) throw new Error("Editorials unavailable");
         return res.json();
       })
-      .then((json) => (Array.isArray(json) ? json : json.data || []).slice(0, 5))
-      .catch(() => featuredEditorials)
+      .then((json) => (Array.isArray(json) ? json : json.data || []).filter((item) => item.featured).slice(0, 5))
+      .catch(() => [])
       .then(async (items) => {
         await preloadCover(items[0]?.hero?.url);
         return items;

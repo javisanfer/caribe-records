@@ -13,7 +13,7 @@ function EventRows({ events, past = false }) {
         <li className="admin-edit-context" key={event.id}>
           <EventItem event={event} past={past} />
           <AdminEditLink
-            to={event.slug ? `/admin/edit-event/${event.slug}` : null}
+            to={`/admin/edit-event/${event.slug || event.id}`}
             label={`el evento ${event.title || event.artist}`}
           />
         </li>
@@ -66,7 +66,6 @@ export default function EventList({ events = [] }) {
             <div><span>02 / Archivo</span><h2 id="event-archive-title">Conciertos pasados</h2></div>
             <span>{String(history.reduce((total, [, items]) => total + items.length, 0)).padStart(2, "0")}</span>
           </header>
-          <p className="event-section__intro">Abre un año para recorrer las fechas anteriores.</p>
           {history.map(([year, items]) => (
             <details className="event-year" key={year}>
               <summary>

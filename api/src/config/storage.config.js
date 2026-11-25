@@ -1,5 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
+const path = require("node:path");
+const { randomUUID } = require("node:crypto");
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -12,7 +14,7 @@ cloudinary.config({
 
 const folder = process.env.NODE_ENV === "test" ? "caribe-records-test" : "iron-records";
 
-const storage = {
+const cloudStorage = {
   _handleFile(req, file, callback) {
     const stream = cloudinary.uploader.upload_stream(
       { folder, resource_type: "image" },
@@ -35,6 +37,16 @@ const storage = {
   },
 };
 
+// La revisión local puede probar el proceso completo sin escribir en Cloudinary.
+const localDirectory = process.env.LOCAL_IMAGE_UPLOADS === "true" && process.env.NODE_ENV !== "production"
+  ? path.resolve(__dirname, "../../uploads/dev")
+  : null;
+const extensions = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
+const storage = localDirectory ? multer.diskStorage({
+  destination: localDirectory,
+  filename: (_req, file, callback) => callback(null, randomUUID() + extensions[file.mimetype]),
+}) : cloudStorage;
+
 const upload = multer({
   storage,
   limits: { fileSize: MAX_IMAGE_BYTES },
@@ -53,3 +65,6 @@ module.exports = upload;
 module.exports.ALLOWED_IMAGE_TYPES = ALLOWED_IMAGE_TYPES;
 module.exports.MAX_IMAGE_BYTES = MAX_IMAGE_BYTES;
 module.exports.imageFileFilter = imageFileFilter;
+
+module.exports.localDirectory = localDirectory;
+module.exports.imageUrlFor = (file) => localDirectory ? `/api/v1/uploads/${file.filename}` : file.path;

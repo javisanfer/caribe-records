@@ -4,11 +4,6 @@ import { useParams } from "react-router-dom";
 import ArtistDetail from "../components/artists/artist-detail/artist-detail";
 import AdminEditLink from "../components/admin/admin-edit-link";
 import SiteLoader from "../components/ui/site-loader.jsx";
-import { withCurrentArtistPhoto } from "../data/artist-media.js";
-import { withCurrentArtistProfile } from "../data/artist-profiles.js";
-import { withCuratedReleases } from "../data/curated-releases.js";
-import { featuredEditorials } from "../data/featured-editorial.js";
-
 export default function ArtistDetailPage() {
   const { slug } = useParams();
 
@@ -33,7 +28,7 @@ export default function ArtistDetailPage() {
         if (!res.ok) {
           throw new Error(`No encontrado: ${res.status}`);
         }
-        const artistData = withCurrentArtistProfile(withCurrentArtistPhoto(await res.json()));
+        const artistData = await res.json();
         setArtist(artistData);
 
         // 2) LISTA PARA PREV / NEXT
@@ -52,14 +47,14 @@ export default function ArtistDetailPage() {
         // 3) RELEASES + EDITORIALS + EVENTS EN PARALELO
         const [relRes, edRes, evRes] = await Promise.all([
           fetch("/api/v1/releases"),
-          fetch("/api/v1/editorials").catch(() => null),
+          fetch(`/api/v1/editorials?artist=${artistData._id}`),
           fetch(`/api/v1/events?artist=${artistData._id}&from=${encodeURIComponent(new Date().toISOString())}`),
         ]);
 
         // RELEASES
         const relJson = await relRes.json();
         const allReleases = Array.isArray(relJson) ? relJson : relJson.data || [];
-        const artistReleases = withCuratedReleases(allReleases).filter((r) => {
+        const artistReleases = allReleases.filter((r) => {
           const artistId =
             typeof r.artist === "string" ? r.artist : r.artist?._id;
           return artistId === artistData._id || r.artist?.slug === artistData.slug;
@@ -68,11 +63,7 @@ export default function ArtistDetailPage() {
 
         const edJson = edRes?.ok ? await edRes.json() : null;
         const allEditorials = Array.isArray(edJson) ? edJson : edJson?.data || [];
-        setEditorials(edJson ? allEditorials.filter((editorial) =>
-          editorial.relatedArtists?.some((related) =>
-            (typeof related === "string" ? related : related?._id) === artistData._id
-          )
-        ) : artistData.slug === "aeronave-adolescente" ? featuredEditorials : []);
+        setEditorials(allEditorials);
 
         // La ficha solo muestra próximos conciertos; el histórico queda en Eventos.
         const evJson = await evRes.json();
@@ -116,7 +107,7 @@ export default function ArtistDetailPage() {
   return (
     <div className="admin-edit-detail">
       <AdminEditLink to={`/admin/edit-artist/${artist.slug}`} label={`a ${artist.name}`} />
-      <ArtistDetail
+      <ArtistDetail key={artist._id}
         artist={artist}
         prevNext={prevNext}
         releases={releases}
