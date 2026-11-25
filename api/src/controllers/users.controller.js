@@ -31,11 +31,17 @@ module.exports.update = (req, res, next) => {
 };
 
 module.exports.validate = (req, res, next) => {
-  User.findOne({ _id: req.params.id, activateToken: req.query.token })
+  const { token } = req.query;
+  if (typeof token !== "string" || !token.trim() || !/^[a-f\d]{24}$/i.test(req.params.id)) {
+    return next(createError(400, "Enlace de activación no válido"));
+  }
+  // Invitations with an expiry use completeInvite, which also sets the password.
+  User.findOneAndUpdate({
+    _id: req.params.id, active: false, activateToken: token, activateExpiresAt: null,
+  }, { $set: { active: true, activateToken: null } }, { new: true })
     .then((user) => {
       if (user) {
-        user.active = true;
-        user.save().then((user) => res.json(user));
+        res.json(user);
       } else {
         next(createError(404, "User not found"));
       }

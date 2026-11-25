@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { isURL } = require('../validators/string.validators');
 const bcrypt = require("bcryptjs");
+const { randomBytes } = require("node:crypto");
 
 const SALT_WORK_FACTOR = 10;
 const EMAIL_PATTERN =
@@ -38,13 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     activateToken: {
       type: String,
-      default: function () {
-        return (
-          Math.random().toString(36).substring(2, 15) +
-          Math.random().toString(36).substring(2, 15) +
-          Math.random().toString(36).substring(2, 15)
-        );
-      },
+      default: () => randomBytes(32).toString("hex"),
     },
     activateExpiresAt: { type: Date },
     passwordResetTokenHash: { type: String, select: false },
