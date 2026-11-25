@@ -7,7 +7,7 @@ const { loadSessionUser } = require("./middlewares/session.middleware");
 const corsMiddleware = require("./config/cors.config"); // ✅ Corregido
 const { connectDatabase } = require("./config/db.config");
 const { migrateCatalogue } = require("./migrations/catalogue-2026-10");
-const { migrateLaunchContent } = require("./migrations/launch-content-2026-11");
+const { migrateLaunchContent, migratePublicationSettings } = require("./migrations/launch-content-2026-11");
 const { inviteProductionAdmin } = require("./migrations/admin-invite-2026-11");
 
 const app = express();
@@ -44,6 +44,7 @@ connectDatabase()
   .then(async (connection) => {
     await migrateCatalogue(connection.db);
     await migrateLaunchContent(connection.db);
+    await migratePublicationSettings(connection.db);
     try {
       await inviteProductionAdmin(connection.db);
     } catch (error) {
@@ -51,7 +52,7 @@ connectDatabase()
     }
   })
   .then(() => {
-    app.listen(port, () => console.info(`🚀 Application running at port ${port}`));
+    app.listen(port, process.env.HOST || undefined, () => console.info(`🚀 Application running at port ${port}`));
   })
   .catch((error) => {
     console.error("Unable to connect to MongoDB after retrying", error);

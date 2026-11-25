@@ -5,7 +5,7 @@ import whiteLogo from "../../assets/brand/caribe-logotipo-white.png";
 
 const navigation = [
   { to: "/artistas", label: "Artistas", index: "01" },
-  { to: "/releases", label: "Discografía", index: "02" },
+  { to: "/releases", label: "Catálogo", index: "02" },
   { to: "/editoriales", label: "Editorial", index: "03" },
   { to: "/eventos", label: "Eventos", index: "04" },
 ];

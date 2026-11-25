@@ -38,7 +38,7 @@ const login = (payload) => http.post("/sessions", payload);
 const logout = () => http.delete("/sessions");
 
 // Profile
-const profile = () => http.get("/users/me");
+const profile = () => http.get("/sessions/current");
 
 // ----------------------------------------------------------------------------
 // 👩‍🎤 ARTISTS
@@ -50,11 +50,11 @@ const getArtistById = (id) => http.get(`/artists/${id}`);
 
 // Admin
 const adminListArtists = () => http.get("/admin/artists");
-const adminGetArtist = (id) => http.get(`/admin/artists/${id}`);
+const adminGetArtist = (slug) => http.get(`/admin/artists/slug/${encodeURIComponent(slug)}`);
 const adminCreateArtist = (payload) => http.post("/admin/artists", payload);
-const adminUpdateArtist = (id, payload) =>
-  http.patch(`/admin/artists/${id}`, payload);
-const adminDeleteArtist = (id) => http.delete(`/admin/artists/${id}`);
+const adminUpdateArtist = (slug, payload) =>
+  http.patch(`/admin/artists/slug/${encodeURIComponent(slug)}`, payload);
+const adminDeleteArtist = (slug) => http.delete(`/admin/artists/slug/${encodeURIComponent(slug)}`);
 
 // ----------------------------------------------------------------------------
 // 💿 RELEASES
@@ -88,7 +88,18 @@ const adminDeleteEvent = (id) => http.delete(`/admin/events/${id}`);
 // 📰 EDITORIALS
 // ----------------------------------------------------------------------------
 
-const listEditorials = () => http.get("/editorials");
+async function listEditorials() {
+  const entries = [];
+  let page = 1;
+  let totalPages;
+  do {
+    const result = await http.get("/editorials", { params: { limit: 50, page } });
+    entries.push(...result.data);
+    totalPages = result.totalPages;
+    page += 1;
+  } while (page <= totalPages);
+  return entries;
+}
 const getEditorialBySlug = (slug) => http.get(`/editorials/slug/${slug}`);
 
 const adminListEditorials = () => http.get("/admin/editorials");

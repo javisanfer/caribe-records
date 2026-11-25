@@ -3,17 +3,13 @@ import { Link } from "react-router-dom";
 import "../../../index.css";
 import { sortReleases } from "../../../utils/release-order";
 
+import { artistPhotoUrl } from "../../../utils/artist-photo";
+import { artistLinks } from "../../../utils/artist-links";
+
 const LINK_GROUPS = [
   ["links", "Enlaces"],
   ["streaming", "Escucha"],
 ];
-
-function humanizeLabel(label) {
-  if (label === "x") return "Twitter";
-  return label
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/^./, (character) => character.toUpperCase());
-}
 
 function formatEventDate(value) {
   if (!value) return "Próximamente";
@@ -48,7 +44,7 @@ export default function ArtistDetail({
   const [tab, setTab] = useState("overview");
   const [expandedBio, setExpandedBio] = useState(false);
   const [heroRatio, setHeroRatio] = useState(4 / 3);
-  const [failedHeroImage, setFailedHeroImage] = useState(null);
+  const [failedPhotoUrls, setFailedPhotoUrls] = useState([]);
   const sortedReleases = useMemo(() => sortReleases(releases), [releases]);
 
   const releasesByYear = useMemo(() => {
@@ -63,15 +59,14 @@ export default function ArtistDetail({
 
   if (!artist) return null;
 
-  const heroImage = artist.photos?.coverUrl || artist.photos?.portraitUrl || artist.image?.url;
-  const hasHeroImage = Boolean(heroImage && failedHeroImage !== heroImage);
-  const portraitImage = artist.photos?.portraitUrl || artist.image?.url || artist.photos?.coverUrl;
+  const photos = [artist.photos?.coverUrl, artist.photos?.portraitUrl, artist.image?.url].map(artistPhotoUrl);
+  const heroImage = photos.find((url) => url && !failedPhotoUrls.includes(url));
+  const hasHeroImage = Boolean(heroImage);
+  const portraitImage = photos[1] && !failedPhotoUrls.includes(photos[1]) ? photos[1] : null;
+  const profileLinks = artistLinks(artist);
   const links = {
-    links: [
-      ...Object.entries(artist.social || {}),
-      ...Object.entries(artist.web || {}),
-    ].filter(([, url]) => Boolean(url)),
-    streaming: Object.entries(artist.streaming || {}).filter(([, url]) => Boolean(url)),
+    links: profileLinks.filter((link) => link.group !== "streaming"),
+    streaming: profileLinks.filter((link) => link.group === "streaming"),
   };
   const hasAnyLinks = Object.values(links).some((group) => group.length > 0);
   const validEvents = events.filter((event) => event && (event.title || event.city || event.venue));
@@ -100,7 +95,7 @@ export default function ArtistDetail({
                 const { naturalWidth, naturalHeight } = event.currentTarget;
                 if (naturalWidth && naturalHeight) setHeroRatio(naturalWidth / naturalHeight);
               }}
-              onError={() => setFailedHeroImage(heroImage)}
+              onError={() => setFailedPhotoUrls((urls) => [...urls, heroImage])}
             />
           ) : <span>CR</span>}
         </div>
@@ -108,7 +103,7 @@ export default function ArtistDetail({
 
       <nav className="artist-detail__tabs" aria-label="Contenido del artista">
         <button className={tab === "overview" ? "is-active" : ""} aria-pressed={tab === "overview"} onClick={() => setTab("overview")}>↳ Perfil</button>
-        <button className={tab === "releases" ? "is-active" : ""} aria-pressed={tab === "releases"} onClick={() => setTab("releases")}>↳ Discografía</button>
+        <button className={tab === "releases" ? "is-active" : ""} aria-pressed={tab === "releases"} onClick={() => setTab("releases")}>↳ Catálogo</button>
         <button className={tab === "links" ? "is-active" : ""} aria-pressed={tab === "links"} onClick={() => setTab("links")} disabled={!hasAnyLinks}>↳ Enlaces</button>
       </nav>
 
@@ -126,6 +121,16 @@ export default function ArtistDetail({
                 )}
               </>
             ) : <p className="artist-detail__empty-copy">Biografía próximamente.</p>}
+            {artist.members?.length > 0 && <p>{artist.members.join(" · ")}</p>}
+            {artist.gallery?.length > 0 && <div className="artist-profile-gallery">
+              {artist.gallery.map((image, index) => <figure key={index}>
+                <img src={image.url} alt={image.alt || ""} loading="lazy" />
+                {image.caption && <figcaption>{image.caption}</figcaption>}
+              </figure>)}
+            </div>}
+            {artist.videos?.length > 0 && <section><h2 className="detail-section-label">Vídeos</h2>
+              {artist.videos.map((video, index) => <p key={index}><a href={video.url} target="_blank" rel="noreferrer">{video.title}{video.year && ` · ${video.year}`}</a></p>)}
+            </section>}
           </section>
 
           <aside className="artist-detail__rail">
@@ -134,8 +139,8 @@ export default function ArtistDetail({
               <section key={key}>
                 <p className="detail-section-label">{title}</p>
                 <ul>
-                  {links[key].map(([label, url]) => (
-                    <li key={label}><a href={url} target="_blank" rel="noreferrer">↳ {humanizeLabel(label)}</a></li>
+                  {links[key].map(({ label, url }, index) => (
+                    <li key={index}><a href={url} target="_blank" rel="noreferrer">↳ {label}</a></li>
                   ))}
                 </ul>
               </section>
@@ -147,7 +152,7 @@ export default function ArtistDetail({
       {tab === "releases" && (
         <section className="artist-detail__catalogue">
           <div className="artist-detail__catalogue-heading">
-            <p className="detail-section-label">Discografía</p>
+            <p className="detail-section-label">Catálogo</p>
             <span>{String(releases.length).padStart(2, "0")}</span>
           </div>
           {releasesByYear.length ? releasesByYear.map(([year, items]) => (
@@ -180,8 +185,8 @@ export default function ArtistDetail({
           {LINK_GROUPS.map(([key, title]) => links[key].length > 0 && (
             <div key={key}>
               <p className="detail-section-label">{title}</p>
-              {links[key].map(([label, url]) => (
-                <a href={url} target="_blank" rel="noreferrer" key={label}><span>{humanizeLabel(label)}</span><span>↗</span></a>
+              {links[key].map(({ label, url }, index) => (
+                <a href={url} target="_blank" rel="noreferrer" key={index}><span>{label}</span><span>↗</span></a>
               ))}
             </div>
           ))}

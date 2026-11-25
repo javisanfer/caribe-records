@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { http } from "../../services/api-services";
 
@@ -21,6 +21,8 @@ const CREATE_LINKS = [
 ];
 
 export default function AdminDashboardPage() {
+  const [counts, setCounts] = useState({});
+  const [totalItems, setTotalItems] = useState(0);
   const [items, setItems] = useState([]);
   const [typeFilter, setTypeFilter] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -33,14 +35,15 @@ export default function AdminDashboardPage() {
       setLoading(true);
       setError("");
       try {
-        const params = new URLSearchParams({ limit: "200" });
+        const params = new URLSearchParams({ limit: String(PAGE_SIZE), page: String(currentPage) });
         if (typeFilter !== "all") params.set("type", typeFilter);
         const data = await http.get(`/admin/activity?${params}`, {
           signal: controller.signal,
         });
         if (controller.signal.aborted) return;
         setItems(data.data || []);
-        setCurrentPage(1);
+        setCounts(data.counts || {});
+        setTotalItems(data.total || 0);
       } catch (loadError) {
         if (controller.signal.aborted) return;
         console.error("Error loading activity:", loadError);
@@ -51,18 +54,12 @@ export default function AdminDashboardPage() {
     }
     loadData();
     return () => controller.abort();
-  }, [typeFilter]);
+  }, [typeFilter, currentPage]);
 
-  const counts = useMemo(() => items.reduce((result, item) => {
-    result[item.type] = (result[item.type] || 0) + 1;
-    return result;
-  }, {}), [items]);
-
-  const totalItems = items.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
   const startIndex = (safePage - 1) * PAGE_SIZE;
-  const pageItems = items.slice(startIndex, startIndex + PAGE_SIZE);
+
 
   const formatDateTime = (value) => value
     ? new Date(value).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })
@@ -70,7 +67,7 @@ export default function AdminDashboardPage() {
 
   const getEditUrl = (item) => ({
     artist: `/admin/edit-artist/${item.slug}`,
-    event: `/admin/edit-event/${item.slug}`,
+    event: `/admin/edit-event/${item.slug || item.id}`,
     editorial: `/admin/edit-editorial/${item.slug}`,
     release: `/admin/edit-release/${item.id}`,
     banner: `/admin/edit-banner/${item.id}`,
@@ -114,10 +111,10 @@ export default function AdminDashboardPage() {
           </div>
           <label>
             <span>Filtrar por</span>
-            <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
+            <select value={typeFilter} onChange={(event) => { setCurrentPage(1); setTypeFilter(event.target.value); }}>
               <option value="all">Todo</option>
               <option value="artist">Artistas</option>
-              <option value="release">Lanzamientos</option>
+              <option value="release">Catálogo</option>
               <option value="event">Eventos</option>
               <option value="editorial">Editorial</option>
               <option value="banner">Banners</option>
@@ -137,7 +134,7 @@ export default function AdminDashboardPage() {
               <table className="admin-table">
                 <thead><tr><th>Tipo</th><th>Título / nombre</th><th>Creado</th><th>Actualizado</th><th><span className="visually-hidden">Acción</span></th></tr></thead>
                 <tbody>
-                  {pageItems.map((item) => (
+                  {items.map((item) => (
                     <tr key={`${item.type}-${item.id}`}>
                       <td data-label="Tipo"><span className={`admin-type admin-type--${item.type}`}>{TYPE_LABELS[item.type]}</span></td>
                       <td data-label="Título / nombre">{item.title}</td>

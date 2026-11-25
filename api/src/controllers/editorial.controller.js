@@ -1,3 +1,4 @@
+const { imageUrlFor } = require("../config/storage.config");
 const Editorial = require("../models/editorial.model");
 const Artist = require("../models/artist.model"); // 👈 NUEVO
 
@@ -30,36 +31,17 @@ function normalizeIdArray(value) {
 }
 
 function normalizeEditorialBlocks(value) {
-  if (!value) return [];
-  let blocks = value;
-  if (typeof value === "string") {
-    try {
-      blocks = JSON.parse(value);
-    } catch {
-      return [];
-    }
-  }
-  if (!Array.isArray(blocks)) return [];
+  if (value === undefined || value === "") return [];
+  const blocks = typeof value === "string" ? JSON.parse(value) : value;
+  if (!Array.isArray(blocks)) throw new Error("Los bloques deben ser una lista");
+  // The nested Mongoose schemas validate types and keep only supported fields.
+  return blocks;
+}
 
-  return blocks.slice(0, 200).flatMap((block) => {
-    if (!block || typeof block !== "object") return [];
-    if (block.type === "paragraph" && typeof block.text === "string") {
-      return [{ type: "paragraph", text: block.text }];
-    }
-    if (block.type === "quote" && typeof block.quote === "string") {
-      return [{ type: "quote", quote: block.quote, cite: typeof block.cite === "string" ? block.cite : "" }];
-    }
-    if (block.type === "image" && block.image && typeof block.image.url === "string") {
-      return [{ type: "image", image: {
-        url: block.image.url,
-        alt: typeof block.image.alt === "string" ? block.image.alt : "",
-        caption: typeof block.image.caption === "string" ? block.image.caption : "",
-        credit: typeof block.image.credit === "string" ? block.image.credit : "",
-      } }];
-    }
-    if (block.type === "separator") return [{ type: "separator" }];
-    return [];
-  });
+function editorialCredits(value) {
+  const credits = typeof value === "string" ? JSON.parse(value) : value;
+  if (!Array.isArray(credits)) throw new Error("Los créditos deben ser una lista");
+  return credits;
 }
 
 function validatePublishableEditorial({ status, publishAt, hero, blocks }) {
@@ -89,6 +71,8 @@ exports.getEditorialsPublic = async (req, res) => {
     };
 
     const filter = { ...visibility };
+    if (req.query.featured === "true") filter.featured = true;
+    if (req.query.artist) filter.relatedArtists = req.query.artist;
     if (tag) filter.tags = tag;
     if (q) filter.$text = { $search: q };
 
@@ -129,7 +113,7 @@ exports.getEditorialBySlugPublic = async (req, res) => {
         { status: "published" },
         { status: "scheduled", publishAt: { $lte: now } },
       ],
-    }).populate("author", "name");
+    }).populate("author", "name").populate("relatedArtists", "name slug");
 
     if (!doc) return res.status(404).json({ message: "Editorial not found" });
 
@@ -224,13 +208,15 @@ exports.createEditorial = async (req, res) => {
     if (body.publishAt) payload.publishAt = body.publishAt;
 
     // author opcional
-    if (req.user?.sub) payload.author = req.user.sub;
+    if (req.user?._id) payload.author = req.user._id;
+    if (body.credits !== undefined) payload.credits = editorialCredits(body.credits);
+    if (body.relatedReleases !== undefined) payload.relatedReleases = normalizeIdArray(body.relatedReleases);
 
     // HERO -------------------------
     payload.hero = {};
 
     if (req.file) {
-      payload.hero.url = req.file.path;
+      payload.hero.url = imageUrlFor(req.file);
     } else if (body.heroUrl) {
       payload.hero.url = body.heroUrl;
     }
@@ -337,6 +323,8 @@ exports.updateEditorial = async (req, res) => {
     const body = req.body;
 
     // Guardamos los artistas anteriores para sincronizar
+    if (body.credits !== undefined) editorial.credits = editorialCredits(body.credits);
+    if (body.relatedReleases !== undefined) editorial.relatedReleases = normalizeIdArray(body.relatedReleases);
     const prevArtists = (editorial.relatedArtists || []).map((id) => id.toString());
 
     // Si cambia el título → regenerar slug
@@ -357,8 +345,8 @@ exports.updateEditorial = async (req, res) => {
       editorial.hero = {};
     }
     if (req.file) {
-      editorial.hero.url = req.file.path;
-    } else if (body.heroUrl) {
+      editorial.hero.url = imageUrlFor(req.file);
+    } else if (editorial.hero && body.heroUrl !== undefined) {
       editorial.hero.url = body.heroUrl;
     }
     if (editorial.hero) {
@@ -399,7 +387,7 @@ exports.updateEditorial = async (req, res) => {
     };
 
     // Otros
-    editorial.featured =
+    if (body.featured !== undefined) editorial.featured =
       body.featured === "true" ||
       body.featured === "on" ||
       body.featured === true;

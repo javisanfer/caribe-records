@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
       inactivityTimer = window.setTimeout(expireSession, 5 * 60 * 1000);
       if (Date.now() - lastSessionTouch > 60 * 1000) {
         lastSessionTouch = Date.now();
-        profile().catch(() => setUser(null));
+        profile().then((current) => { if (!current) setUser(null); }).catch(() => setUser(null));
       }
     };
     const activityEvents = ["pointerdown", "keydown", "scroll", "touchstart"];

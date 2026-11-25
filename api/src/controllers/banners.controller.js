@@ -21,8 +21,8 @@ function validate(payload) {
   if (payload.linkUrl && !/^https?:\/\//i.test(payload.linkUrl)) {
     return "El enlace debe comenzar por http:// o https://";
   }
-  if (payload.imageUrl && !/^https?:\/\//i.test(payload.imageUrl)) {
-    return "La imagen debe comenzar por http:// o https://";
+  if (payload.imageUrl && !/^(?:https?:\/\/[^/\s]+(?:\/.*)?|\/(?![\/\\]).+)$/i.test(payload.imageUrl)) {
+    return "Introduce una URL http(s) o una ruta de imagen que empiece por /";
   }
   return "";
 }

@@ -5,11 +5,11 @@ const Editorial = require("../models/editorial.model");
 const Banner = require("../models/banner.model");
 
 const ACTIVITY_SOURCES = [
-  { type: "artist", model: Artist, titleField: "name", select: "name slug createdAt updatedAt" },
-  { type: "release", model: Release, titleField: "title", select: "title createdAt updatedAt" },
-  { type: "event", model: Event, titleField: "title", select: "title slug createdAt updatedAt" },
-  { type: "editorial", model: Editorial, titleField: "title", select: "title slug createdAt updatedAt" },
-  { type: "banner", model: Banner, titleField: "title", select: "title createdAt updatedAt" },
+  { type: "artist", model: Artist, titleField: "name" },
+  { type: "release", model: Release, titleField: "title" },
+  { type: "event", model: Event, titleField: "title" },
+  { type: "editorial", model: Editorial, titleField: "title" },
+  { type: "banner", model: Banner, titleField: "title" },
 ];
 
 exports.getActivity = async (req, res) => {
@@ -26,30 +26,24 @@ exports.getActivity = async (req, res) => {
     const requestedLimit = Number.parseInt(req.query.limit || "100", 10);
     const limit = Math.min(500, Math.max(1, Number.isNaN(requestedLimit) ? 100 : requestedLimit));
 
-    const groups = await Promise.all(sources.map(async (source) => {
-      const documents = await source.model
-        .find()
-        .select(source.select)
-        .sort({ updatedAt: -1, createdAt: -1 })
-        .limit(limit)
-        .lean();
-
-      return documents.map((document) => ({
-        type: source.type,
-        id: document._id.toString(),
-        slug: document.slug || null,
-        title: document[source.titleField] || "Sin título",
-        createdAt: document.createdAt || null,
-        updatedAt: document.updatedAt || document.createdAt || null,
-      }));
-    }));
-
-    const data = groups
-      .flat()
-      .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
-      .slice(0, limit);
-
-    return res.json({ data, total: data.length });
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const projection = ({ type, titleField }) => ({ $project: {
+      type: { $literal: type }, id: { $toString: "$_id" }, _id: 0,
+      slug: { $ifNull: ["$slug", null] }, title: { $ifNull: [`$${titleField}`, "Sin título"] },
+      createdAt: 1, updatedAt: { $ifNull: ["$updatedAt", "$createdAt"] },
+    } });
+    const [first, ...rest] = sources;
+    const [result] = await first.model.aggregate([
+      projection(first),
+      ...rest.map((source) => ({ $unionWith: { coll: source.model.collection.name, pipeline: [projection(source)] } })),
+      { $facet: {
+        data: [{ $sort: { updatedAt: -1, id: -1 } }, { $skip: (page - 1) * limit }, { $limit: limit }],
+        counts: [{ $group: { _id: "$type", count: { $sum: 1 } } }],
+      } },
+    ]);
+    const counts = Object.fromEntries(result.counts.map((group) => [group._id, group.count]));
+    const total = result.counts.reduce((sum, group) => sum + group.count, 0);
+    return res.json({ data: result.data, total, counts });
   } catch (error) {
     console.error("Error fetching admin activity:", error);
     return res.status(500).json({ message: "Error fetching admin activity" });

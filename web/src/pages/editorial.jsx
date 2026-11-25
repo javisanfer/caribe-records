@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import EditorialList from "../components/editorials/editorial-list/editorial-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
-import { featuredEditorials } from "../data/featured-editorial";
+import { listEditorials } from "../services/api-services";
 import SiteLoader from "../components/ui/site-loader.jsx";
 
 export default function EditorialPage() {
   const [editorials, setEditorials] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    fetch("/api/v1/editorials")
-      .then((res) => {
-        if (!res.ok) throw new Error("Editorials unavailable");
-        return res.json();
-      })
-      .then((json) => setEditorials(Array.isArray(json) ? json : json.data || []))
-      .catch(() => setEditorials(featuredEditorials))
+    listEditorials().then(setEditorials)
+      .catch(() => setError("No se pudo cargar el archivo editorial."))
       .finally(() => setLoading(false));
   }, []);
 
@@ -26,7 +23,7 @@ export default function EditorialPage() {
       count={loading ? null : editorials.length}
       countLabel="historias"
     >
-      {loading ? <SiteLoader /> : <EditorialList editorials={editorials} />}
+      {loading ? <SiteLoader /> : error ? <p role="alert">{error}</p> : <EditorialList editorials={editorials} />}
     </PublicIndexPage>
   );
 }
