@@ -27,6 +27,9 @@ app.get("/health", (_req, res) => {
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(corsMiddleware);
+// Activation links carry credentials in their query string.
+logger.token("url", (req) => req.path);
+logger.token("referrer", (req) => req.get("Referrer")?.split(/[?#]/, 1)[0]);
 app.use(logger(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(sessionMiddleware);
 app.use(loadSessionUser);

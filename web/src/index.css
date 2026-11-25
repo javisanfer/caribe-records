@@ -32,6 +32,7 @@ body {
   margin: 0;
   min-width: 0;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 body.menu-open {
@@ -40,6 +41,7 @@ body.menu-open {
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .site-loader {
@@ -495,28 +497,33 @@ a.event-row:hover {
 }
 
 /* Anuncio programable */
-.site-banner-backdrop {
-  position: fixed;
-  z-index: 1900;
-  inset: 0;
-  display: grid;
-  padding: 24px;
-  place-items: center;
+html:has(dialog.site-banner[open]) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+dialog.site-banner::backdrop {
   background: rgba(9, 9, 9, .42);
   animation: site-banner-backdrop-in .28s ease both;
 }
 
-.site-banner {
-  position: relative;
-  display: grid;
-  width: min(760px, calc(100vw - 48px));
-  min-height: 330px;
-  overflow: hidden;
+dialog.site-banner {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  width: min(760px, calc(100% - 48px));
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   color: var(--cr-white);
   background: var(--cr-blue);
   border: 2px solid var(--cr-white);
   animation: site-banner-in .48s cubic-bezier(.22, 1, .36, 1) both;
 }
+
+dialog.site-banner[open] { display: grid; }
 
 .site-banner--with-image {
   grid-template-columns: minmax(240px, .9fr) minmax(0, 1.1fr);
@@ -636,12 +643,8 @@ a.event-row:hover {
 }
 
 @media (max-width: 700px) {
-  .site-banner-backdrop { padding: 16px; }
-
-  .site-banner {
-    width: min(430px, calc(100vw - 32px));
-    max-height: calc(100svh - 32px);
-    overflow-y: auto;
+  dialog.site-banner {
+    width: min(430px, calc(100% - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
   }
 
   .site-banner--with-image { grid-template-columns: 1fr; }
@@ -2603,7 +2606,7 @@ body {
     gap: 18px;
     min-height: 0;
     padding-top: 18px;
-    padding-bottom: 18px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
   }
 
   .about-page__intro { padding: 24px 18px; }
@@ -5759,11 +5762,15 @@ a.event-row:focus-visible * {
   .home-meta span:nth-child(2) { display: none; }
 }
 
+/* Keep Safari's exposed canvas continuous with the footer at the end of the home page. */
+html:has(.home), body:has(.home) { background: #050505; }
+
 /* Home direction: full-bleed editorial carousel */
 .home {
   position: relative;
   display: block;
   min-height: 100svh;
+  min-height: 100dvh;
   overflow: hidden;
   background: var(--cr-blue);
 }
@@ -5949,7 +5956,7 @@ a.event-row:focus-visible * {
 
   .home-section-nav {
     left: 14px;
-    bottom: 24px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
   }
 
   .home-section-nav a {
