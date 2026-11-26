@@ -85,7 +85,7 @@ export default function NewArtistPage({ isEditMode = false }) {
   }
 
   return <main className="admin-page admin-form-page">
-    <header className="admin-form-header"><button type="button" className="admin-back" onClick={() => navigate("/admin")}>← Panel</button><span>Caribe Records · Artistas</span></header>
+    <header className="admin-form-header"><button type="button" className="admin-back" onClick={() => navigate("/admin")}>← Panel</button></header>
     <div className="admin-form-container">
       <div className="admin-form-intro"><h1>{isEditMode ? "Editar artista" : "Nuevo artista"}</h1></div>
       {loading ? <p>Cargando artista…</p> : loadError ? <p role="alert">{loadError}</p> :

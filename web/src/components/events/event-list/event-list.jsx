@@ -51,7 +51,7 @@ export default function EventList({ events = [] }) {
     <div className="events-wrap">
       <section className="event-section" aria-labelledby="event-upcoming-title">
         <header className="event-section__heading">
-          <div><span>01 / Agenda</span><h2 id="event-upcoming-title">Próximos conciertos</h2></div>
+          <h2 id="event-upcoming-title">Próximos conciertos</h2>
           <span>{String(upcoming.length).padStart(2, "0")}</span>
         </header>
         {upcoming.length ? (
@@ -65,7 +65,7 @@ export default function EventList({ events = [] }) {
       {history.length > 0 && (
         <section className="event-section event-section--archive" aria-labelledby="event-archive-title">
           <header className="event-section__heading">
-            <div><span>02 / Archivo</span><h2 id="event-archive-title">Conciertos pasados</h2></div>
+            <h2 id="event-archive-title">Conciertos pasados</h2>
             <span>{String(history.reduce((total, [, items]) => total + items.length, 0)).padStart(2, "0")}</span>
           </header>
           {history.map(([year, items]) => (

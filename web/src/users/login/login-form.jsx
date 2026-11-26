@@ -44,38 +44,21 @@ export default function LoginForm() {
   return (
     <div className="login-shell">
       <section className="login-manifesto" aria-labelledby="login-title">
-        <div className="login-manifesto__top">
-          <span>Caribe Records</span>
-          <span>Área privada / 2026</span>
-        </div>
-        <div>
-          <p>Gestión del sello</p>
-          <h1 id="login-title">Acceso</h1>
-        </div>
-        <p className="login-manifesto__note">
-          Catálogo, artistas, historias y fechas desde un mismo lugar.
-        </p>
+        <h1 id="login-title">Acceso</h1>
       </section>
 
-      <section className="login-panel" aria-labelledby="login-form-title">
+      <section className="login-panel" aria-label="Inicio de sesión">
         <header>
-          <p>Administración</p>
           <Link to="/">Volver a la web ↗</Link>
         </header>
 
         <div className="login-panel__body">
-          <div className="login-panel__intro">
-            <span>CR / 01</span>
-            <h2 id="login-form-title">Hola de nuevo.</h2>
-            <p>Introduce tus credenciales para acceder al panel.</p>
-          </div>
 
           <form className="login-form" onSubmit={handleSubmit(handleLogin)} noValidate>
             {serverError && <p className="login-form__alert" role="alert">{serverError}</p>}
 
             <div className="login-field">
               <div className="login-field__label">
-                <span>01</span>
                 <label htmlFor="email">Correo electrónico</label>
               </div>
               <input
@@ -98,7 +81,6 @@ export default function LoginForm() {
 
             <div className="login-field">
               <div className="login-field__label">
-                <span>02</span>
                 <label htmlFor="password">Contraseña</label>
               </div>
               <div className="login-password">
@@ -132,10 +114,6 @@ export default function LoginForm() {
           </form>
         </div>
 
-        <footer>
-          <span>Acceso restringido</span>
-          <span>Caribe Records · Vallecas</span>
-        </footer>
       </section>
     </div>
   );

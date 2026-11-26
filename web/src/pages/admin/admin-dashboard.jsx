@@ -13,11 +13,11 @@ const TYPE_LABELS = {
 };
 
 const CREATE_LINKS = [
-  ["01", "Artista", "/admin/new-artist"],
-  ["02", "Lanzamiento", "/admin/new-release"],
-  ["03", "Editorial", "/admin/new-editorial"],
-  ["04", "Evento", "/admin/new-event"],
-  ["05", "Banner", "/admin/new-banner"],
+  ["Artista", "/admin/new-artist"],
+  ["Lanzamiento", "/admin/new-release"],
+  ["Editorial", "/admin/new-editorial"],
+  ["Evento", "/admin/new-event"],
+  ["Banner", "/admin/new-banner"],
 ];
 
 export default function AdminDashboardPage() {
@@ -76,7 +76,6 @@ export default function AdminDashboardPage() {
   return (
     <main className="admin-page admin-dashboard">
       <header className="admin-dashboard__hero">
-        <p>Caribe Records · Gestión</p>
         <div>
           <h1>Panel</h1><Link to="/admin/about">Editar About</Link>
           <span>{String(totalItems).padStart(2, "0")} registros</span>
@@ -86,12 +85,10 @@ export default function AdminDashboardPage() {
       <section className="admin-create" aria-labelledby="admin-create-title">
         <div className="admin-section-heading">
           <h2 id="admin-create-title">Crear contenido</h2>
-          <span>Accesos rápidos</span>
         </div>
         <div className="admin-create__grid">
-          {CREATE_LINKS.map(([number, label, url]) => (
+          {CREATE_LINKS.map(([label, url]) => (
             <Link to={url} key={url}>
-              <small>{number}</small>
               <span>{label}</span>
               <b aria-hidden="true">＋</b>
             </Link>

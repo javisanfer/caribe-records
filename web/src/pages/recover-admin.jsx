@@ -39,7 +39,6 @@ export default function RecoverAdminPage() {
 
   return (
     <main className="admin-activation">
-      <p className="detail-section-label">Caribe Records / Administración</p>
       <h1>Recuperar acceso</h1>
       {done ? (
         <p>{token ? "Contraseña actualizada. " : "Si ese correo tiene acceso al panel, recibirás un enlace válido durante 30 minutos. Revisa también la carpeta de spam. "}

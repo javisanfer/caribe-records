@@ -93,12 +93,10 @@ export default function NewBannerPage({ isEditMode = false }) {
 
   return (
     <main className="admin-page admin-form-page">
-      <header className="admin-form-header"><span>CR / Banner</span><span>{isEditMode ? "Editar" : "Nuevo"}</span><span>Anuncio público</span></header>
-      <section className="admin-form-intro admin-form-intro--with-action">
-        <p>Comunicación</p>
-        <div><h1>{isEditMode ? "Editar banner" : "Nuevo banner"}</h1><span>Una ventana central para avisos puntuales.</span></div>
+      <header className="admin-form-intro">
+        <h1>{isEditMode ? "Editar banner" : "Nuevo banner"}</h1>
         {isEditMode && <button type="button" className="admin-delete" onClick={remove}>Borrar banner</button>}
-      </section>
+      </header>
       {loadError && <p className="admin-status admin-status--error">{loadError}</p>}
       {loading && <p>Cargando banner…</p>}
       {!loading && !loadError && <form className="admin-form row g-0" onSubmit={handleSubmit(onSubmit)}>

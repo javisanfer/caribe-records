@@ -87,8 +87,7 @@ export default function ArtistDetail({
             {artist.formedYear && <span>Desde {artist.formedYear}</span>}
           </div>
         </div>
-        <div className={`artist-detail__visual ${hasHeroImage ? "" : "is-empty"}`}>
-          {hasHeroImage ? (
+        {hasHeroImage && <div className="artist-detail__visual">
             <img
               src={heroImage}
               alt={artist.name}
@@ -98,8 +97,7 @@ export default function ArtistDetail({
               }}
               onError={() => setFailedPhotoUrls((urls) => [...urls, heroImage])}
             />
-          ) : <span>CR</span>}
-        </div>
+        </div>}
       </header>
 
       <nav className="artist-detail__tabs" aria-label="Contenido del artista">
@@ -167,7 +165,7 @@ export default function ArtistDetail({
                   >
                     {(release.cover?.url || release.cover_image) ? (
                       <img src={release.cover?.url || release.cover_image} alt={release.cover?.alt || release.title} />
-                    ) : <span className="artist-release__placeholder">CR</span>}
+                    ) : <span className="artist-release__placeholder" aria-hidden="true" />}
                     <span className="artist-release__name">{release.title}</span>
                     <small>{releaseFormat(release.format)}{releaseUrl(release) ? " ↗" : ""}</small>
                   </a>
