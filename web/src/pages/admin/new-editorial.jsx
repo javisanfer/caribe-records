@@ -1,4 +1,4 @@
-import PanelBackLink from "../../components/admin/panel-back-link";
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import DOMPurify from "dompurify";
 import React, { useEffect, useMemo, useState } from "react";
@@ -25,7 +25,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
   const [releases, setReleases] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [optionsError, setOptionsError] = useState("");
-  const { control, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { status: "draft", featured: false, title: "", credits: [], relatedArtists: [], relatedReleases: [] } });
+  const { control, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { status: "draft", title: "", credits: [], relatedArtists: [], relatedReleases: [] } });
   const credits = useFieldArray({ control, name: "credits" });
   useEffect(() => {
     Promise.all([adminListArtists(), adminListReleases()]).then(([people, catalogue]) => {
@@ -63,7 +63,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
         if (!response.ok) throw new Error("Error loading editorial");
         const data = await response.json();
         setValue("title", data.title || ""); setValue("slug", data.slug || ""); setValue("subtitle", data.subtitle || "");
-        setValue("status", data.status || "draft"); setValue("featured", Boolean(data.featured)); setValue("section", data.section || ""); setValue("series", data.series || "");
+        setValue("status", data.status || "draft"); setValue("section", data.section || ""); setValue("series", data.series || "");
         if (data.publishAt) setValue("publishAt", localDateTime(data.publishAt));
         const hero = typeof data.hero === "string" ? { url: data.hero } : data.hero || {};
         setValue("heroUrl", hero.url || data.heroUrl || ""); setValue("heroAlt", hero.alt || ""); setValue("heroCaption", hero.caption || ""); setValue("heroCredit", hero.credit || "");
@@ -138,11 +138,9 @@ export default function NewEditorialPage({ isEditMode = false }) {
   return (
     <main className="admin-page admin-form-page admin-wordpress-page">
       <div className="admin-form-container">
-        <header className="editor-workspace-header">
-          <PanelBackLink />
-          <h1>{pageTitle}</h1>
+        <AdminFormHeading title={pageTitle}>
           <a className="editor-settings-jump" href="#editorial-publicacion">Publicación ↓</a>
-        </header>
+        </AdminFormHeading>
         {loadError ? <p role="alert">{loadError}</p> : effectiveEditMode && loadingInitial ? <p className="admin-loading-state">Cargando editorial…</p> : (
           <form onSubmit={handleSubmit(onSubmit)} className="admin-form admin-editor-form admin-editorial-form">
             <div className="admin-editorial-layout">
@@ -193,7 +191,6 @@ export default function NewEditorialPage({ isEditMode = false }) {
                   <h2>Publicación</h2>
                   <div className="admin-field"><label className="form-label" htmlFor="editorial-status">Estado</label><select id="editorial-status" className="form-select" {...register("status")}><option value="draft">Borrador</option><option value="published">Publicada</option><option value="scheduled">Programada</option></select></div>
                   <div className="admin-field"><label className="form-label" htmlFor="editorial-date">Fecha de publicación</label><input id="editorial-date" type="datetime-local" step="1" required={currentStatus === "scheduled"} className="form-control" {...register("publishAt")} /></div>
-                  <label className="admin-switch"><input type="checkbox" {...register("featured")} /><span /><b>Marcar como destacada</b></label>
                   <button type="submit" className="btn admin-primary-action" disabled={isSubmitting || uploadingBlock}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar editorial" : currentStatus === "published" ? "Publicar editorial" : currentStatus === "scheduled" ? "Programar editorial" : "Guardar borrador"}</button>
                 </section>
 

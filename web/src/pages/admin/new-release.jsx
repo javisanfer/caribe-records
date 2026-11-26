@@ -1,4 +1,4 @@
-import PanelBackLink from "../../components/admin/panel-back-link";
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import React, { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -79,9 +79,8 @@ export default function NewReleasePage() {
   const pageTitle = isEditMode ? "Editar lanzamiento" : "Nuevo lanzamiento";
   return (
     <main className="admin-page admin-form-page">
-      <header className="admin-form-header"><PanelBackLink /></header>
       <div className="admin-form-container">
-        <div className="admin-form-intro"><h1>{pageTitle}</h1></div>
+        <AdminFormHeading title={pageTitle} />
         {loadError ? <p role="alert">{loadError}</p> : isEditMode && loadingRelease ? <p className="admin-loading-state">Cargando lanzamiento…</p> : (
           <form onSubmit={handleSubmit(onSubmit)} className="admin-form admin-editor-form">
             <div className="admin-editor-layout">

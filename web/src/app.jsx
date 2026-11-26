@@ -28,6 +28,7 @@ const NotFoundPage = lazy(() => import("./pages/not-found.jsx"));
 
 // Admin: keep the private editing tools out of the public initial download.
 const AdminDashboardPage = lazy(() => import("./pages/admin/admin-dashboard.jsx"));
+const EditCarousel = lazy(() => import("./pages/admin/edit-carousel.jsx"));
 const NewArtistPage = lazy(() => import("./pages/admin/new-artist.jsx"));
 const NewReleasePage = lazy(() => import("./pages/admin/new-release.jsx"));
 const NewEventPage = lazy(() => import("./pages/admin/new-event.jsx"));
@@ -295,6 +296,7 @@ function App() {
             }
           />
 
+          <Route path="/admin/portada" element={<PrivateRoute><PageLayout><EditCarousel /></PageLayout></PrivateRoute>} />
           <Route path="/admin/about" element={<PrivateRoute><PageLayout><EditAboutPage /></PageLayout></PrivateRoute>} />
           {/* ADMIN DASHBOARD */}
           <Route

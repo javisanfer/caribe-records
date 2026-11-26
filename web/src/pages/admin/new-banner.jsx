@@ -1,4 +1,4 @@
-import PanelBackLink from "../../components/admin/panel-back-link";
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -94,12 +94,10 @@ export default function NewBannerPage({ isEditMode = false }) {
 
   return (
     <main className="admin-page admin-form-page">
-      <header className="admin-form-header"><PanelBackLink /></header>
       <div className="admin-form-container">
-      <header className="admin-form-intro">
-        <h1>{isEditMode ? "Editar banner" : "Nuevo banner"}</h1>
+      <AdminFormHeading title={isEditMode ? "Editar banner" : "Nuevo banner"}>
         {isEditMode && <button type="button" className="admin-delete" onClick={remove}>Borrar banner</button>}
-      </header>
+      </AdminFormHeading>
       {loadError && <p className="admin-status admin-status--error">{loadError}</p>}
       {loading && <p>Cargando banner…</p>}
       {!loading && !loadError && <form className="admin-form row g-0" onSubmit={handleSubmit(onSubmit)}>

@@ -1,4 +1,4 @@
-import PanelBackLink from "../../components/admin/panel-back-link";
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 // src/pages/admin/new-event.jsx
 import React, { useEffect, useState } from "react";
@@ -199,15 +199,10 @@ export default function NewEventPage({ isEditMode = false }) {
   return (
     <main className="admin-page admin-form-page">
       {/* Header */}
-      <header className="admin-form-header">
-        <PanelBackLink />
-      </header>
 
       {/* Form */}
       <div className="admin-form-container">
-        <div className="admin-form-intro">
-          <h1>{titleLabel}</h1>
-        </div>
+        <AdminFormHeading title={titleLabel} />
 
         {loadError ? <p role="alert">{loadError}</p> : effectiveEditMode && loadingInitial ? (
           <p className="text-muted">Loading event…</p>

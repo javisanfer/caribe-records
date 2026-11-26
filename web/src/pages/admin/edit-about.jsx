@@ -1,4 +1,4 @@
-import PanelBackLink from "../../components/admin/panel-back-link";
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import React, { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { http, uploadImage } from "../../services/api-services";
@@ -38,9 +38,8 @@ export default function EditAboutPage() {
     } catch (error) { setMessage(error.response?.data?.message || "No se han podido guardar los cambios."); }
   }
   return <main className="admin-page admin-form-page">
-      <header className="admin-form-header"><PanelBackLink /></header>
       <div className="admin-form-container">
-    <div className="admin-form-intro"><h1>Editar About</h1></div>
+    <AdminFormHeading title="Editar About" />
     <p role="status" aria-live="polite">{message || (version === null ? "Cargando…" : "")}</p>
     {version !== null && <form className="admin-form" onSubmit={handleSubmit(save)}>
       <fieldset disabled={uploading || isSubmitting} className="admin-panel-fields admin-form-card">

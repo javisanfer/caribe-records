@@ -1,3 +1,4 @@
+import { cleanBiography } from "../../../utils/artist-biography";
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../../index.css";
@@ -112,7 +113,9 @@ export default function ArtistDetail({
             <p className="detail-section-label">Biografía</p>
             {artist.bio ? (
               <>
-                <p className={expandedBio ? "is-expanded" : ""}>{artist.bio}</p>
+                {artist.bioHtml
+                  ? <div className={`artist-bio-copy${expandedBio || artist.bio.length <= 430 ? " is-expanded" : ""}`} dangerouslySetInnerHTML={{ __html: cleanBiography(artist.bioHtml) }} />
+                  : <p className={expandedBio ? "is-expanded" : ""}>{artist.bio}</p>}
                 {artist.bio.length > 430 && (
                   <button className="artist-detail__more" onClick={() => setExpandedBio((value) => !value)}>
                     {expandedBio ? "Mostrar menos −" : "Seguir leyendo +"}

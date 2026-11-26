@@ -1,73 +1,10 @@
+import RichTextEditor from "./rich-text-editor";
 import EditorialPlayer from "../editorials/editorial-player";
 import { editorialEmbed } from "../../utils/editorial-embed";
 import { imageUrlInput } from "./image-url-input";
 import React, { useEffect, useRef, useState } from "react";
-import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
 import { uploadImage } from "../../services/api-services";
 import { createTextBlock, makeEditorialBlockId } from "./editorial-block-utils";
-
-const editorExtensions = [
-  StarterKit.configure({ heading: { levels: [2, 3] } }),
-  Placeholder.configure({ placeholder: "Empieza a escribir…" }),
-];
-
-function ToolButton({ active, label, title, onClick, disabled }) {
-  return <button type="button" className={active ? "is-active" : ""} aria-pressed={active}
-    aria-label={title} title={title} disabled={disabled}
-    onMouseDown={(event) => event.preventDefault()} onClick={onClick}>{label}</button>;
-}
-
-function RichTextBlock({ block, onChange }) {
-  const editor = useEditor({
-    extensions: editorExtensions,
-    content: block.text || "",
-    immediatelyRender: false,
-    onCreate: ({ editor: instance }) => {
-      const article = instance.view.dom.closest("article");
-      if (article && article === document.activeElement) instance.commands.focus("start");
-    },
-    editorProps: { attributes: { role: "textbox", "aria-multiline": "true", "aria-label": "Cuerpo del artículo" } },
-    onUpdate: ({ editor: currentEditor }) => onChange({ ...block, text: currentEditor.getHTML() }),
-  });
-  useEffect(() => {
-    if (editor && (block.text || !editor.isEmpty) && block.text !== editor.getHTML()) editor.commands.setContent(block.text || "", { emitUpdate: false });
-  }, [block.text, editor]);
-  if (!editor) return null;
-  return <div className="magazine-rich-block">
-    <FormatToolbar editor={editor} />
-    <EditorContent editor={editor} />
-  </div>;
-}
-
-function FormatToolbar({ editor }) {
-  const formatting = useEditorState({ editor, selector: ({ editor: e }) => e && ({
-    style: e.isActive("heading", { level: 2 }) ? "2" : e.isActive("heading", { level: 3 }) ? "3" : "p",
-    bold: e.isActive("bold"), italic: e.isActive("italic"), bullet: e.isActive("bulletList"),
-    numbered: e.isActive("orderedList"), undo: e.can().undo(), redo: e.can().redo(),
-  }) });
-  return (
-      <div className="magazine-toolbar" role="group" aria-label="Formato del texto">
-        <select aria-label="Estilo del texto" value={formatting.style} onChange={(event) => {
-          const chain = editor.chain().focus();
-          if (event.target.value === "p") chain.setParagraph().run();
-          else chain.setHeading({ level: Number(event.target.value) }).run();
-        }}>
-          <option value="p">Párrafo</option><option value="2">Título de sección</option><option value="3">Subtítulo</option>
-        </select>
-        <i aria-hidden="true" />
-        <ToolButton label={<strong>B</strong>} title="Negrita" active={formatting.bold} onClick={() => editor.chain().focus().toggleBold().run()} />
-        <ToolButton label={<em>I</em>} title="Cursiva" active={formatting.italic} onClick={() => editor.chain().focus().toggleItalic().run()} />
-        <ToolButton label="• Lista" title="Lista con viñetas" active={formatting.bullet} onClick={() => editor.chain().focus().toggleBulletList().run()} />
-        <ToolButton label="1. Lista" title="Lista numerada" active={formatting.numbered} onClick={() => editor.chain().focus().toggleOrderedList().run()} />
-        <ToolButton label="❝" title="Cita en el texto" onClick={() => editor.chain().focus().toggleBlockquote().run()} />
-        <i aria-hidden="true" />
-        <ToolButton label="↶" title="Deshacer escritura" disabled={!formatting.undo} onClick={() => editor.chain().focus().undo().run()} />
-        <ToolButton label="↷" title="Rehacer escritura" disabled={!formatting.redo} onClick={() => editor.chain().focus().redo().run()} />
-      </div>
-  );
-}
 
 const blockLabels = {
   paragraph: "Texto", heading: "Encabezado", image: "Imagen", gallery: "Galería",
@@ -197,7 +134,7 @@ export default function EditorialBlockEditor({ blocks, onChange, busy, setBusy }
               </div>
             </div>
             <div className="magazine-block__content">
-              {block.type === "paragraph" && <RichTextBlock block={block} onChange={(next) => updateBlock(index, next)} />}
+              {block.type === "paragraph" && <RichTextEditor label="Cuerpo del artículo" value={block.text} onChange={(text) => updateBlock(index, { ...block, text })} />}
               {block.type === "image" && <ImageBlock setBusy={setBusy} block={block} onChange={(next) => updateBlock(index, next)} />}
               {block.type === "heading" && <div className="admin-field-grid">
                 <label>Nivel<select value={block.level || 2} onChange={(event) => updateBlock(index, { ...block, level: Number(event.target.value) })}><option value={2}>H2</option><option value={3}>H3</option></select></label>

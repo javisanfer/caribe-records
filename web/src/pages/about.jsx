@@ -25,7 +25,7 @@ export default function AboutPage() {
           <span className="about-studio__mark" aria-hidden="true" />
         </div>
         <div className="about-studio__statement">
-          <span className="about-studio__index">El sello</span>
+          <span className="about-studio__index">Caribe Records</span>
           <div>
             {content.statement.split(/\n\s*\n/).map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </div>

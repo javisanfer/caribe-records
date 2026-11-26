@@ -119,6 +119,7 @@ exports.createArtists = async (req, res) => {
 exports.updateArtist = async (req, res) => {
   try {
     const updates = { ...req.body };
+    if (updates.bio !== undefined && updates.bioHtml === undefined) updates.bioHtml = "";
 
     // Si cambia el nombre → regenerar slug (a no ser que el user lo ponga a mano)
     if (updates.name && !updates.slug) {

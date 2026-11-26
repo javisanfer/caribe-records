@@ -21,12 +21,12 @@ export default function HomePage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/v1/editorials?featured=true&limit=5")
+    fetch("/api/v1/home-carousel")
       .then((res) => {
         if (!res.ok) throw new Error("Editorials unavailable");
         return res.json();
       })
-      .then((json) => (Array.isArray(json) ? json : json.data || []).filter((item) => item.featured).slice(0, 5))
+      .then((json) => Array.isArray(json) ? json : [])
       .catch(() => [])
       .then((items) => {
         if (active) setEditorials(items);

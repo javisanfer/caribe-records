@@ -70,7 +70,7 @@ async function main() {
         await page.getByRole("heading", { name: "Panel", exact: true }).waitFor();
         const paths = ["/", "/artistas", "/artistas/ferrocentro-club", "/editoriales", "/editorial/" + article,
           "/eventos", "/eventos/" + event.slug, "/releases", "/releases/" + releases[0]._id, "/about",
-          "/admin", "/admin/new-artist", "/admin/new-release", "/admin/new-editorial", "/admin/new-event", "/admin/new-banner", "/admin/about"];
+          "/admin", "/admin/new-artist", "/admin/new-release", "/admin/new-editorial", "/admin/new-event", "/admin/new-banner", "/admin/portada", "/admin/about"];
         for (const width of [375, 1280]) {
           await page.setViewportSize({ width, height: 850 });
           for (const path of paths) {
@@ -127,6 +127,25 @@ async function main() {
           await releaseChoice.waitFor();
           assert.equal(await releaseChoice.isChecked(), true);
 
+          await page.goto(base + "/admin");
+          const search = page.getByRole("searchbox", { name: "Buscar por título o nombre" });
+          await search.fill("asociaciones de catálogo qa");
+          await page.getByRole("link", { name: "Editar Asociaciones de catálogo QA" }).waitFor();
+          await page.getByRole("combobox", { name: "Última actualización" }).selectOption("oldest");
+          await page.getByRole("link", { name: "Carrusel de portada" }).click();
+          await page.getByRole("heading", { name: "Carrusel de portada" }).waitFor();
+
+          await page.goto(base + "/admin/edit-artist/ferrocentro-club");
+          const bio = page.getByRole("textbox", { name: "Biografía" });
+          await bio.fill("Una biografía de prueba.");
+          await bio.press("Control+a");
+          await page.getByRole("button", { name: "Negrita" }).click();
+          await page.getByRole("button", { name: "Actualizar artista" }).click();
+          await page.getByRole("heading", { name: "Panel", exact: true }).waitFor();
+          const profile = await fetch(api + "/api/v1/artists/slug/ferrocentro-club").then((r) => r.json());
+          assert.equal(profile.bio, "Una biografía de prueba.");
+          assert.match(profile.bioHtml, /<strong>Una biografía de prueba\.<\/strong>/);
+
           const edits = [
             ["artist", "ferrocentro-club", "city", "artists/slug/ferrocentro-club"],
             ["release", releases[0]._id, "country", "releases/" + releases[0]._id],
@@ -166,7 +185,7 @@ async function main() {
         // Solo se retira el anuncio temporal creado en esta iteración.
         await db.db().collection("banners").deleteOne({ title: "Banner QA " + engine });
         assert.deepEqual(errors, []);
-        console.log(engine, "OK: 17 rutas a 375 y 1280 px, About y banner con archivo");
+        console.log(engine, "OK: 18 rutas a 375 y 1280 px, About y banner con archivo");
       } finally { await browser.close(); }
     }
     assert.deepEqual(layoutFailures, [], "Desbordamientos horizontales");

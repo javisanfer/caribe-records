@@ -1,4 +1,6 @@
-import PanelBackLink from "../../components/admin/panel-back-link";
+import RichTextEditor from "../../components/admin/rich-text-editor";
+import { biographyForEditor, cleanBiography } from "../../utils/artist-biography";
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,7 +11,7 @@ import { imageUrlInput } from "../../components/admin/image-url-input";
 import { artistPhotoUrl } from "../../utils/artist-photo";
 import { artistLinks, serializeLinks } from "../../utils/artist-links";
 
-const defaults = { name: "", slug: "", city: "", country: "", bio: "", formedYear: "", rosterVisible: true,
+const defaults = { name: "", slug: "", city: "", country: "", bio: "", bioHtml: "", formedYear: "", rosterVisible: true,
   portraitUrl: "", coverUrl: "", genres: [], links: [] };
 
 const textRow = (value) => ({ value });
@@ -29,7 +31,7 @@ async function photoUrl(url, files) {
 export default function NewArtistPage({ isEditMode = false }) {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { register, control, reset, watch, handleSubmit, formState: { isSubmitting } } = useForm({ defaultValues: defaults });
+  const { register, control, reset, watch, setValue, handleSubmit, formState: { isSubmitting, dirtyFields } } = useForm({ defaultValues: defaults });
   const [loading, setLoading] = useState(isEditMode);
   const [loadError, setLoadError] = useState("");
   const [error, setError] = useState("");
@@ -40,7 +42,7 @@ export default function NewArtistPage({ isEditMode = false }) {
     adminGetArtist(slug).then((artist) => {
       if (!active) return;
       reset({
-        ...defaults, name: artist.name, slug: artist.slug, bio: artist.bio || "", country: artist.country || "",
+        ...defaults, name: artist.name, slug: artist.slug, bio: artist.bio || "", bioHtml: biographyForEditor(artist), country: artist.country || "",
         city: artist.city || "", formedYear: artist.formedYear || "", rosterVisible: artist.rosterVisible !== false,
         portraitUrl: artistPhotoUrl(artist.photos?.portraitUrl ?? artist.portraitUrl) || "",
         coverUrl: artistPhotoUrl(artist.photos?.coverUrl ?? artist.coverUrl) || "",
@@ -57,7 +59,8 @@ export default function NewArtistPage({ isEditMode = false }) {
     try {
       const payload = {
         name: data.name.trim(), slug: data.slug.trim() || undefined,
-        country: data.country.trim(), city: data.city.trim(), bio: data.bio.trim(),
+        country: data.country.trim(), city: data.city.trim(),
+        ...(!isEditMode || dirtyFields.bioHtml || dirtyFields.bio ? { bio: data.bio.trim(), bioHtml: cleanBiography(data.bioHtml) } : {}),
         formedYear: data.formedYear || null, rosterVisible: data.rosterVisible,
         genres: data.genres.map((row) => row.value.trim()).filter(Boolean),
         photos: { portraitUrl: await photoUrl(data.portraitUrl, data.portraitFile), coverUrl: await photoUrl(data.coverUrl, data.coverFile) },
@@ -76,9 +79,8 @@ export default function NewArtistPage({ isEditMode = false }) {
   }
 
   return <main className="admin-page admin-form-page">
-    <header className="admin-form-header"><PanelBackLink /></header>
     <div className="admin-form-container">
-      <div className="admin-form-intro"><h1>{isEditMode ? "Editar artista" : "Nuevo artista"}</h1></div>
+      <AdminFormHeading title={isEditMode ? "Editar artista" : "Nuevo artista"} />
       {loading ? <p>Cargando artista…</p> : loadError ? <p role="alert">{loadError}</p> :
         <form className="admin-form admin-editor-form" onSubmit={handleSubmit(save)}>
           <div className="admin-editor-layout"><div className="admin-editor-main">
@@ -87,7 +89,13 @@ export default function NewArtistPage({ isEditMode = false }) {
                 {[["name", "Nombre"], ["slug", "Slug"], ["city", "Ciudad"], ["country", "País"], ["formedYear", "Año de formación"]].map(([key, label]) =>
                   <label key={key} className="admin-field">{label}<input className="form-control" type={key === "formedYear" ? "number" : "text"} required={key === "name"} {...register(key)} /></label>)}
               </div>
-              <label className="admin-field">Biografía<textarea className="form-control admin-writing-area" rows={9} {...register("bio")} /></label>
+              <div className="artist-bio-editor">
+                <h3>Biografía</h3>
+                <RichTextEditor label="Biografía" value={watch("bioHtml")} onChange={(html, text) => {
+                  setValue("bioHtml", html, { shouldDirty: true });
+                  setValue("bio", text, { shouldDirty: true });
+                }} />
+              </div>
             </section>
             <section className="admin-form-card"><h2>Fotografías</h2><div className="admin-field-grid admin-field-grid--2">
               {[["portrait", "Retrato"], ["cover", "Cabecera"]].map(([key, label]) => <div key={key}>
