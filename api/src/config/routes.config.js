@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const createError = require("http-errors");
 const { rateLimit } = require("express-rate-limit");
 
@@ -8,7 +7,6 @@ const router = express.Router();
 // -------------------- Middlewares --------------------
 const auth = require("../middlewares/session.middleware");
 const upload = require("../config/storage.config");
-const { normalizeUploadError } = require("../config/upload-error.config");
 
 const adminRateLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -30,6 +28,12 @@ const authenticationRateLimit = rateLimit({
   },
 });
 
+router.use((req, res, next) => {
+  if (Object.values(req.query).some((value) => typeof value !== "string")) {
+    return res.status(400).json({ message: "Los filtros deben ser valores individuales" });
+  }
+  next();
+});
 router.use(auth.loadSessionUser);
 
 // -------------------- Controllers --------------------
@@ -51,8 +55,19 @@ router.patch("/users/me", auth.isAuthenticated, users.update);
 router.get("/users/me", auth.isAuthenticated, users.profile);
 router.get("/users/:id/validate", authenticationRateLimit, users.validate);
 router.post("/users/complete-invite", authenticationRateLimit, users.completeInvite);
+const passwordResetRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+router.post("/users/password-reset/request", passwordResetRateLimit, users.requestPasswordReset);
+router.post("/users/password-reset/complete", authenticationRateLimit, users.completePasswordReset);
 
 // Sesiones
+router.get("/sessions/current", (req, res) => {
+  res.set("Cache-Control", "no-store").json(req.user || null);
+});
 router.post("/sessions", authenticationRateLimit, sessions.create);
 router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
 
@@ -68,6 +83,23 @@ router.use(
   auth.isAuthenticated,
   auth.isAdmin,
 );
+
+const about = require("../controllers/about.controller");
+const aboutReadLimit = rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false });
+router.get("/about", aboutReadLimit, about.get);
+router.get("/admin/about", adminRateLimit, about.get);
+router.put("/admin/about", adminRateLimit, about.update);
+
+const carousel = require("../controllers/home-carousel.controller");
+const carouselReadLimit = rateLimit({
+  windowMs: 60_000,
+  limit: 120,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+router.get("/home-carousel", carouselReadLimit, carousel.publicList);
+router.get("/admin/home-carousel", adminRateLimit, carousel.adminList);
+router.put("/admin/home-carousel", adminRateLimit, carousel.update);
 
 router.get("/admin/activity", adminRateLimit, adminController.getActivity);
 
@@ -88,11 +120,13 @@ router.get(
 // Público
 router.get("/artists", artistController.getArtists);
 
+const artistProfileReadLimit = rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false });
+
 // slug FIRST
-router.get("/artists/slug/:slug", artistController.getArtistBySlug);
+router.get("/artists/slug/:slug", artistProfileReadLimit, artistController.getArtistBySlug);
 
 // id AFTER
-router.get("/artists/:id", artistController.getArtistById);
+router.get("/artists/:id", artistProfileReadLimit, artistController.getArtistById);
 
 // Admin
 router.get("/admin/artists", adminRateLimit, artistController.getArtists);
@@ -253,6 +287,17 @@ router.delete("/admin/banners/:id", adminRateLimit, bannerController.deleteBanne
 // UPLOADS GENERIC
 // ======================================================
 
+if (upload.localDirectory) {
+  router.use("/uploads", express.static(upload.localDirectory, {
+    index: false,
+    redirect: false,
+    setHeaders: (res) => {
+      res.set("X-Content-Type-Options", "nosniff");
+      res.set("Content-Security-Policy", "default-src 'none'");
+    },
+  }));
+}
+
 router.post(
   "/upload",
   auth.isAuthenticated,
@@ -265,7 +310,7 @@ router.post(
         .status(400)
         .json({ message: "No se ha subido ninguna imagen" });
     }
-    res.status(200).json({ imageUrl: req.file.path });
+    res.status(200).json({ imageUrl: upload.imageUrlFor(req.file) });
   },
 );
 
@@ -274,29 +319,5 @@ router.post(
 // ======================================================
 
 router.use((req, res, next) => next(createError(404, "Route not found")));
-
-router.use((error, req, res, next) => {
-  error = normalizeUploadError(error);
-
-  if (error instanceof mongoose.Error.CastError && error.message.includes("_id")) {
-    error = createError(404, "Resource not found");
-  } else if (error instanceof mongoose.Error.ValidationError) {
-    error = createError(400, error.message);
-  } else if (!error.status) {
-    error = createError(500, error.message);
-  }
-
-  console.error(error);
-
-  const data = { message: error.message };
-  if (error.errors) {
-    data.errors = Object.keys(error.errors).reduce((errors, key) => {
-      errors[key] = error.errors[key]?.message || error.errors[key];
-      return errors;
-    }, {});
-  }
-
-  res.status(error.status).json(data);
-});
 
 module.exports = router;

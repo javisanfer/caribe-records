@@ -34,8 +34,8 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test
-      - name: Audit production dependencies
-        run: npm audit --omit=dev --audit-level=high
+      - name: Audit runtime and development dependencies
+        run: npm audit --audit-level=high
 
   api-container:
     name: API container
@@ -69,8 +69,8 @@ jobs:
         run: npm run lint
       - name: Build QA configuration
         run: npm run build -- --mode test
-      - name: Audit production dependencies
-        run: npm audit --omit=dev --audit-level=high
+      - name: Audit runtime and development dependencies
+        run: npm audit --audit-level=high
 
   pull-request-policy:
     name: Pull request policy
@@ -98,11 +98,37 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Accept develop or hotfix branches only
+      - name: Accept integration, release, or hotfix branches
         env:
           HEAD_REF: ${{ github.head_ref }}
         run: |
-          if [[ "$HEAD_REF" != "develop" && "$HEAD_REF" != codex/hotfix-* ]]; then
-            echo "Production PRs must come from develop or codex/hotfix-*"
+          if [[ "$HEAD_REF" != "develop" && "$HEAD_REF" != codex/release-* && "$HEAD_REF" != codex/hotfix-* ]]; then
+            echo "Production PRs must come from develop, codex/release-*, or codex/hotfix-*"
             exit 1
           fi
+
+  browser-qa:
+    name: CMS and responsive browser tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.20.0
+      - run: npm ci --prefix api && npm ci --prefix web && npm run build --prefix web
+      - name: Install isolated browser test tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/caribe-qa" --no-audit --no-fund playwright@1.56.1
+          "$RUNNER_TEMP/caribe-qa/node_modules/.bin/playwright" install --with-deps chromium firefox webkit
+      - name: Test production build with disposable content
+        run: NODE_PATH="$RUNNER_TEMP/caribe-qa/node_modules" node api/scripts/review-browser.cjs
+      - name: Test consent and audience measurement with intercepted requests
+        run: |
+          npm run build --prefix web -- --mode analytics-test
+          NODE_PATH="$RUNNER_TEMP/caribe-qa/node_modules" node api/scripts/review-analytics.cjs

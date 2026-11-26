@@ -1,23 +1,13 @@
+import EditorialShare from "../editorial-share";
+import EditorialPlayer from "../editorial-player";
 import React, { useEffect, useState } from "react";
+import { editorialEmbed } from "../../../utils/editorial-embed";
 import DOMPurify from "dompurify";
 import { Link } from "react-router-dom";
 import "../../../index.css";
 
 function getBlockImage(block) {
   return block.image || (block.url ? block : null);
-}
-
-function getSafeEmbedUrl(value) {
-  if (!value || typeof value !== "string") return null;
-  const iframeSource = value.match(/src=["']([^"']+)["']/i)?.[1];
-  const candidate = iframeSource || value.trim();
-  try {
-    const url = new URL(candidate);
-    const allowedHosts = ["www.youtube.com", "youtube.com", "www.youtube-nocookie.com", "open.spotify.com"];
-    return url.protocol === "https:" && allowedHosts.includes(url.hostname) ? url.toString() : null;
-  } catch {
-    return null;
-  }
 }
 
 export default function EditorialDetail({ editorial, prevNext }) {
@@ -37,7 +27,9 @@ export default function EditorialDetail({ editorial, prevNext }) {
         year: "numeric",
       })
     : null;
-  const section = editorial.section || editorial.series || "Editorial";
+  const author = editorial.credits?.filter((credit) => /autor|author/i.test(credit.role)).map((credit) => credit.name).filter(Boolean).join(", ") || editorial.author?.name;
+  const artistNames = new Set(editorial.relatedArtists?.map((artist) => artist.name?.toLowerCase()));
+  const tags = editorial.tags?.filter((tag) => !artistNames.has(tag.toLowerCase()));
   const hasMeta = created || editorial.readingTime || editorial.wordCount;
 
   return (
@@ -54,9 +46,6 @@ export default function EditorialDetail({ editorial, prevNext }) {
           />
         )}
         <div className="editorial-detail__veil" aria-hidden="true" />
-        <div className="editorial-detail__masthead-top">
-          <span>CR / ED</span>
-        </div>
         <div className="editorial-detail__headline">
           <h1>{editorial.title}</h1>
           {editorial.subtitle && <p>{editorial.subtitle}</p>}
@@ -68,12 +57,7 @@ export default function EditorialDetail({ editorial, prevNext }) {
 
       <div className="editorial-detail__layout" id="leer">
         <aside className="editorial-detail__meta" aria-label="Datos del artículo">
-          <p className="editorial-detail__eyebrow">{section}</p>
-          {editorial.credits?.find((credit) => /autor|author/i.test(credit.role || ""))?.name && (
-            <p className="editorial-detail__byline">
-              Texto de {editorial.credits.find((credit) => /autor|author/i.test(credit.role || ""))?.name}
-            </p>
-          )}
+          {author && <p className="editorial-detail__byline">Texto de {author}</p>}
           {hasMeta && (
             <dl>
               {created && <div><dt>Publicado</dt><dd>{created}</dd></div>}
@@ -81,9 +65,9 @@ export default function EditorialDetail({ editorial, prevNext }) {
               {editorial.wordCount > 0 && <div><dt>Extensión</dt><dd>{editorial.wordCount} palabras</dd></div>}
             </dl>
           )}
-          {editorial.tags?.length > 0 && (
+          {tags?.length > 0 && (
             <ul className="editorial-detail__tags" aria-label="Etiquetas">
-              {editorial.tags.map((tag) => <li key={tag}>{tag}</li>)}
+              {tags.map((tag) => <li key={tag}>{tag}</li>)}
             </ul>
           )}
         </aside>
@@ -106,7 +90,7 @@ export default function EditorialDetail({ editorial, prevNext }) {
               if (!image?.url) return null;
               return (
                 <figure key={key} className="editorial-body__media">
-                  <img src={image.url} alt={image.alt || ""} />
+                  <img loading="lazy" decoding="async" width={image.width} height={image.height} src={image.url} alt={image.alt || ""} />
                   {(image.caption || image.credit) && (
                     <figcaption>
                       {image.caption}{image.caption && image.credit ? " · " : ""}{image.credit}
@@ -129,7 +113,7 @@ export default function EditorialDetail({ editorial, prevNext }) {
                 <div key={key} className="editorial-body__gallery">
                   {block.gallery.map((image, imageIndex) => (
                     <figure key={`${image.url}-${imageIndex}`}>
-                      <img src={image.url} alt={image.alt || ""} />
+                      <img loading="lazy" decoding="async" width={image.width} height={image.height} src={image.url} alt={image.alt || ""} />
                       {(image.caption || image.credit) && <figcaption>{image.caption || image.credit}</figcaption>}
                     </figure>
                   ))}
@@ -137,22 +121,23 @@ export default function EditorialDetail({ editorial, prevNext }) {
               );
             }
             if (block.type === "embed" && block.embed) {
-              const embedUrl = getSafeEmbedUrl(block.embed);
-              if (embedUrl) {
+              const media = editorialEmbed(block.embed);
+              if (media?.src) {
                 return (
                   <div key={key} className="editorial-body__embed">
-                    <iframe src={embedUrl} title="Contenido multimedia del artículo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
+                    <EditorialPlayer media={media} />
                   </div>
                 );
               }
-              return (
+              return media?.href && (
                 <p key={key} className="editorial-body__external">
-                  <a href={block.embed} target="_blank" rel="noreferrer">Ver contenido externo ↗</a>
+                  <a href={media.href} target="_blank" rel="noreferrer">Ver contenido externo ↗</a>
                 </p>
               );
             }
             return null;
           })}
+          <EditorialShare key={editorial.slug} slug={editorial.slug} title={editorial.title} />
         </section>
       </div>
 

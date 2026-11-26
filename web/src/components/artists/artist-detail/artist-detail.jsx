@@ -1,19 +1,19 @@
+import ListenLink from "../../releases/listen-link";
+import { releaseListenUrl } from "../../../utils/release-listen-url";
+import { cleanBiography } from "../../../utils/artist-biography";
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../../index.css";
+import "./julia-garblan.css";
 import { sortReleases } from "../../../utils/release-order";
+
+import { artistPhotoUrl } from "../../../utils/artist-photo";
+import { artistLinks } from "../../../utils/artist-links";
 
 const LINK_GROUPS = [
   ["links", "Enlaces"],
   ["streaming", "Escucha"],
 ];
-
-function humanizeLabel(label) {
-  if (label === "x") return "Twitter";
-  return label
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/^./, (character) => character.toUpperCase());
-}
 
 function formatEventDate(value) {
   if (!value) return "Próximamente";
@@ -34,10 +34,6 @@ function releaseFormat(format) {
   return "Lanzamiento";
 }
 
-function releaseUrl(release) {
-  return release.spotifyUrl || release.bandcampUrl || release.appleMusicUrl || "";
-}
-
 export default function ArtistDetail({
   artist,
   prevNext,
@@ -48,7 +44,7 @@ export default function ArtistDetail({
   const [tab, setTab] = useState("overview");
   const [expandedBio, setExpandedBio] = useState(false);
   const [heroRatio, setHeroRatio] = useState(4 / 3);
-  const [failedHeroImage, setFailedHeroImage] = useState(null);
+  const [failedPhotoUrls, setFailedPhotoUrls] = useState([]);
   const sortedReleases = useMemo(() => sortReleases(releases), [releases]);
 
   const releasesByYear = useMemo(() => {
@@ -63,19 +59,19 @@ export default function ArtistDetail({
 
   if (!artist) return null;
 
-  const heroImage = artist.photos?.coverUrl || artist.photos?.portraitUrl || artist.image?.url;
-  const hasHeroImage = Boolean(heroImage && failedHeroImage !== heroImage);
-  const portraitImage = artist.photos?.portraitUrl || artist.image?.url || artist.photos?.coverUrl;
+  const photos = [artist.photos?.coverUrl, artist.photos?.portraitUrl, artist.image?.url].map(artistPhotoUrl);
+  const heroImage = photos.find((url) => url && !failedPhotoUrls.includes(url));
+  const hasHeroImage = Boolean(heroImage);
+  const portraitImage = photos[1] && !failedPhotoUrls.includes(photos[1]) ? photos[1] : null;
+  const profileLinks = artistLinks(artist);
   const links = {
-    links: [
-      ...Object.entries(artist.social || {}),
-      ...Object.entries(artist.web || {}),
-    ].filter(([, url]) => Boolean(url)),
-    streaming: Object.entries(artist.streaming || {}).filter(([, url]) => Boolean(url)),
+    links: profileLinks.filter((link) => link.group !== "streaming"),
+    streaming: profileLinks.filter((link) => link.group === "streaming"),
   };
   const hasAnyLinks = Object.values(links).some((group) => group.length > 0);
   const validEvents = events.filter((event) => event && (event.title || event.city || event.venue));
   const location = [artist.city, artist.country].filter(Boolean).join(", ");
+  const members = artist.members || [];
 
   return (
     <main
@@ -91,8 +87,7 @@ export default function ArtistDetail({
             {artist.formedYear && <span>Desde {artist.formedYear}</span>}
           </div>
         </div>
-        <div className={`artist-detail__visual ${hasHeroImage ? "" : "is-empty"}`}>
-          {hasHeroImage ? (
+        {hasHeroImage && <div className="artist-detail__visual">
             <img
               src={heroImage}
               alt={artist.name}
@@ -100,15 +95,14 @@ export default function ArtistDetail({
                 const { naturalWidth, naturalHeight } = event.currentTarget;
                 if (naturalWidth && naturalHeight) setHeroRatio(naturalWidth / naturalHeight);
               }}
-              onError={() => setFailedHeroImage(heroImage)}
+              onError={() => setFailedPhotoUrls((urls) => [...urls, heroImage])}
             />
-          ) : <span>CR</span>}
-        </div>
+        </div>}
       </header>
 
       <nav className="artist-detail__tabs" aria-label="Contenido del artista">
         <button className={tab === "overview" ? "is-active" : ""} aria-pressed={tab === "overview"} onClick={() => setTab("overview")}>↳ Perfil</button>
-        <button className={tab === "releases" ? "is-active" : ""} aria-pressed={tab === "releases"} onClick={() => setTab("releases")}>↳ Discografía</button>
+        <button className={tab === "releases" ? "is-active" : ""} aria-pressed={tab === "releases"} onClick={() => setTab("releases")}>↳ Catálogo</button>
         <button className={tab === "links" ? "is-active" : ""} aria-pressed={tab === "links"} onClick={() => setTab("links")} disabled={!hasAnyLinks}>↳ Enlaces</button>
       </nav>
 
@@ -118,14 +112,23 @@ export default function ArtistDetail({
             <p className="detail-section-label">Biografía</p>
             {artist.bio ? (
               <>
-                <p className={expandedBio ? "is-expanded" : ""}>{artist.bio}</p>
+                {artist.bioHtml
+                  ? <div className={`artist-bio-copy${expandedBio || artist.bio.length <= 430 ? " is-expanded" : ""}`} dangerouslySetInnerHTML={{ __html: cleanBiography(artist.bioHtml) }} />
+                  : <p className={expandedBio ? "is-expanded" : ""}>{artist.bio}</p>}
                 {artist.bio.length > 430 && (
-                  <button className="artist-detail__more" onClick={() => setExpandedBio((value) => !value)}>
+                  <button className="artist-detail__more" aria-expanded={expandedBio} onClick={() => setExpandedBio((value) => !value)}>
                     {expandedBio ? "Mostrar menos −" : "Seguir leyendo +"}
                   </button>
                 )}
               </>
             ) : <p className="artist-detail__empty-copy">Biografía próximamente.</p>}
+            {members.length > 1 && <p>{members.join(" · ")}</p>}
+            {artist.gallery?.length > 0 && <div className="artist-profile-gallery">
+              {artist.gallery.map((image, index) => <figure key={index}>
+                <img src={image.url} alt={image.alt || ""} loading="lazy" />
+                {image.caption && <figcaption>{image.caption}</figcaption>}
+              </figure>)}
+            </div>}
           </section>
 
           <aside className="artist-detail__rail">
@@ -134,8 +137,8 @@ export default function ArtistDetail({
               <section key={key}>
                 <p className="detail-section-label">{title}</p>
                 <ul>
-                  {links[key].map(([label, url]) => (
-                    <li key={label}><a href={url} target="_blank" rel="noreferrer">↳ {humanizeLabel(label)}</a></li>
+                  {links[key].map(({ label, url }, index) => (
+                    <li key={index}><a data-outbound={key === "streaming" ? "listen" : undefined} href={url} target="_blank" rel="noreferrer">↳ {label}</a></li>
                   ))}
                 </ul>
               </section>
@@ -147,7 +150,7 @@ export default function ArtistDetail({
       {tab === "releases" && (
         <section className="artist-detail__catalogue">
           <div className="artist-detail__catalogue-heading">
-            <p className="detail-section-label">Discografía</p>
+            <p className="detail-section-label">Catálogo</p>
             <span>{String(releases.length).padStart(2, "0")}</span>
           </div>
           {releasesByYear.length ? releasesByYear.map(([year, items]) => (
@@ -155,19 +158,17 @@ export default function ArtistDetail({
               <h2>{year}</h2>
               <div>
                 {items.map((release) => (
-                  <a
+                  <ListenLink
                     className="artist-release"
-                    href={releaseUrl(release) || undefined}
-                    target={releaseUrl(release) ? "_blank" : undefined}
-                    rel={releaseUrl(release) ? "noopener noreferrer" : undefined}
+                    href={releaseListenUrl(release) || undefined}
                     key={release._id}
                   >
                     {(release.cover?.url || release.cover_image) ? (
                       <img src={release.cover?.url || release.cover_image} alt={release.cover?.alt || release.title} />
-                    ) : <span className="artist-release__placeholder">CR</span>}
+                    ) : <span className="artist-release__placeholder" aria-hidden="true" />}
                     <span className="artist-release__name">{release.title}</span>
-                    <small>{releaseFormat(release.format)}{releaseUrl(release) ? " ↗" : ""}</small>
-                  </a>
+                    <small>{releaseFormat(release.format)}{releaseListenUrl(release) ? " ↗" : ""}</small>
+                  </ListenLink>
                 ))}
               </div>
             </div>
@@ -180,8 +181,8 @@ export default function ArtistDetail({
           {LINK_GROUPS.map(([key, title]) => links[key].length > 0 && (
             <div key={key}>
               <p className="detail-section-label">{title}</p>
-              {links[key].map(([label, url]) => (
-                <a href={url} target="_blank" rel="noreferrer" key={label}><span>{humanizeLabel(label)}</span><span>↗</span></a>
+              {links[key].map(({ label, url }, index) => (
+                <a data-outbound={key === "streaming" ? "listen" : undefined} href={url} target="_blank" rel="noreferrer" key={index}><span>{label}</span><span>↗</span></a>
               ))}
             </div>
           ))}
@@ -192,12 +193,12 @@ export default function ArtistDetail({
         <section className="artist-detail__related">
           {releases.length > 0 && (
             <div className="artist-related-block">
-              <p className="detail-section-label">Últimos lanzamientos</p>
+              <p className="detail-section-label">Catálogo</p>
               {sortedReleases.slice(0, 4).map((release) => {
-                const listenUrl = releaseUrl(release);
+                const listenUrl = releaseListenUrl(release);
                 const content = <><span>{release.title}</span><small>{releaseFormat(release.format)} · {release.release_date?.slice(0, 4) || "—"}{listenUrl ? " ↗" : ""}</small></>;
                 return listenUrl ? (
-                  <a href={listenUrl} target="_blank" rel="noopener noreferrer" key={release._id}>{content}</a>
+                  <a data-outbound="listen" href={listenUrl} target="_blank" rel="noopener noreferrer" key={release._id}>{content}</a>
                 ) : (
                   <div className="artist-related-block__unavailable" key={release._id}>{content}</div>
                 );
@@ -221,7 +222,7 @@ export default function ArtistDetail({
                 );
                 const content = <><span>{event.title || event.venue}</span><small>{formatEventDate(event.date)} · {ticketUrl ? "Entradas ↗" : "Entradas próximamente"}</small></>;
                 return ticketUrl ? (
-                  <a href={ticketUrl} target="_blank" rel="noopener noreferrer" key={event._id}>{content}</a>
+                  <a data-outbound="ticket" href={ticketUrl} target="_blank" rel="noopener noreferrer" key={event._id}>{content}</a>
                 ) : (
                   <div className="artist-related-block__unavailable" key={event._id}>{content}</div>
                 );

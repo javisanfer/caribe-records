@@ -33,3 +33,14 @@ test("permite continuar a un usuario con rol admin", async () => {
   assert.equal(await runMiddleware(isAuthenticated, request), undefined);
   assert.equal(await runMiddleware(isAdmin, request), undefined);
 });
+
+test("una cuenta desactivada pierde su sesión en la siguiente petición", async (t) => {
+  const User = require("../src/models/user.model");
+  const { loadSessionUser } = require("../src/middlewares/session.middleware");
+  t.mock.method(User, "findById", async () => ({ active: false, role: "admin" }));
+  let destroyed = false;
+  const req = { session: { userId: "local", destroy(callback) { destroyed = true; callback(); } } };
+  await runMiddleware(loadSessionUser, req);
+  assert.equal(destroyed, true);
+  assert.equal((await runMiddleware(isAuthenticated, req)).status, 401);
+});

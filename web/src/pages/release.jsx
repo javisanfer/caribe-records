@@ -1,8 +1,9 @@
+import { releaseArtistCredit } from "../utils/release-artists";
+import { releaseListenUrl } from "../utils/release-listen-url";
 import React, { useEffect, useState } from "react";
 import ReleaseList from "../components/releases/release-list/release-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 import SiteLoader from "../components/ui/site-loader.jsx";
-import { withCuratedReleases } from "../data/curated-releases.js";
 
 export default function ReleasePage() {
   const [releases, setReleases] = useState([]);
@@ -24,17 +25,14 @@ export default function ReleasePage() {
         const data = await res.json();
 
         // 🔧 Normalización para adaptarlo a ReleaseList / ReleaseItem
-        const normalized = withCuratedReleases(data || []).map((r, idx) => {
+        const normalized = (data || []).map((r, idx) => {
           const artistObj = r.artist;
 
-          const artistName =
-            typeof artistObj === "string"
-              ? artistObj
-              : artistObj?.name || r.artistName || "Unknown Artist";
+          const artistName = releaseArtistCredit(r) || "Artista por confirmar";
 
           return {
             id: r._id || idx,
-            managed: !String(r._id || "").startsWith("curated-"),
+            managed: true,
 
             // datos “bonitos” para el front
             artistName,
@@ -66,11 +64,9 @@ export default function ReleasePage() {
             })),
 
             // label / catálogo
-            label: r.labelName || (typeof r.label === "object" ? r.label?.name : r.label) || "",
+            label: r.labelName || r.label?.name || "",
             catalogType: r.catalogType || "own",
-            spotifyUrl: r.spotifyUrl || "",
-            bandcampUrl: r.bandcampUrl || "",
-            appleMusicUrl: r.appleMusicUrl || "",
+            listenUrl: releaseListenUrl(r),
             catalog: r.catalog || r.catNo || null,
           };
         });
@@ -90,7 +86,7 @@ export default function ReleasePage() {
   return (
     <PublicIndexPage
       className="release-page"
-      title="Discografía"
+      title="Catálogo"
       count={loading ? null : releases.length}
       countLabel="referencias"
     >

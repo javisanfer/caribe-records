@@ -1,9 +1,15 @@
+import AdminFormHeading from "../../components/admin/admin-form-heading";
+import { imageUrlInput } from "../../components/admin/image-url-input";
 // src/pages/admin/new-event.jsx
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { adminListArtists, adminCreateEvent, uploadImage } from "../../services/api-services";
 import AdminImagePreview from "../../components/admin/admin-image-preview";
+
+import { localDateTime } from "../../utils/local-datetime";
+
+import AdminRelations from "../../components/admin/admin-relations";
 
 const API_BASE = "/api/v1";
 
@@ -17,11 +23,12 @@ export default function NewEventPage({ isEditMode = false }) {
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({ defaultValues: { isActive: true, lineup: [] } });
 
   const [artists, setArtists] = useState([]);
   const [loadingInitial, setLoadingInitial] = useState(isEditMode);
 
+  const [loadError, setLoadError] = useState("");
   const effectiveEditMode = isEditMode && !!slug;
   const posterUrl = watch("posterUrl") || "";
 
@@ -68,22 +75,21 @@ export default function NewEventPage({ isEditMode = false }) {
         setValue("country", data.country || "");
         setValue("address", data.address || "");
         setValue("ticketUrl", data.ticketUrl || "");
+        setValue("isActive", data.isActive !== false);
+        setValue("artistName", data.artistName || "");
+        setValue("sourceUrl", data.sourceUrl || "");
         setValue("description", data.description || "");
         setValue("posterUrl", data.posterUrl || "");
 
         // Fecha → datetime-local
         if (data.date) {
-          setValue("datetime", data.date.slice(0, 16));
+          setValue("datetime", localDateTime(data.date));
         }
 
-        // Artist principal = lineup[0]
-        const mainArtist = data.lineup?.[0];
-        const artistId =
-          typeof mainArtist === "string" ? mainArtist : mainArtist?._id;
-        if (artistId) setValue("artistId", artistId);
+        setValue("lineup", (data.lineup || []).map((artist) => artist._id || artist));
       } catch (err) {
         console.error(err);
-        alert("Error loading event");
+        setLoadError("No se pudo cargar el evento.");
       } finally {
         setLoadingInitial(false);
       }
@@ -117,7 +123,8 @@ export default function NewEventPage({ isEditMode = false }) {
         ticketUrl: data.ticketUrl?.trim() || "",
         description: data.description?.trim() || "",
         posterUrl: nextPosterUrl,
-        lineup: data.artistId ? [data.artistId] : [],
+        lineup: data.lineup || [],
+        artistName: data.artistName.trim(), sourceUrl: data.sourceUrl.trim(), isActive: data.isActive,
       };
 
       if (!effectiveEditMode) {
@@ -187,76 +194,62 @@ export default function NewEventPage({ isEditMode = false }) {
     }
   };
 
-  const headerLabel = effectiveEditMode ? "Editar evento" : "Nuevo evento";
   const titleLabel = effectiveEditMode ? "Editar evento" : "Nuevo evento";
 
   return (
     <main className="admin-page admin-form-page">
       {/* Header */}
-      <header className="admin-form-header">
-        <button
-          type="button"
-          className="admin-back"
-          onClick={() => navigate(-1)}
-        >
-          ← Panel
-        </button>
-        <span>
-          Caribe Records · {headerLabel}
-        </span>
-        <span />
-      </header>
 
       {/* Form */}
       <div className="admin-form-container">
-        <div className="admin-form-intro">
-          <div><p>Eventos / {effectiveEditMode ? "Editar" : "Crear"}</p><h1>{titleLabel}</h1></div>
-          <span>Organiza los datos como los verá quien busca fecha, lugar y entradas.</span>
-        </div>
+        <AdminFormHeading title={titleLabel} />
 
-        {effectiveEditMode && loadingInitial ? (
+        {loadError ? <p role="alert">{loadError}</p> : effectiveEditMode && loadingInitial ? (
           <p className="text-muted">Loading event…</p>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="admin-form admin-editor-form">
             <div className="admin-editor-layout">
               <div className="admin-editor-main">
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>01</span><div><h2>Evento</h2><p>Qué ocurre y quién actúa.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Evento</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
-                    <div className="admin-field admin-field--wide"><label className="form-label">Título <b>Obligatorio</b></label><input className={`form-control ${errors.title ? "is-invalid" : ""}`} placeholder="Nombre del evento" {...register("title", { required: "Escribe el título del evento" })} />{errors.title && <div className="invalid-feedback">{errors.title.message}</div>}</div>
-                    <div className="admin-field"><label className="form-label">Artista <b>Obligatorio</b></label><select className={`form-select ${errors.artistId ? "is-invalid" : ""}`} {...register("artistId", { required: "Selecciona un artista" })}><option value="">Seleccionar artista…</option>{artists.map((artist) => <option key={artist._id} value={artist._id}>{artist.name}</option>)}</select>{errors.artistId && <div className="invalid-feedback">{errors.artistId.message}</div>}</div>
-                    <div className="admin-field"><label className="form-label">Fecha y hora <b>Obligatorio</b></label><input type="datetime-local" className={`form-control ${errors.datetime ? "is-invalid" : ""}`} {...register("datetime", { required: "Selecciona fecha y hora" })} />{errors.datetime && <div className="invalid-feedback">{errors.datetime.message}</div>}</div>
+                    <div className="admin-field admin-field--wide"><label htmlFor="new-event-title" className="form-label">Título <b>Obligatorio</b></label><input id="new-event-title" className={`form-control ${errors.title ? "is-invalid" : ""}`} placeholder="Nombre del evento" {...register("title", { required: "Escribe el título del evento" })} />{errors.title && <div className="invalid-feedback">{errors.title.message}</div>}</div>
+                    <AdminRelations title="Artistas del cartel" items={artists} selected={watch("lineup")} onChange={(ids) => setValue("lineup", ids)} />
+                    <label className="admin-field">Nombre público del cartel<input className="form-control" {...register("artistName")} /></label>
+                    <div className="admin-field"><label htmlFor="new-event-datetime" className="form-label">Fecha y hora <b>Obligatorio</b></label><input id="new-event-datetime" type="datetime-local" step="1" className={`form-control ${errors.datetime ? "is-invalid" : ""}`} {...register("datetime", { required: "Selecciona fecha y hora" })} />{errors.datetime && <div className="invalid-feedback">{errors.datetime.message}</div>}</div>
                   </div>
                 </section>
 
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>02</span><div><h2>Lugar</h2><p>Datos para que el público pueda encontrarlo.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Lugar</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
-                    <div className="admin-field admin-field--wide"><label className="form-label">Sala o espacio</label><input className="form-control" placeholder="Nombre del recinto" {...register("venue")} /></div>
-                    <div className="admin-field"><label className="form-label">Ciudad <b>Obligatorio</b></label><input className={`form-control ${errors.city ? "is-invalid" : ""}`} placeholder="Madrid" {...register("city", { required: "Escribe la ciudad" })} />{errors.city && <div className="invalid-feedback">{errors.city.message}</div>}</div>
-                    <div className="admin-field"><label className="form-label">País</label><input className="form-control" placeholder="ES" {...register("country")} /></div>
-                    <div className="admin-field admin-field--wide"><label className="form-label">Dirección</label><input className="form-control" placeholder="Calle, número y código postal" {...register("address")} /></div>
+                    <div className="admin-field admin-field--wide"><label htmlFor="new-event-venue" className="form-label">Sala o espacio</label><input id="new-event-venue" className="form-control" required placeholder="Nombre del recinto" {...register("venue")} /></div>
+                    <div className="admin-field"><label htmlFor="new-event-city" className="form-label">Ciudad <b>Obligatorio</b></label><input id="new-event-city" className={`form-control ${errors.city ? "is-invalid" : ""}`} placeholder="Madrid" {...register("city", { required: "Escribe la ciudad" })} />{errors.city && <div className="invalid-feedback">{errors.city.message}</div>}</div>
+                    <div className="admin-field"><label htmlFor="new-event-country" className="form-label">País</label><input id="new-event-country" className="form-control" placeholder="ES" {...register("country")} /></div>
+                    <div className="admin-field admin-field--wide"><label htmlFor="new-event-address" className="form-label">Dirección</label><input id="new-event-address" className="form-control" placeholder="Calle, número y código postal" {...register("address")} /></div>
                   </div>
                 </section>
 
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>03</span><div><h2>Cartel</h2><p>La imagen principal del evento.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Cartel</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field admin-field--wide"><AdminImagePreview src={posterUrl} alt="Cartel actual del evento" label="Cartel guardado" /></div>
-                    <div className="admin-field"><label className="form-label">Archivo</label><input type="file" accept="image/*" className="form-control" {...register("posterFile")} /><div className="form-text">Déjalo vacío para conservar el cartel actual.</div></div>
-                    <div className="admin-field"><label className="form-label">URL alternativa</label><input type="url" className="form-control" placeholder="https://…" {...register("posterUrl")} /></div>
+                    <div className="admin-field"><label htmlFor="new-event-posterFile" className="form-label">Archivo</label><input id="new-event-posterFile" type="file" accept="image/*" className="form-control" {...register("posterFile")} /><div className="form-text">Déjalo vacío para conservar el cartel actual.</div></div>
+                    <div className="admin-field"><label htmlFor="new-event-posterUrl" className="form-label">URL alternativa</label><input id="new-event-posterUrl" {...imageUrlInput} className="form-control" placeholder="https://…" {...register("posterUrl")} /></div>
                   </div>
                 </section>
 
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>04</span><div><h2>Información pública</h2><p>Venta de entradas y contexto adicional.</p></div></div>
-                  <div className="admin-field"><label className="form-label">Enlace de entradas</label><input type="url" className="form-control" placeholder="https://…" {...register("ticketUrl")} /></div>
-                  <div className="admin-field"><label className="form-label">Descripción <em>Opcional</em></label><textarea rows={7} className="form-control admin-writing-area" placeholder="Información útil sobre el evento…" {...register("description")} /></div>
+                  <div className="admin-form-card__heading"><h2>Información pública</h2></div>
+                  <label className="admin-field">Enlace al cartel o archivo<input className="form-control" type="url" {...register("sourceUrl")} /></label>
+                  <label><input type="checkbox" {...register("isActive")} /> Visible en Eventos</label>
+                  <div className="admin-field"><label htmlFor="new-event-ticketUrl" className="form-label">Enlace de entradas</label><input id="new-event-ticketUrl" type="url" className="form-control" placeholder="https://…" {...register("ticketUrl")} /></div>
+                  <div className="admin-field"><label htmlFor="new-event-description" className="form-label">Descripción <em>Opcional</em></label><textarea id="new-event-description" rows={7} className="form-control admin-writing-area" placeholder="Información útil sobre el evento…" {...register("description")} /></div>
                 </section>
               </div>
 
               <aside className="admin-editor-sidebar">
-                <section className="admin-action-card"><span className="admin-action-card__status">{effectiveEditMode ? "Evento existente" : "Nuevo evento"}</span><h2>{effectiveEditMode ? "Guardar cambios" : "Crear evento"}</h2><p>Comprueba especialmente la fecha, la ciudad y el enlace de entradas.</p><div className="admin-action-checks"><span><i>01</i> Artista y fecha</span><span><i>02</i> Recinto y ubicación</span><span><i>03</i> Cartel</span><span><i>04</i> Entradas e información</span></div><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar evento" : "Guardar evento"}</button></section>
+                <section className="admin-action-card"><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar evento" : "Guardar evento"}</button></section>
                 {effectiveEditMode && <section className="admin-danger-card"><h3>Zona sensible</h3><p>El evento desaparecerá del calendario.</p><button type="button" className="btn btn-danger" onClick={handleDelete}>Eliminar evento</button></section>}
               </aside>
             </div>

@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function EventItem({ event = {}, past = false }) {
+export default function EventItem({ event = {}, past = false, onOpenPoster }) {
   // 🛡️ Normalización de fecha
   const rawDate =
     event.datetime ||
@@ -30,18 +30,20 @@ export default function EventItem({ event = {}, past = false }) {
     (value) => typeof value === "string" && /^https?:\/\//i.test(value)
   );
 
-  const EventRoot = url ? "a" : "article";
+  const ticketProps = {
+    href: url, target: "_blank", rel: "noopener noreferrer nofollow",
+    "data-outbound": "ticket", "data-content-type": "event", "data-content-slug": event.slug,
+  };
+  const heading = <><strong>{artist}</strong>{event.title && <span>{event.title}</span>}</>;
 
   return (
-    <EventRoot
+    <article
       className={`event-row${past ? " event-row--past" : ""}`}
       aria-label={`${artist} en ${city}${country ? ", " + country : ""} — ${dateLabel}`}
-      {...(url ? { href: url, target: "_blank", rel: "noopener noreferrer nofollow" } : {})}
     >
-      <div className="event-row__artist">
-        <strong>{artist}</strong>
-        {event.title && <span>{event.title}</span>}
-      </div>
+      {!past && url ? (
+        <a className="event-row__artist content-permalink" {...ticketProps}>{heading}</a>
+      ) : <div className="event-row__artist">{heading}</div>}
 
       <div className="event-row__place">
         <strong>{venue}</strong>
@@ -53,8 +55,13 @@ export default function EventItem({ event = {}, past = false }) {
       </time>
 
       <div className="event-row__ticket">
-        <span>{past ? (url ? <>Ver cartel <span aria-hidden="true">↗</span></> : "Finalizado") : url ? <>Entradas <span aria-hidden="true">↗</span></> : "Próximamente"}</span>
+        {past && event.posterUrl ? (
+          <button type="button" className="event-poster-trigger" aria-haspopup="dialog"
+            onClick={(click) => onOpenPoster(event.id, click.currentTarget)}>
+            Ver cartel
+          </button>
+        ) : url ? <a {...ticketProps} data-outbound={past ? undefined : "ticket"} className="content-permalink">{past ? "Ver cartel" : "Entradas"} <span aria-hidden="true">↗</span></a> : <span>{past ? "Finalizado" : "Próximamente"}</span>}
       </div>
-    </EventRoot>
+    </article>
   );
 }

@@ -1,14 +1,11 @@
+import { useContentView } from "../analytics/use-audience";
+import { usePageMeta } from "../utils/page-meta";
 // src/pages/artist-detail.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ArtistDetail from "../components/artists/artist-detail/artist-detail";
 import AdminEditLink from "../components/admin/admin-edit-link";
 import SiteLoader from "../components/ui/site-loader.jsx";
-import { withCurrentArtistPhoto } from "../data/artist-media.js";
-import { withCurrentArtistProfile } from "../data/artist-profiles.js";
-import { withCuratedReleases } from "../data/curated-releases.js";
-import { featuredEditorials } from "../data/featured-editorial.js";
-
 export default function ArtistDetailPage() {
   const { slug } = useParams();
 
@@ -23,23 +20,32 @@ export default function ArtistDetailPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function loadArtistAndRelated() {
       try {
         setLoading(true);
         setError(null);
 
         // 1) ARTISTA POR SLUG
-        const res = await fetch(`/api/v1/artists/slug/${slug}`);
-        if (!res.ok) {
-          throw new Error(`No encontrado: ${res.status}`);
-        }
-        const artistData = withCurrentArtistProfile(withCurrentArtistPhoto(await res.json()));
+        const read = async (url) => {
+          const res = await fetch(url, { signal: controller.signal });
+          if (!res.ok) throw new Error(String(res.status));
+          return res.json();
+        };
+        const profile = read(`/api/v1/artists/slug/${encodeURIComponent(slug)}`);
+        const related = profile.then((item) => {
+          const id = encodeURIComponent(item._id);
+          return Promise.all([
+            read(`/api/v1/releases?artist=${id}`),
+            read(`/api/v1/editorials?artist=${id}`),
+            read(`/api/v1/events?artist=${id}&from=${encodeURIComponent(new Date().toISOString())}`),
+          ]);
+        });
+        const [artistData, list, [records, articles, dates]] = await Promise.all([
+          profile, read("/api/v1/artists"), related,
+        ]);
+        if (controller.signal.aborted) return;
         setArtist(artistData);
-
-        // 2) LISTA PARA PREV / NEXT
-        const resList = await fetch("/api/v1/artists");
-        const list = await resList.json();
-
         const ordered = list.sort((a, b) =>
           a.name.localeCompare(b.name, "es", { sensitivity: "base" })
         );
@@ -49,45 +55,24 @@ export default function ArtistDetailPage() {
           next: ordered[index + 1] || null,
         });
 
-        // 3) RELEASES + EDITORIALS + EVENTS EN PARALELO
-        const [relRes, edRes, evRes] = await Promise.all([
-          fetch("/api/v1/releases"),
-          fetch("/api/v1/editorials").catch(() => null),
-          fetch(`/api/v1/events?artist=${artistData._id}&from=${encodeURIComponent(new Date().toISOString())}`),
-        ]);
-
-        // RELEASES
-        const relJson = await relRes.json();
-        const allReleases = Array.isArray(relJson) ? relJson : relJson.data || [];
-        const artistReleases = withCuratedReleases(allReleases).filter((r) => {
-          const artistId =
-            typeof r.artist === "string" ? r.artist : r.artist?._id;
-          return artistId === artistData._id || r.artist?.slug === artistData.slug;
-        });
-        setReleases(artistReleases);
-
-        const edJson = edRes?.ok ? await edRes.json() : null;
-        const allEditorials = Array.isArray(edJson) ? edJson : edJson?.data || [];
-        setEditorials(edJson ? allEditorials.filter((editorial) =>
-          editorial.relatedArtists?.some((related) =>
-            (typeof related === "string" ? related : related?._id) === artistData._id
-          )
-        ) : artistData.slug === "aeronave-adolescente" ? featuredEditorials : []);
-
-        // La ficha solo muestra próximos conciertos; el histórico queda en Eventos.
-        const evJson = await evRes.json();
-        const artistEvents = Array.isArray(evJson) ? evJson : evJson.data || [];
-        setEvents(artistEvents);
+        setReleases(records);
+        setEditorials(articles.data || []);
+        setEvents(dates.data || []);
       } catch (err) {
+        if (controller.signal.aborted) return;
         console.error("Error en ArtistDetailPage:", err);
         setError("No se pudo cargar el artista.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     loadArtistAndRelated();
+    return () => controller.abort();
   }, [slug]);
+
+  useContentView("artistas", artist);
+  usePageMeta(`/artistas/${encodeURIComponent(slug)}`, artist?.name, artist?.bio?.slice(0, 180), artist?.photos?.coverUrl);
 
   // Loading
   if (loading) {
@@ -116,7 +101,7 @@ export default function ArtistDetailPage() {
   return (
     <div className="admin-edit-detail">
       <AdminEditLink to={`/admin/edit-artist/${artist.slug}`} label={`a ${artist.name}`} />
-      <ArtistDetail
+      <ArtistDetail key={artist._id}
         artist={artist}
         prevNext={prevNext}
         releases={releases}

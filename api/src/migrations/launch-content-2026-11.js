@@ -1,4 +1,5 @@
 const { ObjectId } = require("mongodb");
+const slugify = require("slugify");
 const content = require("../data/launch-content.json");
 
 async function migrateLaunchContent(db) {
@@ -15,21 +16,16 @@ async function migrateLaunchContent(db) {
   for (const profile of content.artists) {
     const artist = await artists.findOne({ slug: profile.slug });
     if (!artist) throw new Error(`Artist missing for launch: ${profile.slug}`);
-    await artists.updateOne({ _id: artist._id }, {
-      $set: {
-        bio: profile.bio,
-        photos: profile.photos,
-        social: profile.social,
-        streaming: profile.streaming,
-        web: profile.web,
-        updatedAt: now,
-      },
-    });
+    // On a database predating launch, fill missing fields without replacing edits.
+    for (const field of ["bio", "photos", "social", "streaming", "web"]) {
+      const value = profile[field];
+      const entries = typeof value === "string" ? [[field, value]]
+        : Object.entries(value || {}).map(([key, item]) => [`${field}.${key}`, item]);
+      for (const [path, item] of entries) {
+        await artists.updateOne({ _id: artist._id, [path]: { $exists: false } }, { $set: { [path]: item } });
+      }
+    }
   }
-  await artists.updateMany(
-    { slug: { $nin: content.artists.map((artist) => artist.slug) } },
-    { $set: { bio: "???" } },
-  );
 
   const article = content.featuredEditorial;
   const artist = await artists.findOne({ slug: "aeronave-adolescente" });
@@ -38,24 +34,21 @@ async function migrateLaunchContent(db) {
   const wordCount = article.blocks.map((block) => block.text || "").join(" ")
     .replace(/<[^>]*>/g, " ").trim().split(/\s+/).filter(Boolean).length;
   await editorials.updateOne({ _id: articleId }, {
-    $set: {
+    $setOnInsert: {
       ...article,
+      createdAt: now,
       publishAt: new Date(article.publishAt),
       relatedArtists: [artist._id],
-      featured: true,
+      featured: false,
       wordCount,
       readingTime: Math.max(1, Math.round(wordCount / 200)),
       updatedAt: now,
     },
-    $setOnInsert: { createdAt: now },
   }, { upsert: true });
 
-  const oldIds = await editorials.find({ _id: { $ne: articleId } }, { projection: { _id: 1 } }).map((item) => item._id).toArray();
-  if (oldIds.length) {
-    await artists.updateMany({}, { $pull: { editorials: { $in: oldIds } } });
-    await editorials.deleteMany({ _id: { $in: oldIds } });
+  if (!existing || existing.relatedArtists?.some((id) => String(id) === String(artist._id))) {
+    await artists.updateOne({ _id: artist._id }, { $addToSet: { editorials: articleId } });
   }
-  await artists.updateOne({ _id: artist._id }, { $addToSet: { editorials: articleId } });
 
   const ferro = await artists.findOne({ slug: "ferrocentro-club" });
   for (const release of content.releases) {
@@ -80,11 +73,20 @@ async function migrateLaunchContent(db) {
     const date = new Date(entry.datetime);
     const existingEvent = await events.findOne({ date, city: entry.city, venue: entry.venue });
     if (existingEvent) continue;
+    const baseSlug = slugify(`${entry.title}-${date.toISOString().slice(0, 10)}-${entry.city}-${entry.venue}`, {
+      lower: true, strict: true, trim: true,
+    });
+    let slug = baseSlug;
+    let suffix = 2;
+    while (await events.findOne({ slug }, { projection: { _id: 1 } })) {
+      slug = `${baseSlug}-${suffix++}`;
+    }
     const lineup = entry.artist?.includes("Aeronave")
       ? [artist._id]
       : entry.artist?.includes("Ferrocentro") ? [ferro._id] : [];
     const result = await events.insertOne({
       title: entry.title,
+      slug,
       date,
       venue: entry.venue,
       city: entry.city,
@@ -105,4 +107,20 @@ async function migrateLaunchContent(db) {
   await migrations.updateOne({ _id: migrationId }, { $set: { completedAt: now } }, { upsert: true });
 }
 
-module.exports = { migrateLaunchContent };
+async function migratePublicationSettings(db) {
+  const migrations = db.collection("app_migrations");
+  const id = "publication-settings-2026-11";
+  if (await migrations.findOne({ _id: id })) return;
+  await db.collection("editorials").updateOne(
+    { slug: content.featuredEditorial.slug, featured: true },
+    { $set: { featured: false } },
+  );
+  // Preserve the existing public archive while making visibility editable in the panel.
+  await db.collection("events").updateMany(
+    { slug: { $in: ["prueba-1", "prueba-2", "aeronave-adolescente-live-at-apolo"] } },
+    { $set: { isActive: false } },
+  );
+  await migrations.updateOne({ _id: id }, { $set: { completedAt: new Date() } }, { upsert: true });
+}
+
+module.exports = { migrateLaunchContent, migratePublicationSettings };
