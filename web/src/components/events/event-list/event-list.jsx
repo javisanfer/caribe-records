@@ -3,7 +3,10 @@ import PosterGallery from "../poster-gallery";
 import EventItem from "../event-item/event-item";
 import AdminEditLink from "../../admin/admin-edit-link";
 
-import { madridDate } from "../../../utils/public-event-date";
+const formatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit",
+});
+const madridDate = (date) => formatter.format(date);
 
 function EventRows({ events, past = false, onOpenPoster }) {
   return (

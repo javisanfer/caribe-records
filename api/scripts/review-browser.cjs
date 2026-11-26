@@ -81,6 +81,9 @@ async function main() {
     const article = launch.featuredEditorial.slug;
     const sitemap = await fetch(api + "/api/v1/pages/sitemap.xml").then((r) => r.text());
     assert.ok(sitemap.includes("/editorial/" + article));
+    assert.ok(!sitemap.includes("/eventos/archivo-en-revision-qa"));
+    assert.ok(sitemap.includes("/eventos/concierto-futuro-qa"));
+    assert.equal((await fetch(api + "/api/v1/events/slug/archivo-en-revision-qa")).status, 404);
     const layoutFailures = [];
     for (const [engine, driver] of Object.entries({ chromium, firefox, webkit })) {
       if (!browserApi) browserApi = await startApi();

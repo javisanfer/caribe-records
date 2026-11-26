@@ -1,3 +1,4 @@
+const { publicEvents } = require("../utils/public-events");
 const express = require("express");
 const Artist = require("../models/artist.model");
 const Release = require("../models/release.model");
@@ -25,7 +26,7 @@ const types = {
     meta: (x) => [x.title, [x.artistName, x.format?.toUpperCase(), x.catalog, "Catálogo de Caribe Records"].filter(Boolean).join(" · "), x.cover?.url || x.cover_image, "MusicAlbum"],
   },
   eventos: {
-    model: Event, key: "slug", visible: () => ({ isActive: true }), fields: "title venue city date description posterUrl",
+    model: Event, key: "slug", visible: publicEvents, fields: "title venue city date description posterUrl",
     meta: (x) => [x.title, [x.venue, x.city, x.date?.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" }), x.description].filter(Boolean).join(" · "), x.posterUrl, "MusicEvent"],
   },
 };

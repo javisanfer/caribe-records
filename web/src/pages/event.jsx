@@ -3,8 +3,6 @@ import EventList from "../components/events/event-list/event-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 import SiteLoader from "../components/ui/site-loader.jsx";
 
-import { isPublicEventDate, madridDate } from "../utils/public-event-date";
-
 export default function EventPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,9 +26,8 @@ export default function EventPage() {
           page += 1;
         } while (page <= totalPages);
 
-        const today = madridDate(new Date());
         const normalized = rawEvents
-          .filter((event) => isPublicEventDate(event?.date || event?.datetime, today))
+          .filter(Boolean)
           .map((e, idx) => {
             const mainArtist =
               Array.isArray(e.lineup) && e.lineup.length > 0

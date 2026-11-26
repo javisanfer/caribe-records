@@ -5,8 +5,6 @@ import { usePageMeta } from "../utils/page-meta";
 import ReleaseItem from "../components/releases/release-item/release-item";
 import SiteLoader from "../components/ui/site-loader";
 
-import { isPublicEventDate } from "../utils/public-event-date";
-
 export default function CatalogueDetail({ event = false }) {
   const { key } = useParams();
   const [item, setItem] = useState(null);
@@ -14,17 +12,12 @@ export default function CatalogueDetail({ event = false }) {
   const parent = event ? "/eventos" : "/releases";
   useEffect(() => {
     const controller = new AbortController();
-    setError("");
-    setItem(null);
     const endpoint = event ? "events/slug/" : "releases/";
     fetch("/api/v1/" + endpoint + encodeURIComponent(key), { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error(r.status === 404 ? "No se ha encontrado esta ficha." : "No se ha podido cargar la ficha.");
         return r.json();
-      }).then((record) => {
-        if (event && !isPublicEventDate(record.date)) throw new Error("Esta fecha todavía no está en el archivo público.");
-        if (!controller.signal.aborted) setItem(record);
-      }).catch((e) => { if (!controller.signal.aborted) setError(e.message); });
+      }).then(setItem).catch((e) => { if (!controller.signal.aborted) setError(e.message); });
     return () => controller.abort();
   }, [key, event]);
   useContentView(event ? "eventos" : "releases", item);

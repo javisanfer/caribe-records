@@ -1,3 +1,4 @@
+const { publicEvents } = require("../utils/public-events");
 const Event = require("../models/event.model");
 const Artist = require("../models/artist.model");
 
@@ -27,12 +28,11 @@ exports.getEventsPublic = async (req, res) => {
     const { city, country, q, artist } = req.query;
     const { page, limit, skip } = getPagination(req.query);
 
-    // Sin filtro explícito, incluir también el histórico.
     const from = parseDate(req.query.from);
     const to = parseDate(req.query.to, true);
 
     const filter = {
-      isActive: true,
+      ...publicEvents(),
       ...(from || to ? { date: {
         ...(from ? { $gte: from } : {}),
         ...(to ? { $lte: to } : {}),
@@ -71,7 +71,7 @@ exports.getEventBySlugPublic = async (req, res) => {
   try {
     const doc = await Event.findOne({
       slug: req.params.slug,
-      isActive: true,
+      ...publicEvents(),
     }).populate({ path: "lineup", select: "name slug photos.portraitUrl" });
 
     if (!doc) return res.status(404).json({ message: "Event not found" });
