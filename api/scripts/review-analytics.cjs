@@ -8,6 +8,8 @@ const base = "http://127.0.0.1:5282";
 const album = { _id: "635000000000000000000001", title: "Prueba", artistName: "Caribe", format: "ep", cover: {url:"/favicon.png"}, listenUrl:"https://open.spotify.com/album/example" };
 const concert = { _id: "x", slug: "concierto-qa", date: "2099-10-10", artistName: "Caribe", venue: "Sala", ticketUrl: "https://entradium.com/events/example" };
 const fakeTag = `
+  if (!/^https?:$/.test(location.protocol)) throw Error('El documento de medición debe usar HTTP(S)');
+  if (!dataLayer.some(args => args[0] === 'set' && args[1] === 'send_page_view' && args[2] === false)) throw Error('Falta desactivar la vista automática');
   document.cookie = '_ga=qa; Path=/';
   document.cookie = '_ga_TEST000001=qa; Path=/';
   function processCommand(args) {
