@@ -1122,6 +1122,7 @@ dialog.site-banner[open] { display: grid; }
   text-transform: none;
   text-decoration: none;
 }
+.cr-menu-shop a { background: var(--cr-sun); }
 .cr-mobile-links a[aria-current="page"] {
   color: var(--cr-white);
   background: var(--cr-blue);
