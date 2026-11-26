@@ -5277,7 +5277,7 @@ body {
 
 .event-row__ticket {
   margin: 0;
-  text-align: right;
+  text-align: start;
 }
 
 .event-row.event-row--past {
@@ -6389,7 +6389,25 @@ html:has(.home), body:has(.home) { background: #050505; }
 .home-editorial-carousel.is-empty ~ .home-section-nav a:hover { color: var(--cr-sun); }
 
 .content-permalink { color: inherit; text-decoration: inherit; }
-.content-permalink:hover, .content-permalink:focus-visible { text-decoration: underline; }
+.content-permalink:focus-visible, .event-poster-trigger:focus-visible { text-decoration: underline; }
+@media (hover: hover) and (pointer: fine) {
+  .content-permalink:hover, .event-poster-trigger:hover { text-decoration: underline; }
+}
+.event-row .content-permalink, .event-poster-trigger {
+  text-underline-offset: .09em;
+  text-decoration-thickness: 1px;
+}
+.event-row__artist > strong:has(a) { padding-bottom: .12em; margin-bottom: -.12em; }
+.event-poster-trigger {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
 
 .artist-detail:not(.artist-detail--has-photo) .artist-detail__hero { display: block; height: auto; }
 .artist-detail:not(.artist-detail--has-photo) .artist-detail__identity { min-height: 0; gap: 16px; }
