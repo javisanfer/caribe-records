@@ -1066,7 +1066,7 @@ dialog.site-banner[open] { display: grid; }
   text-transform: uppercase;
 }
 
-.cr-menu-toggle[aria-expanded="true"] { color: var(--cr-blue); background: var(--cr-paper); }
+.cr-menu-toggle[aria-expanded="true"] { color: var(--cr-blue); }
 
 .cr-menu-icon {
   position: relative;
@@ -1099,7 +1099,7 @@ dialog.site-banner[open] { display: grid; }
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--cr-paper);
+  background: var(--cr-white);
   border: 1px solid var(--cr-line);
   border-width: 0 0 1px 1px;
 }
