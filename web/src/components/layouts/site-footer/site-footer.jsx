@@ -1,13 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function SiteFooter() {
+export default function SiteFooter({ preferences }) {
   return (
     <footer className="cr-site-footer">
       <nav className="cr-site-footer__links" aria-label="Enlaces del pie">
         <a href="https://instagram.com/cariberecords" target="_blank" rel="noreferrer">
           Seguir <span aria-hidden="true">↗</span>
         </a>
+        <Link to="/privacidad">Aviso legal y privacidad</Link>
+        {preferences && <button type="button" onClick={preferences}>Preferencias de cookies</button>}
         <Link to="/about">About</Link>
         <a href="mailto:hola@caribe-records.com">Contacto</a>
       </nav>

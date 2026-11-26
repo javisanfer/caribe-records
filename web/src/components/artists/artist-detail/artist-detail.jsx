@@ -1,3 +1,4 @@
+import ListenLink from "../../releases/listen-link";
 import { releaseListenUrl } from "../../../utils/release-listen-url";
 import { cleanBiography } from "../../../utils/artist-biography";
 import React, { useMemo, useState } from "react";
@@ -136,7 +137,7 @@ export default function ArtistDetail({
                 <p className="detail-section-label">{title}</p>
                 <ul>
                   {links[key].map(({ label, url }, index) => (
-                    <li key={index}><a href={url} target="_blank" rel="noreferrer">↳ {label}</a></li>
+                    <li key={index}><a data-outbound={key === "streaming" ? "listen" : undefined} href={url} target="_blank" rel="noreferrer">↳ {label}</a></li>
                   ))}
                 </ul>
               </section>
@@ -156,11 +157,9 @@ export default function ArtistDetail({
               <h2>{year}</h2>
               <div>
                 {items.map((release) => (
-                  <a
+                  <ListenLink
                     className="artist-release"
                     href={releaseListenUrl(release) || undefined}
-                    target={releaseListenUrl(release) ? "_blank" : undefined}
-                    rel={releaseListenUrl(release) ? "noopener noreferrer" : undefined}
                     key={release._id}
                   >
                     {(release.cover?.url || release.cover_image) ? (
@@ -168,7 +167,7 @@ export default function ArtistDetail({
                     ) : <span className="artist-release__placeholder" aria-hidden="true" />}
                     <span className="artist-release__name">{release.title}</span>
                     <small>{releaseFormat(release.format)}{releaseListenUrl(release) ? " ↗" : ""}</small>
-                  </a>
+                  </ListenLink>
                 ))}
               </div>
             </div>
@@ -182,7 +181,7 @@ export default function ArtistDetail({
             <div key={key}>
               <p className="detail-section-label">{title}</p>
               {links[key].map(({ label, url }, index) => (
-                <a href={url} target="_blank" rel="noreferrer" key={index}><span>{label}</span><span>↗</span></a>
+                <a data-outbound={key === "streaming" ? "listen" : undefined} href={url} target="_blank" rel="noreferrer" key={index}><span>{label}</span><span>↗</span></a>
               ))}
             </div>
           ))}
@@ -198,7 +197,7 @@ export default function ArtistDetail({
                 const listenUrl = releaseListenUrl(release);
                 const content = <><span>{release.title}</span><small>{releaseFormat(release.format)} · {release.release_date?.slice(0, 4) || "—"}{listenUrl ? " ↗" : ""}</small></>;
                 return listenUrl ? (
-                  <a href={listenUrl} target="_blank" rel="noopener noreferrer" key={release._id}>{content}</a>
+                  <a data-outbound="listen" href={listenUrl} target="_blank" rel="noopener noreferrer" key={release._id}>{content}</a>
                 ) : (
                   <div className="artist-related-block__unavailable" key={release._id}>{content}</div>
                 );
@@ -222,7 +221,7 @@ export default function ArtistDetail({
                 );
                 const content = <><span>{event.title || event.venue}</span><small>{formatEventDate(event.date)} · {ticketUrl ? "Entradas ↗" : "Entradas próximamente"}</small></>;
                 return ticketUrl ? (
-                  <a href={ticketUrl} target="_blank" rel="noopener noreferrer" key={event._id}>{content}</a>
+                  <a data-outbound="ticket" href={ticketUrl} target="_blank" rel="noopener noreferrer" key={event._id}>{content}</a>
                 ) : (
                   <div className="artist-related-block__unavailable" key={event._id}>{content}</div>
                 );

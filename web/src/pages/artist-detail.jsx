@@ -1,3 +1,4 @@
+import { useContentView } from "../analytics/use-audience";
 import { usePageMeta } from "../utils/page-meta";
 // src/pages/artist-detail.jsx
 import React, { useEffect, useState } from "react";
@@ -70,6 +71,7 @@ export default function ArtistDetailPage() {
     return () => controller.abort();
   }, [slug]);
 
+  useContentView("artistas", artist);
   usePageMeta(`/artistas/${encodeURIComponent(slug)}`, artist?.name, artist?.bio?.slice(0, 180), artist?.photos?.coverUrl);
 
   // Loading

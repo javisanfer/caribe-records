@@ -13,6 +13,7 @@ export function usePageMeta(path, name, description, image, type = "website") {
     const title = name || section?.[0] || (privatePage ? "Administración" : "Caribe Records");
     const fullTitle = title === "Caribe Records" ? title : title + " · Caribe Records";
     const text = description || section?.[1] || sections["/"][1];
+    const socialText = section?.[2] || text;
     const canonical = publicUrl(path);
     const set = (attribute, key, value) => {
       let node = document.head.querySelector(`meta[${attribute}="${key}"]`);
@@ -27,7 +28,7 @@ export function usePageMeta(path, name, description, image, type = "website") {
     set("name", "description", text);
     set("name", "robots", privatePage ? "noindex,nofollow" : "index,follow");
     set("property", "og:title", fullTitle);
-    set("property", "og:description", text);
+    set("property", "og:description", socialText);
     set("property", "og:type", type);
     set("property", "og:url", canonical);
     let cover;
@@ -36,7 +37,7 @@ export function usePageMeta(path, name, description, image, type = "website") {
     set("property", "og:image", picture);
     set("name", "twitter:card", "summary_large_image");
     set("name", "twitter:title", fullTitle);
-    set("name", "twitter:description", text);
+    set("name", "twitter:description", socialText);
     set("name", "twitter:image", picture);
     let link = document.head.querySelector('link[rel="canonical"]');
     if (!link) { link = document.createElement("link"); link.rel = "canonical"; document.head.append(link); }

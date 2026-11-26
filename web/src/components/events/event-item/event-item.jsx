@@ -56,7 +56,7 @@ export default function EventItem({ event = {}, past = false, onOpenPoster }) {
             onClick={(click) => onOpenPoster(event.id, click.currentTarget)}>
             Ver cartel
           </button>
-        ) : url ? <a className="content-permalink" href={url} target="_blank" rel="noopener noreferrer nofollow">{past ? "Ver cartel" : "Entradas"} <span aria-hidden="true">↗</span></a> : <span>{past ? "Finalizado" : "Próximamente"}</span>}
+        ) : url ? <a data-outbound={past ? undefined : "ticket"} data-content-type="event" data-content-slug={event.slug} className="content-permalink" href={url} target="_blank" rel="noopener noreferrer nofollow">{past ? "Ver cartel" : "Entradas"} <span aria-hidden="true">↗</span></a> : <span>{past ? "Finalizado" : "Próximamente"}</span>}
       </div>
     </article>
   );

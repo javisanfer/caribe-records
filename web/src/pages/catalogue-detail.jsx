@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useContentView } from "../analytics/use-audience";
 import { usePageMeta } from "../utils/page-meta";
 import ReleaseItem from "../components/releases/release-item/release-item";
 import SiteLoader from "../components/ui/site-loader";
@@ -19,6 +20,7 @@ export default function CatalogueDetail({ event = false }) {
       }).then(setItem).catch((e) => { if (!controller.signal.aborted) setError(e.message); });
     return () => controller.abort();
   }, [key, event]);
+  useContentView(event ? "eventos" : "releases", item);
   usePageMeta(parent + "/" + encodeURIComponent(key), item?.title, event ? item?.description : item?.artistName, item?.posterUrl || item?.cover?.url);
   if (error) return <main className="detail-state" role="alert">{error} <Link to={parent}>Volver</Link></main>;
   if (!item) return <SiteLoader />;
@@ -31,7 +33,7 @@ export default function CatalogueDetail({ event = false }) {
       {item.description && <p>{item.description}</p>}
       {item.posterUrl && <img className="img-fluid" src={item.posterUrl} alt={`Cartel de ${item.title}`} />}
       {[[item.ticketUrl, "Entradas"], [item.sourceUrl, "Ver cartel"]].map(([href, label]) =>
-        /^https?:\/\//i.test(href || "") && <p key={label}><a href={href} target="_blank" rel="noreferrer">{label} ↗</a></p>)}
+        /^https?:\/\//i.test(href || "") && <p key={label}><a data-outbound={label === "Entradas" ? "ticket" : undefined} href={href} target="_blank" rel="noreferrer">{label} ↗</a></p>)}
     </article> : <ReleaseItem release={item} />}
   </main>;
 }
