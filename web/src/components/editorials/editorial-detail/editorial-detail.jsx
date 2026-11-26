@@ -1,3 +1,4 @@
+import EditorialShare from "../editorial-share";
 import EditorialPlayer from "../editorial-player";
 import React, { useEffect, useState } from "react";
 import { editorialEmbed } from "../../../utils/editorial-embed";
@@ -136,6 +137,7 @@ export default function EditorialDetail({ editorial, prevNext }) {
             }
             return null;
           })}
+          <EditorialShare key={editorial.slug} slug={editorial.slug} title={editorial.title} />
         </section>
       </div>
 

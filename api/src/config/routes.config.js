@@ -90,6 +90,17 @@ router.get("/about", aboutReadLimit, about.get);
 router.get("/admin/about", adminRateLimit, about.get);
 router.put("/admin/about", adminRateLimit, about.update);
 
+const carousel = require("../controllers/home-carousel.controller");
+const carouselReadLimit = rateLimit({
+  windowMs: 60_000,
+  limit: 120,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+router.get("/home-carousel", carouselReadLimit, carousel.publicList);
+router.get("/admin/home-carousel", adminRateLimit, carousel.adminList);
+router.put("/admin/home-carousel", adminRateLimit, carousel.update);
+
 router.get("/admin/activity", adminRateLimit, adminController.getActivity);
 
 // Accounts are provisioned with an internal bootstrap command. There is no

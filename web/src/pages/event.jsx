@@ -47,6 +47,8 @@ export default function EventPage() {
               datetime: e.date || e.datetime || null,
               ticketUrl: e.ticketUrl || e.url || null,
               sourceUrl: e.sourceUrl || null,
+              posterUrl: typeof e.posterUrl === "string" && /^(?:https?:\/\/|\/(?![/\\]))/i.test(e.posterUrl.trim())
+                ? e.posterUrl.trim() : null,
             };
           });
 

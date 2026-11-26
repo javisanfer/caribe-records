@@ -13,21 +13,29 @@ const TYPE_LABELS = {
 };
 
 const CREATE_LINKS = [
-  ["01", "Artista", "/admin/new-artist"],
-  ["02", "Lanzamiento", "/admin/new-release"],
-  ["03", "Editorial", "/admin/new-editorial"],
-  ["04", "Evento", "/admin/new-event"],
-  ["05", "Banner", "/admin/new-banner"],
+  ["Artista", "/admin/new-artist"],
+  ["Lanzamiento", "/admin/new-release"],
+  ["Editorial", "/admin/new-editorial"],
+  ["Evento", "/admin/new-event"],
+  ["Banner", "/admin/new-banner"],
 ];
 
 export default function AdminDashboardPage() {
   const [counts, setCounts] = useState({});
   const [totalItems, setTotalItems] = useState(0);
   const [items, setItems] = useState([]);
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
+  const [order, setOrder] = useState("newest");
   const [typeFilter, setTypeFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => { setQuery(search.trim()); setCurrentPage(1); }, 200);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -36,6 +44,8 @@ export default function AdminDashboardPage() {
       setError("");
       try {
         const params = new URLSearchParams({ limit: String(PAGE_SIZE), page: String(currentPage) });
+        if (query) params.set("q", query);
+        params.set("order", order);
         if (typeFilter !== "all") params.set("type", typeFilter);
         const data = await http.get(`/admin/activity?${params}`, {
           signal: controller.signal,
@@ -54,7 +64,7 @@ export default function AdminDashboardPage() {
     }
     loadData();
     return () => controller.abort();
-  }, [typeFilter, currentPage]);
+  }, [query, order, typeFilter, currentPage]);
 
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
@@ -76,9 +86,8 @@ export default function AdminDashboardPage() {
   return (
     <main className="admin-page admin-dashboard">
       <header className="admin-dashboard__hero">
-        <p>Caribe Records · Gestión</p>
         <div>
-          <h1>Panel</h1><Link to="/admin/about">Editar About</Link>
+          <h1>Panel</h1>
           <span>{String(totalItems).padStart(2, "0")} registros</span>
         </div>
       </header>
@@ -86,18 +95,21 @@ export default function AdminDashboardPage() {
       <section className="admin-create" aria-labelledby="admin-create-title">
         <div className="admin-section-heading">
           <h2 id="admin-create-title">Crear contenido</h2>
-          <span>Accesos rápidos</span>
         </div>
         <div className="admin-create__grid">
-          {CREATE_LINKS.map(([number, label, url]) => (
+          {CREATE_LINKS.map(([label, url]) => (
             <Link to={url} key={url}>
-              <small>{number}</small>
               <span>{label}</span>
               <b aria-hidden="true">＋</b>
             </Link>
           ))}
         </div>
       </section>
+
+      <nav className="admin-page-tools" aria-label="Páginas del sello">
+        <Link to="/admin/about">Editar About <span aria-hidden="true">↗</span></Link>
+        <Link to="/admin/portada">Carrusel de portada <span aria-hidden="true">↗</span></Link>
+      </nav>
 
       <section className="admin-activity" aria-labelledby="admin-activity-title">
         <div className="admin-section-heading admin-activity__heading">
@@ -109,6 +121,12 @@ export default function AdminDashboardPage() {
               ))}
             </p>
           </div>
+        </div>
+        <div className="activity-filters">
+          <label>Buscar por título o nombre<input type="search" maxLength={120} placeholder="Buscar…" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+          <label>Última actualización<select value={order} onChange={(event) => { setCurrentPage(1); setOrder(event.target.value); }}>
+            <option value="newest">Más reciente primero</option><option value="oldest">Más antiguo primero</option>
+          </select></label>
           <label>
             <span>Filtrar por</span>
             <select value={typeFilter} onChange={(event) => { setCurrentPage(1); setTypeFilter(event.target.value); }}>
@@ -127,7 +145,7 @@ export default function AdminDashboardPage() {
         ) : error ? (
           <p className="admin-status admin-status--error">{error}</p>
         ) : totalItems === 0 ? (
-          <p className="admin-status">Todavía no hay actividad.</p>
+          <p className="admin-status">{query || typeFilter !== "all" ? "Sin resultados para estos filtros." : "Todavía no hay actividad."}</p>
         ) : (
           <>
             <div className="admin-table-wrap">

@@ -41,17 +41,63 @@ async function checkPersistence(email, password) {
     const catalogue = await request("/releases/" + release.doc._id);
     assert.equal(catalogue.tracklist[0].position, 2);
     assert.equal(catalogue.appleMusicUrl, "https://music.apple.com/es/");
+    const listenUrl = "https://listen.example.org/disco";
+    await request(release.path, "PATCH", { listenUrl });
+    assert.equal((await request("/releases/" + release.doc._id)).listenUrl, listenUrl);
+    await assert.rejects(request(release.path, "PATCH", { listenUrl: "mailto:label@example.org" }), /HTTP 400/);
+    await request(release.path, "PATCH", { listenUrl: "" });
+    const clearedRelease = await request("/releases/" + release.doc._id);
+    assert.equal(clearedRelease.listenUrl, "");
+    assert.equal(clearedRelease.appleMusicUrl, catalogue.appleMusicUrl);
+
 
     const article = await create("editorials", {
       title, heroUrl: image, status: "published", credits: [{ role: "Autor", name: "Autor de prueba" }],
       blocks: [{ type: "heading", text: "Prueba", level: 3 }, { type: "gallery", gallery: [{ url: image }] }],
-      relatedArtists: [artist.doc._id],
+      relatedArtists: [artist.doc._id], relatedReleases: [release.doc._id],
     }, true);
     await request(article.path, "PATCH", { subtitle: "Edición de prueba" });
     const reading = await request("/editorials/slug/" + article.doc.slug);
     assert.equal(reading.relatedArtists[0]._id, artist.doc._id);
+    assert.deepEqual(reading.relatedReleases, [release.doc._id]);
+    const otherArtist = await create("artists", { name: title + " B" }, true);
+    await assert.rejects(request(article.path, "PATCH", { relatedArtists: [otherArtist.doc._id] }), /HTTP 400/);
+    await assert.rejects(request("/admin/editorials", "POST", {
+      title: title + " B", relatedArtists: [otherArtist.doc._id], relatedReleases: [release.doc._id],
+    }), /HTTP 400/);
+    const original = await request(article.path);
+    assert.deepEqual(original.relatedArtists, [artist.doc._id]);
+    assert.deepEqual(original.relatedReleases, [release.doc._id]);
     assert.equal(reading.blocks[1].gallery[0].url, image);
     assert.equal(reading.credits[0].name, "Autor de prueba");
+
+    const newer = await create("editorials", {
+      title: title + " [segunda]", heroUrl: image, status: "published", blocks: [{ type: "paragraph", text: "Texto" }],
+    }, true);
+    const draft = await create("editorials", { title: title + " borrador", status: "draft" }, true);
+    const initial = await request("/admin/home-carousel");
+    const order = [newer.doc._id, article.doc._id];
+    const saveCarousel = (version, entries) => request("/admin/home-carousel", "PUT", { version, entries });
+    const firstSave = await saveCarousel(initial.version, order);
+    assert.deepEqual((await request("/home-carousel")).map((x) => x._id), order);
+    await assert.rejects(saveCarousel(initial.version, []), /HTTP 409/);
+    await assert.rejects(saveCarousel(firstSave.version, [draft.doc._id]), /HTTP 400/);
+    await assert.rejects(saveCarousel(firstSave.version, [article.doc._id, article.doc._id]), /HTTP 400/);
+    const second = await saveCarousel(firstSave.version, order.slice().reverse());
+    assert.deepEqual((await request("/home-carousel")).map((x) => x._id), order.slice().reverse());
+    await request(newer.path, "PATCH", { status: "draft" });
+    assert.deepEqual((await request("/home-carousel")).map((x) => x._id), [article.doc._id]);
+    const cleared = await saveCarousel(second.version, []);
+    assert.deepEqual(await request("/home-carousel"), []);
+    await saveCarousel(cleared.version, initial.entries);
+
+    const search = "/admin/activity?type=editorial&q=" + encodeURIComponent(title);
+    const ascending = await request(search + "&order=oldest");
+    const descending = await request(search + "&order=newest");
+    assert.equal(ascending.total, 3);
+    assert.deepEqual(ascending.data.map((x) => x.id), descending.data.map((x) => x.id).reverse());
+    const literal = await request("/admin/activity?q=" + encodeURIComponent(title + " [segunda]"));
+    assert.deepEqual(literal.data.map((x) => x.id), [newer.doc._id]);
 
     const event = await create("events", {
       title, venue: "Sala de prueba", city: "Madrid", date: new Date().toISOString(), lineup: [artist.doc._id],

@@ -1,3 +1,4 @@
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import DOMPurify from "dompurify";
 import React, { useEffect, useMemo, useState } from "react";
@@ -21,16 +22,29 @@ export default function NewEditorialPage({ isEditMode = false }) {
   const [blocks, setBlocks] = useState([createTextBlock()]);
   const [uploadingBlock, setUploadingBlock] = useState(false);
   const [artists, setArtists] = useState([]);
-  const [releases, setReleases] = useState([]);
+  const [releases, setReleases] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [optionsError, setOptionsError] = useState("");
-  const { control, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { status: "draft", featured: false, title: "", credits: [], relatedArtists: [], relatedReleases: [] } });
+  const { control, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { status: "draft", title: "", credits: [], relatedArtists: [], relatedReleases: [] } });
   const credits = useFieldArray({ control, name: "credits" });
   useEffect(() => {
     Promise.all([adminListArtists(), adminListReleases()]).then(([people, catalogue]) => {
       setArtists(people); setReleases(catalogue);
     }).catch(() => setOptionsError("No se pudieron cargar las asociaciones disponibles."));
   }, []);
+  const selectedArtists = watch("relatedArtists");
+  const selectedReleases = watch("relatedReleases");
+  const forArtists = (ids) => (releases || []).filter(({ artist }) => ids.includes(artist?._id || artist));
+  const availableReleases = forArtists(selectedArtists);
+  const eligibleIds = new Set(availableReleases.map((release) => release._id));
+  const hasLegacyLinks = releases && selectedReleases.some((id) => !eligibleIds.has(id));
+
+  function changeArtists(ids) {
+    const eligible = new Set(forArtists(ids).map((release) => release._id));
+    setValue("relatedArtists", ids);
+    setValue("relatedReleases", selectedReleases.filter((id) => eligible.has(id)));
+  }
+
   const title = watch("title") || "";
   const currentStatus = watch("status") || "draft";
   const excerpt = watch("excerpt") || "";
@@ -49,15 +63,15 @@ export default function NewEditorialPage({ isEditMode = false }) {
         if (!response.ok) throw new Error("Error loading editorial");
         const data = await response.json();
         setValue("title", data.title || ""); setValue("slug", data.slug || ""); setValue("subtitle", data.subtitle || "");
-        setValue("status", data.status || "draft"); setValue("featured", Boolean(data.featured)); setValue("section", data.section || ""); setValue("series", data.series || "");
+        setValue("status", data.status || "draft"); setValue("section", data.section || ""); setValue("series", data.series || "");
         if (data.publishAt) setValue("publishAt", localDateTime(data.publishAt));
         const hero = typeof data.hero === "string" ? { url: data.hero } : data.hero || {};
         setValue("heroUrl", hero.url || data.heroUrl || ""); setValue("heroAlt", hero.alt || ""); setValue("heroCaption", hero.caption || ""); setValue("heroCredit", hero.credit || "");
         const contentBlocks = data.blocks || [];
         setBlocks(contentBlocks.length ? contentBlocks.map((block, index) => ({ ...block, id: `${block.type}-${index}-${Date.now()}` })) : [createTextBlock()]);
         setValue("credits", data.credits || []);
-        setValue("relatedArtists", data.relatedArtists || []);
-        setValue("relatedReleases", data.relatedReleases || []);
+        setValue("relatedArtists", (data.relatedArtists || []).map((artist) => artist._id || artist));
+        setValue("relatedReleases", (data.relatedReleases || []).map((release) => release._id || release));
         setValue("excerpt", data.excerpt || ""); setValue("tags", data.tags?.join(", ") || "");
         if (data.seo) { setValue("seoTitle", data.seo.title || ""); setValue("seoDescription", data.seo.description || ""); setValue("seoOgImage", data.seo.ogImage || ""); }
       } catch (error) { setLoadError(error.message || "No se pudo cargar la editorial."); } finally { setLoadingInitial(false); }
@@ -124,11 +138,9 @@ export default function NewEditorialPage({ isEditMode = false }) {
   return (
     <main className="admin-page admin-form-page admin-wordpress-page">
       <div className="admin-form-container">
-        <header className="editor-workspace-header">
-          <a href="/admin" className="editor-back">← Panel</a>
-          <h1>{pageTitle}</h1>
+        <AdminFormHeading title={pageTitle}>
           <a className="editor-settings-jump" href="#editorial-publicacion">Publicación ↓</a>
-        </header>
+        </AdminFormHeading>
         {loadError ? <p role="alert">{loadError}</p> : effectiveEditMode && loadingInitial ? <p className="admin-loading-state">Cargando editorial…</p> : (
           <form onSubmit={handleSubmit(onSubmit)} className="admin-form admin-editor-form admin-editorial-form">
             <div className="admin-editorial-layout">
@@ -159,9 +171,17 @@ export default function NewEditorialPage({ isEditMode = false }) {
                 <details className="admin-form-panel admin-visible-panel">
                   <summary className="admin-visible-panel__heading"><span>Asociaciones</span></summary>
                   <div className="admin-form-panel__body admin-panel-fields">
-                    {optionsError && <p role="alert">{optionsError}</p>}
-                    <AdminRelations title="Artistas relacionados" items={artists} selected={watch("relatedArtists")} onChange={(ids) => setValue("relatedArtists", ids)} />
-                    <AdminRelations title="Lanzamientos relacionados" items={releases} selected={watch("relatedReleases")} onChange={(ids) => setValue("relatedReleases", ids)} />
+                    {optionsError ? <p role="alert">{optionsError}</p> : releases === null ? <p>Cargando catálogo…</p> : <>
+                      <AdminRelations title="Artistas relacionados" items={artists} selected={selectedArtists} onChange={changeArtists} />
+                      {availableReleases.length > 0
+                        ? <AdminRelations title="Lanzamientos relacionados" items={availableReleases} selected={selectedReleases}
+                            onChange={(ids) => setValue("relatedReleases", ids.filter((id) => eligibleIds.has(id)))} />
+                        : <p>{selectedArtists.length ? "Sin lanzamientos para los artistas seleccionados." : "Elige un artista para ver su catálogo."}</p>}
+                      {hasLegacyLinks && <div>
+                        <p>Hay asociaciones anteriores fuera de esta selección. Se conservarán hasta que cambies las asociaciones.</p>
+                        <button type="button" className="btn admin-secondary-action" onClick={() => changeArtists(selectedArtists)}>Desvincular lanzamientos fuera de la selección</button>
+                      </div>}
+                    </>}
                   </div>
                 </details>
               </div>
@@ -171,11 +191,10 @@ export default function NewEditorialPage({ isEditMode = false }) {
                   <h2>Publicación</h2>
                   <div className="admin-field"><label className="form-label" htmlFor="editorial-status">Estado</label><select id="editorial-status" className="form-select" {...register("status")}><option value="draft">Borrador</option><option value="published">Publicada</option><option value="scheduled">Programada</option></select></div>
                   <div className="admin-field"><label className="form-label" htmlFor="editorial-date">Fecha de publicación</label><input id="editorial-date" type="datetime-local" step="1" required={currentStatus === "scheduled"} className="form-control" {...register("publishAt")} /></div>
-                  <label className="admin-switch"><input type="checkbox" {...register("featured")} /><span /><b>Marcar como destacada</b></label>
                   <button type="submit" className="btn admin-primary-action" disabled={isSubmitting || uploadingBlock}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar editorial" : currentStatus === "published" ? "Publicar editorial" : currentStatus === "scheduled" ? "Programar editorial" : "Guardar borrador"}</button>
                 </section>
 
-                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>Imagen principal</span><small>Portada del artículo</small></div><div className="admin-form-panel__body admin-panel-fields"><AdminImagePreview src={heroUrl} alt="Imagen principal actual del artículo" label="Imagen guardada" /><div className="admin-field"><label htmlFor="new-editorial-heroFile" className="form-label">Subir imagen</label><input id="new-editorial-heroFile" type="file" accept="image/*" className="form-control" {...register("heroFile")} /><div className="form-text">Déjalo vacío para conservar la imagen actual.</div></div><div className="admin-field"><label htmlFor="new-editorial-heroUrl" className="form-label">O usar URL</label><input id="new-editorial-heroUrl" {...imageUrlInput} className="form-control" placeholder="https://…" {...register("heroUrl")} /></div><div className="admin-field"><label htmlFor="new-editorial-heroAlt" className="form-label">Texto alternativo</label><input id="new-editorial-heroAlt" className="form-control" placeholder="Describe lo que aparece en la imagen" {...register("heroAlt")} /></div><div className="admin-field-grid admin-field-grid--2"><div className="admin-field"><label htmlFor="new-editorial-heroCaption" className="form-label">Pie</label><input id="new-editorial-heroCaption" className="form-control" {...register("heroCaption")} /></div><div className="admin-field"><label htmlFor="new-editorial-heroCredit" className="form-label">Crédito</label><input id="new-editorial-heroCredit" className="form-control" {...register("heroCredit")} /></div></div></div></section>
+                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>Imagen principal</span></div><div className="admin-form-panel__body admin-panel-fields"><AdminImagePreview src={heroUrl} alt="Imagen principal actual del artículo" label="Imagen guardada" /><div className="admin-field"><label htmlFor="new-editorial-heroFile" className="form-label">Subir imagen</label><input id="new-editorial-heroFile" type="file" accept="image/*" className="form-control" {...register("heroFile")} /><div className="form-text">Déjalo vacío para conservar la imagen actual.</div></div><div className="admin-field"><label htmlFor="new-editorial-heroUrl" className="form-label">O usar URL</label><input id="new-editorial-heroUrl" {...imageUrlInput} className="form-control" placeholder="https://…" {...register("heroUrl")} /></div><div className="admin-field"><label htmlFor="new-editorial-heroAlt" className="form-label">Texto alternativo</label><input id="new-editorial-heroAlt" className="form-control" placeholder="Describe lo que aparece en la imagen" {...register("heroAlt")} /></div><div className="admin-field-grid admin-field-grid--2"><div className="admin-field"><label htmlFor="new-editorial-heroCaption" className="form-label">Pie</label><input id="new-editorial-heroCaption" className="form-control" {...register("heroCaption")} /></div><div className="admin-field"><label htmlFor="new-editorial-heroCredit" className="form-label">Crédito</label><input id="new-editorial-heroCredit" className="form-control" {...register("heroCredit")} /></div></div></div></section>
 
                 <details className="admin-form-panel admin-visible-panel"><summary className="admin-visible-panel__heading"><span>Organización</span><small>Ruta, sección y etiquetas</small></summary><div className="admin-form-panel__body admin-panel-fields"><div className="admin-field"><label htmlFor="new-editorial-slug" className="form-label">Slug <em>Automático si está vacío</em></label><input id="new-editorial-slug" className="form-control" placeholder="titulo-del-articulo" {...register("slug")} /></div><div className="admin-field-grid admin-field-grid--2"><div className="admin-field"><label htmlFor="new-editorial-section" className="form-label">Sección</label><input id="new-editorial-section" className="form-control" placeholder="Editorial" {...register("section")} /></div><div className="admin-field"><label htmlFor="new-editorial-series" className="form-label">Serie</label><input id="new-editorial-series" className="form-control" placeholder="Memory of Music" {...register("series")} /></div></div><div className="admin-field"><label htmlFor="new-editorial-tags" className="form-label">Etiquetas</label><input id="new-editorial-tags" className="form-control" placeholder="Galicia, shoegaze, entrevista" {...register("tags")} /><div className="form-text">{tags ? `${tags.split(",").filter(Boolean).length} etiquetas` : "Separa cada etiqueta con una coma."}</div></div></div></details>
 

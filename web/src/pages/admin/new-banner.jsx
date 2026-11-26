@@ -1,3 +1,4 @@
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -93,34 +94,88 @@ export default function NewBannerPage({ isEditMode = false }) {
 
   return (
     <main className="admin-page admin-form-page">
-      <header className="admin-form-header"><span>CR / Banner</span><span>{isEditMode ? "Editar" : "Nuevo"}</span><span>Anuncio público</span></header>
-      <section className="admin-form-intro admin-form-intro--with-action">
-        <p>Comunicación</p>
-        <div><h1>{isEditMode ? "Editar banner" : "Nuevo banner"}</h1><span>Una ventana central para avisos puntuales.</span></div>
-        {isEditMode && <button type="button" className="admin-delete" onClick={remove}>Borrar banner</button>}
-      </section>
-      {loadError && <p className="admin-status admin-status--error">{loadError}</p>}
-      {loading && <p>Cargando banner…</p>}
-      {!loading && !loadError && <form className="admin-form row g-0" onSubmit={handleSubmit(onSubmit)}>
-        <div className="col-12"><label htmlFor="new-banner-title" className="form-label">Título</label><input id="new-banner-title" className="form-control" {...register("title", { required: true })} />{errors.title && <span className="invalid-feedback d-block">Es obligatorio.</span>}</div>
-        <div className="col-12"><label htmlFor="new-banner-message" className="form-label">Texto</label><textarea id="new-banner-message" className="form-control" rows="3" {...register("message")} /></div>
-        <div className="col-md-8"><label htmlFor="new-banner-imageUrl" className="form-label">Imagen</label><input id="new-banner-imageUrl" className="form-control" {...imageUrlInput} placeholder="https://…" {...register("imageUrl")} /></div>
-        <div className="col-md-4"><label className="form-label" htmlFor="banner-image-file">O subir archivo</label><input id="banner-image-file" className="form-control" type="file" accept="image/jpeg,image/png,image/webp" {...register("imageFile", {
-          validate: (files) => {
-            const file = files?.[0];
-            if (!file) return true;
-            if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return "Elige una imagen JPEG, PNG o WebP.";
-            return file.size <= 10 * 1024 * 1024 || "La imagen supera el límite de 10 MiB.";
-          },
-        })} />{errors.imageFile && <span className="invalid-feedback d-block" role="alert">{errors.imageFile.message}</span>}</div>
-        <div className="col-md-8"><label htmlFor="new-banner-linkUrl" className="form-label">Enlace</label><input id="new-banner-linkUrl" className="form-control" type="url" placeholder="https://…" {...register("linkUrl")} /></div>
-        <div className="col-md-4"><label htmlFor="new-banner-linkLabel" className="form-label">Texto del enlace</label><input id="new-banner-linkLabel" className="form-control" {...register("linkLabel")} /></div>
-        <div className="col-md-6"><label htmlFor="new-banner-startAt" className="form-label">Visible desde</label><input id="new-banner-startAt" className="form-control" type="datetime-local" step="1" {...register("startAt")} /></div>
-        <div className="col-md-6"><label htmlFor="new-banner-endAt" className="form-label">Visible hasta</label><input id="new-banner-endAt" className="form-control" type="datetime-local" step="1" {...register("endAt")} /></div>
-        <div className="col-12"><label className="form-check"><input className="form-check-input" type="checkbox" {...register("active")} /><span>Banner activo</span></label></div>
-        {saveError && <p className="admin-status admin-status--error" role="alert">{saveError}</p>}
-        <div className="col-12"><button className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : "Guardar banner"}</button></div>
-      </form>}
+      <div className="admin-form-container">
+        <AdminFormHeading title={isEditMode ? "Editar banner" : "Nuevo banner"} />
+        {loadError && <p className="admin-status admin-status--error" role="alert">{loadError}</p>}
+        {loading && <p>Cargando banner…</p>}
+        {!loading && !loadError && (
+          <form className="admin-form admin-editor-form" onSubmit={handleSubmit(onSubmit)}>
+            <div className="admin-editor-layout">
+              <div className="admin-editor-main">
+                <section className="admin-form-card">
+                  <h2>Contenido</h2>
+                  <label className="admin-field">
+                    Título
+                    <input className="form-control" id="new-banner-title" aria-invalid={!!errors.title}
+                      aria-describedby={errors.title ? "banner-title-error" : undefined}
+                      {...register("title", { required: true })} />
+                  </label>
+                  {errors.title && <span id="banner-title-error" className="invalid-feedback d-block" role="alert">Escribe un título.</span>}
+                  <label className="admin-field">
+                    Texto
+                    <textarea className="form-control" id="new-banner-message" rows="3" {...register("message")} />
+                  </label>
+                </section>
+                <section className="admin-form-card">
+                  <h2>Portada</h2>
+                  <div className="admin-field-grid admin-field-grid--2">
+                    <label className="admin-field">
+                      URL de la imagen
+                      <input className="form-control" id="new-banner-imageUrl" {...imageUrlInput} placeholder="https://…" {...register("imageUrl")} />
+                    </label>
+                    <label className="admin-field">
+                      Subir archivo
+                      <input className="form-control" id="banner-image-file" type="file" accept="image/jpeg,image/png,image/webp"
+                        aria-describedby={errors.imageFile ? "banner-file-error" : undefined}
+                        {...register("imageFile", {
+                          validate: (files) => {
+                            const file = files?.[0];
+                            if (!file) return true;
+                            if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return "Elige una imagen JPEG, PNG o WebP.";
+                            return file.size <= 10 * 1024 * 1024 || "La imagen supera el límite de 10 MiB.";
+                          },
+                        })} />
+                    </label>
+                  </div>
+                  {errors.imageFile && <span id="banner-file-error" className="invalid-feedback d-block" role="alert">{errors.imageFile.message}</span>}
+                </section>
+                <section className="admin-form-card">
+                  <h2>Enlace</h2>
+                  <div className="admin-field-grid admin-field-grid--2">
+                    <label className="admin-field">
+                      Destino
+                      <input className="form-control" id="new-banner-linkUrl" type="url" placeholder="https://…" {...register("linkUrl")} />
+                    </label>
+                    <label className="admin-field">
+                      Texto del enlace
+                      <input className="form-control" id="new-banner-linkLabel" {...register("linkLabel")} />
+                    </label>
+                  </div>
+                </section>
+              </div>
+              <aside className="admin-editor-sidebar">
+                <section className="admin-action-card">
+                  <h2>Publicación</h2>
+                  <label className="admin-field">
+                    Visible desde
+                    <input className="form-control" id="new-banner-startAt" type="datetime-local" step="1" {...register("startAt")} />
+                  </label>
+                  <label className="admin-field">
+                    Visible hasta
+                    <input className="form-control" id="new-banner-endAt" type="datetime-local" step="1" {...register("endAt")} />
+                  </label>
+                  <label className="form-check"><input className="form-check-input" type="checkbox" {...register("active")} />Banner activo</label>
+                  {saveError && <p className="admin-status admin-status--error" role="alert">{saveError}</p>}
+                  <button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : "Guardar banner"}</button>
+                </section>
+                {isEditMode && <section className="admin-danger-card">
+                  <button type="button" className="btn btn-danger" onClick={remove}>Borrar banner</button>
+                </section>}
+              </aside>
+            </div>
+          </form>
+        )}
+      </div>
     </main>
   );
 }

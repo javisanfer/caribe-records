@@ -1,3 +1,5 @@
+import { isListenUrl, releaseListenUrl } from "../../utils/release-listen-url";
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import React, { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -35,9 +37,9 @@ export default function NewReleasePage() {
         reset({
           title: data.title || "", artist: data.artist?._id || data.artist || "", catalog: data.catalog || "", serialNumber: data.serialNumber || "", format: data.format || "",
           labelName: data.labelName || "", catalogType: data.catalogType || "own", catalogVisible: data.catalogVisible !== false,
-          artistName: data.artistName || "", appleMusicUrl: data.appleMusicUrl || "", barcode: data.barcode || "",
-          bandcampUrl: data.bandcampUrl || "",
-          release_date: data.release_date ? data.release_date.slice(0, 10) : "", country: data.country || "", spotifyUrl: data.spotifyUrl || "",
+          artistName: data.artistName || "", barcode: data.barcode || "",
+          listenUrl: releaseListenUrl(data),
+          release_date: data.release_date ? data.release_date.slice(0, 10) : "", country: data.country || "",
           coverUrl: data.cover?.url || data.cover_image || "", coverAlt: data.cover?.alt || "",
           tracklist: data.tracklist?.length ? data.tracklist.map((track) => ({ position: track.position, title: track.title || "", duration: track.duration || "" })) : [{ title: "", duration: "" }],
         });
@@ -53,11 +55,12 @@ export default function NewReleasePage() {
       const payload = {
         title: data.title.trim(), artist: data.artist || null, format: data.format.trim().toLowerCase(), release_date: data.release_date || null,
         labelName: data.labelName?.trim() || "", catalogType: data.catalogType || "own", catalogVisible: data.catalogVisible !== false,
-        artistName: data.artistName.trim(), appleMusicUrl: data.appleMusicUrl.trim(), barcode: data.barcode.trim(),
-        bandcampUrl: data.bandcampUrl?.trim() || "",
-        country: data.country?.trim() || "", spotifyUrl: data.spotifyUrl?.trim() || "", catalog: data.catalog?.trim() || "", serialNumber: data.serialNumber?.trim() || "",
+        artistName: data.artistName.trim(), barcode: data.barcode.trim(),
+        country: data.country?.trim() || "", catalog: data.catalog?.trim() || "", serialNumber: data.serialNumber?.trim() || "",
         tracklist: (data.tracklist || []).filter((track) => track.title?.trim()).map((track, index) => ({ position: Number(track.position) || index + 1, title: track.title.trim(), duration: track.duration?.trim() || "" })),
       };
+      const listenUrl = data.listenUrl?.trim() || "";
+      if (!isEditMode || listenUrl !== releaseListenUrl(initialRelease)) payload.listenUrl = listenUrl;
       if (isEditMode && initialRelease?.release_date?.slice(0, 10) === data.release_date) delete payload.release_date;
       payload.cover = { url: coverUrl, alt: data.coverAlt?.trim() || "" };
       payload.cover_image = coverUrl;
@@ -78,15 +81,14 @@ export default function NewReleasePage() {
   const pageTitle = isEditMode ? "Editar lanzamiento" : "Nuevo lanzamiento";
   return (
     <main className="admin-page admin-form-page">
-      <header className="admin-form-header"><button type="button" className="admin-back" onClick={() => navigate(-1)}>← Panel</button><span>Caribe Records · {pageTitle}</span><span /></header>
       <div className="admin-form-container">
-        <div className="admin-form-intro"><div><p>Lanzamientos / {isEditMode ? "Editar" : "Crear"}</p><h1>{pageTitle}</h1></div><span>Construye la ficha de catálogo de lo general al detalle.</span></div>
+        <AdminFormHeading title={pageTitle} />
         {loadError ? <p role="alert">{loadError}</p> : isEditMode && loadingRelease ? <p className="admin-loading-state">Cargando lanzamiento…</p> : (
           <form onSubmit={handleSubmit(onSubmit)} className="admin-form admin-editor-form">
             <div className="admin-editor-layout">
               <div className="admin-editor-main">
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>01</span><div><h2>Datos principales</h2><p>La información que identifica el lanzamiento.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Datos principales</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field"><label htmlFor="new-release-title" className="form-label">Título <b>Obligatorio</b></label><input id="new-release-title" className={`form-control ${errors.title ? "is-invalid" : ""}`} placeholder="Título del lanzamiento" {...register("title", { required: "Escribe un título" })} />{errors.title && <div className="invalid-feedback">{errors.title.message}</div>}</div>
                     <div className="admin-field"><label htmlFor="new-release-artist" className="form-label">Artista</label><select id="new-release-artist" className={`form-select ${errors.artist ? "is-invalid" : ""}`} {...register("artist")}><option value="">Seleccionar artista…</option>{artists.map((artist) => <option key={artist._id} value={artist._id}>{artist.name}</option>)}</select>{errors.artist && <div className="invalid-feedback">{errors.artist.message}</div>}</div>
@@ -96,7 +98,7 @@ export default function NewReleasePage() {
                   </div>
                 </section>
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>02</span><div><h2>Catálogo</h2><p>Referencias internas y disponibilidad.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Catálogo</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field"><label htmlFor="new-release-catalog" className="form-label">Número de catálogo</label><input id="new-release-catalog" className="form-control" placeholder="CRB-001" {...register("catalog")} /></div>
                     <div className="admin-field"><label htmlFor="new-release-labelName" className="form-label">Sello</label><input id="new-release-labelName" className="form-control" placeholder="Caribe Records/Buenos Amigos" {...register("labelName")} /></div>
@@ -104,14 +106,19 @@ export default function NewReleasePage() {
                     <div className="admin-field"><label className="form-label"><input type="checkbox" {...register("catalogVisible")} /> Visible en el catálogo público</label></div>
                     <div className="admin-field"><label htmlFor="new-release-serialNumber" className="form-label">Número de serie</label><input id="new-release-serialNumber" className="form-control" placeholder="#023/300" {...register("serialNumber")} /></div>
                     <div className="admin-field"><label htmlFor="new-release-country" className="form-label">País</label><input id="new-release-country" className="form-control" placeholder="ES" {...register("country")} /></div>
-                    <div className="admin-field"><label htmlFor="new-release-spotifyUrl" className="form-label">Spotify</label><input id="new-release-spotifyUrl" type="url" className={`form-control ${errors.spotifyUrl ? "is-invalid" : ""}`} placeholder="https://open.spotify.com/album/…" {...register("spotifyUrl", { validate: (value) => !value || /^https:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(?:album|track)\/[A-Za-z0-9]{22}(?:\?.*)?$/i.test(value.trim()) || "Introduce un enlace válido de álbum o canción de Spotify" })} />{errors.spotifyUrl && <div className="invalid-feedback">{errors.spotifyUrl.message}</div>}</div>
+                    <div className="admin-field">
+                      <label htmlFor="new-release-listenUrl" className="form-label">Enlace de escucha</label>
+                      <input id="new-release-listenUrl" type="url" className={`form-control ${errors.listenUrl ? "is-invalid" : ""}`}
+                        placeholder="https://…" aria-invalid={Boolean(errors.listenUrl)}
+                        aria-describedby={errors.listenUrl ? "release-listen-error" : undefined}
+                        {...register("listenUrl", { validate: value => !value?.trim() || isListenUrl(value) || "Introduce un enlace http o https válido." })} />
+                      {errors.listenUrl && <div id="release-listen-error" className="invalid-feedback">{errors.listenUrl.message}</div>}
+                    </div>
                     <label className="admin-field">Código de barras<input className="form-control" {...register("barcode")} /></label>
-                    <label className="admin-field">Apple Music<input type="url" className="form-control" {...register("appleMusicUrl")} /></label>
-                    <div className="admin-field"><label htmlFor="new-release-bandcampUrl" className="form-label">Bandcamp</label><input id="new-release-bandcampUrl" type="url" className="form-control" placeholder="https://artista.bandcamp.com/album/…" {...register("bandcampUrl")} /></div>
                   </div>
                 </section>
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>03</span><div><h2>Portada</h2><p>Sube un archivo o pega una URL existente.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Portada</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field admin-field--wide"><AdminImagePreview src={currentCoverUrl} alt="Portada actual del lanzamiento" label="Portada guardada" /></div>
                     <div className="admin-field"><label htmlFor="new-release-coverFile" className="form-label">Archivo</label><input id="new-release-coverFile" type="file" accept="image/*" className="form-control" {...register("coverFile")} /><div className="form-text">El archivo tiene prioridad sobre la URL.</div></div>
@@ -120,13 +127,13 @@ export default function NewReleasePage() {
                   </div>
                 </section>
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>04</span><div><h2>Lista de temas</h2><p>Añade las canciones en el orden definitivo.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Lista de temas</h2><p>Añade las canciones en el orden definitivo.</p></div>
                   <div className="admin-tracklist" role="group" aria-label="Lista de temas">{fields.map((field, index) => <div key={field.id} className="admin-track-row"><input aria-label={`Posición del tema ${index + 1}`} type="number" min="1" className="form-control" placeholder={String(index + 1)} {...register(`tracklist.${index}.position`)} /><input aria-label={`Título del tema ${index + 1}`} className="form-control" placeholder="Título del tema" {...register(`tracklist.${index}.title`)} /><input aria-label={`Duración del tema ${index + 1}`} className="form-control" placeholder="3:34" {...register(`tracklist.${index}.duration`)} /><button type="button" className="admin-track-remove" aria-label={`Eliminar tema ${index + 1}`} onClick={() => remove(index)}>×</button></div>)}</div>
                   <button type="button" className="btn admin-secondary-action" onClick={() => append({ title: "", duration: "" })}>+ Añadir tema</button>
                 </section>
               </div>
               <aside className="admin-editor-sidebar">
-                <section className="admin-action-card"><span className="admin-action-card__status">{isEditMode ? "Ficha existente" : "Nuevo catálogo"}</span><h2>{isEditMode ? "Guardar cambios" : "Crear lanzamiento"}</h2><p>Los temas vacíos no se incluirán al guardar.</p><div className="admin-action-checks"><span><i>01</i> Datos principales</span><span><i>02</i> Referencia de catálogo</span><span><i>03</i> Portada accesible</span><span><i>04</i> Tracklist ordenado</span></div><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : isEditMode ? "Actualizar lanzamiento" : "Guardar lanzamiento"}</button></section>
+                <section className="admin-action-card"><p>Los temas vacíos no se incluirán al guardar.</p><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : isEditMode ? "Actualizar lanzamiento" : "Guardar lanzamiento"}</button></section>
                 {isEditMode && <section className="admin-danger-card"><h3>Zona sensible</h3><p>Eliminarás la ficha y su tracklist.</p><button type="button" className="btn btn-danger" onClick={handleDelete}>Eliminar lanzamiento</button></section>}
               </aside>
             </div>

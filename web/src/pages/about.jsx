@@ -18,19 +18,14 @@ export default function AboutPage() {
     <main className="about-page about-studio">
       <AdminEditLink to="/admin/about" label="la página About" />
       <header className="about-studio__intro">
-        <div className="about-studio__meta">
-          <span>Caribe Records / Est. Madrid</span>
-          <span>Sello independiente · 2024</span>
-        </div>
         <div className="about-studio__opening">
           <div>
-            <p className="about-studio__eyebrow">Sobre nosotros</p>
             <h1>{content.heading.split("\n").map((line, index) => <React.Fragment key={index}>{index > 0 && <br />}{line}</React.Fragment>)}<span className="about-studio__period">.</span></h1>
           </div>
           <span className="about-studio__mark" aria-hidden="true" />
         </div>
         <div className="about-studio__statement">
-          <span className="about-studio__index">01 / El sello</span>
+          <span className="about-studio__index">Caribe Records</span>
           <div>
             {content.statement.split(/\n\s*\n/).map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </div>
@@ -40,7 +35,6 @@ export default function AboutPage() {
       <section className="about-studio__archive" aria-labelledby="about-archive-title">
         <div className="about-studio__section-heading">
           <div>
-            <span className="about-studio__index">02 / Registro</span>
             <h2 id="about-archive-title">Archivo</h2>
           </div>
           <span>Fotografías · {String(photographs.length).padStart(2, "0")}</span>
@@ -58,10 +52,9 @@ export default function AboutPage() {
       <section className="about-studio__connect" aria-labelledby="about-connect-title">
         <div className="about-studio__section-heading">
           <div>
-            <span className="about-studio__index">03 / Conecta</span>
             <h2 id="about-connect-title">Seguimos en contacto.</h2>
           </div>
-          <span>Madrid, España</span>
+          <span>Madrid · Desde 2024</span>
         </div>
         <div className="about-studio__links">
           {links.map(({ label, detail, href }, index) => (

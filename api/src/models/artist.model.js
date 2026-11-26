@@ -44,6 +44,7 @@ const artistSchema = new mongoose.Schema({
   name:   { type: String, required: true, trim: true },
   slug:   { type: String, unique: true },
   bio:    { type: String },
+  bioHtml: { type: String },
   rosterVisible: { type: Boolean, default: true },
   genres: [{ type: String, trim: true }],
 

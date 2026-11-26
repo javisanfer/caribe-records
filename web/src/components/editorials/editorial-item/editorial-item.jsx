@@ -22,8 +22,7 @@ export default function EditorialItem({ editorial, index }) {
       className="editorial-item"
       style={{ cursor: slug === "#" ? "default" : "pointer" }}
     >
-      <div className="editorial-item__media">
-        {editorial.hero?.url && !imageFailed ? (
+      {editorial.hero?.url && !imageFailed && <div className="editorial-item__media">
           <img
             src={editorial.hero.url}
             alt={editorial.hero.alt || editorial.title}
@@ -31,10 +30,7 @@ export default function EditorialItem({ editorial, index }) {
             decoding="async"
             onError={() => setImageFailed(true)}
           />
-        ) : (
-          <span aria-hidden="true">CR</span>
-        )}
-      </div>
+      </div>}
       <div className="editorial-item__copy">
         <p>{String(index).padStart(2, "0")} · {authorName}</p>
         <h2>{editorial.title}</h2>

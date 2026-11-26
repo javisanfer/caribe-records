@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import React from "react";
 
-export default function EventItem({ event = {}, past = false }) {
+export default function EventItem({ event = {}, past = false, onOpenPoster }) {
   // 🛡️ Normalización de fecha
   const rawDate =
     event.datetime ||
@@ -31,8 +31,6 @@ export default function EventItem({ event = {}, past = false }) {
     (value) => typeof value === "string" && /^https?:\/\//i.test(value)
   );
 
-
-
   return (
     <article
       className={`event-row${past ? " event-row--past" : ""}`}
@@ -53,7 +51,12 @@ export default function EventItem({ event = {}, past = false }) {
       </time>
 
       <div className="event-row__ticket">
-        {url ? <a className="content-permalink" href={url} target="_blank" rel="noopener noreferrer nofollow">{past ? "Ver cartel" : "Entradas"} <span aria-hidden="true">↗</span></a> : <span>{past ? "Finalizado" : "Próximamente"}</span>}
+        {past && event.posterUrl ? (
+          <button type="button" className="event-poster-trigger" aria-haspopup="dialog"
+            onClick={(click) => onOpenPoster(event.id, click.currentTarget)}>
+            Ver cartel
+          </button>
+        ) : url ? <a className="content-permalink" href={url} target="_blank" rel="noopener noreferrer nofollow">{past ? "Ver cartel" : "Entradas"} <span aria-hidden="true">↗</span></a> : <span>{past ? "Finalizado" : "Próximamente"}</span>}
       </div>
     </article>
   );

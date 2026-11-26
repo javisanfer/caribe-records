@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import mark from "../assets/brand/caribe-mark.webp";
+import { useAuthContext } from "../contexts/use-auth-context";
 import runner from "../assets/brand/caribe-runner.webp";
 import SiteLoader from "../components/ui/site-loader.jsx";
 
@@ -12,6 +12,7 @@ const homeNavigation = [
 ];
 
 export default function HomePage() {
+  const { user } = useAuthContext();
   const [editorials, setEditorials] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -19,12 +20,12 @@ export default function HomePage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/v1/editorials?featured=true&limit=5")
+    fetch("/api/v1/home-carousel")
       .then((res) => {
         if (!res.ok) throw new Error("Editorials unavailable");
         return res.json();
       })
-      .then((json) => (Array.isArray(json) ? json : json.data || []).filter((item) => item.featured).slice(0, 5))
+      .then((json) => Array.isArray(json) ? json : [])
       .catch(() => [])
       .then((items) => {
         if (active) setEditorials(items);
@@ -51,8 +52,9 @@ export default function HomePage() {
     <div className={`home${loading ? " is-loading" : ""}`}>
       <header className="home-nav">
         <Link to="/" className="home-brand" aria-label="Caribe Records, inicio">
-          <img src={mark} alt="" />
+          <span className="home-brand__mark" aria-hidden="true" />
         </Link>
+        {user?.role === "admin" && <Link to="/admin" className="home-panel-link">Panel <span aria-hidden="true">↗</span></Link>}
       </header>
 
       <main

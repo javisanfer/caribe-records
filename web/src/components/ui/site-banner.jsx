@@ -39,8 +39,8 @@ export default function SiteBanner() {
   return (
     <dialog ref={dialogRef} onCancel={(event) => { event.preventDefault(); close(); }} className={`site-banner${banner.imageUrl ? " site-banner--with-image" : ""}`} aria-label="Anuncio especial">
       <div className="site-banner__chrome">
-        <span>Caribe Records / Anuncio</span>
-        <button className="site-banner__close" type="button" onClick={close} aria-label="Cerrar anuncio">×</button>
+        <span>Anuncio</span>
+        <button className="site-banner__close" type="button" onClick={close} aria-label="Cerrar anuncio" />
       </div>
       {banner.imageUrl && (
         <div className="site-banner__media">

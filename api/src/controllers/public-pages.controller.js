@@ -42,6 +42,7 @@ function renderPage({ title, description, image, type, url, missing = false }) {
 <meta property="og:title" content="${name}"><meta property="og:description" content="${escape(summary)}">${url ? '<meta property="og:url" content="' + escape(url) + '">' : ''}
 <meta property="og:image" content="${escape(imageUrl)}"><meta property="og:site_name" content="Caribe Records"><meta property="og:locale" content="es_ES">
 <meta property="og:type" content="${type === "Article" ? "article" : "website"}"><meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${name}"><meta name="twitter:description" content="${escape(summary)}"><meta name="twitter:image" content="${escape(imageUrl)}">
 ${missing ? '<meta name="robots" content="noindex">' : '<script id="page-schema" type="application/ld+json">' + JSON.stringify(schema).replaceAll("<", "\\u003c") + '</script>'}
 <meta name="theme-color" content="#0020d1"><link rel="icon" href="/favicon.png?v=2"><link rel="stylesheet" href="/page-entry.css">
 <script type="module" src="/page-entry.js"></script></head><body><div id="root"><main><h1>${escape(title)}</h1><p>${escape(summary)}</p><a href="/">Caribe Records</a></main></div></body></html>`;

@@ -37,7 +37,6 @@ export default function ActivateAdminPage() {
 
   return (
     <main className="admin-activation">
-      <p className="detail-section-label">Caribe Records / Administración</p>
       <h1>Activa tu cuenta</h1>
       {done ? (
         <p>Tu contraseña ya está lista. <Link to="/admin/login">Iniciar sesión →</Link></p>

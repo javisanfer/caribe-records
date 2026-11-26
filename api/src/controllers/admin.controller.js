@@ -27,17 +27,29 @@ exports.getActivity = async (req, res) => {
     const limit = Math.min(500, Math.max(1, Number.isNaN(requestedLimit) ? 100 : requestedLimit));
 
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const { q = "", order = "newest" } = req.query;
+    if (typeof q !== "string" || q.length > 120 || !["newest", "oldest"].includes(order)) {
+      return res.status(400).json({ message: "Filtro de actividad no válido." });
+    }
+    const direction = order === "oldest" ? 1 : -1;
+    const search = q.trim();
     const projection = ({ type, titleField }) => ({ $project: {
       type: { $literal: type }, id: { $toString: "$_id" }, _id: 0,
       slug: { $ifNull: ["$slug", null] }, title: { $ifNull: [`$${titleField}`, "Sin título"] },
       createdAt: 1, updatedAt: { $ifNull: ["$updatedAt", "$createdAt"] },
     } });
+    const sourcePipeline = (source) => {
+      const stages = [];
+      if (search) stages.push({ $match: { [source.titleField]: { $regex: search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } } });
+      stages.push(projection(source));
+      return stages;
+    };
     const [first, ...rest] = sources;
     const [result] = await first.model.aggregate([
-      projection(first),
-      ...rest.map((source) => ({ $unionWith: { coll: source.model.collection.name, pipeline: [projection(source)] } })),
+      ...sourcePipeline(first),
+      ...rest.map((source) => ({ $unionWith: { coll: source.model.collection.name, pipeline: sourcePipeline(source) } })),
       { $facet: {
-        data: [{ $sort: { updatedAt: -1, id: -1 } }, { $skip: (page - 1) * limit }, { $limit: limit }],
+        data: [{ $sort: { updatedAt: direction, id: direction, type: 1 } }, { $skip: (page - 1) * limit }, { $limit: limit }],
         counts: [{ $group: { _id: "$type", count: { $sum: 1 } } }],
       } },
     ]);

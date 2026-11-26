@@ -39,7 +39,7 @@ exports.getArtistById = async (req, res) => {
         path: "albums",
         match: { catalogVisible: { $ne: false } },
         select:
-          "title format release_date cover_image cover spotifyUrl catalog serialNumber",
+          "title format release_date cover_image cover listenUrl spotifyUrl appleMusicUrl bandcampUrl catalog serialNumber",
         options: { sort: { release_date: -1, createdAt: -1 } },
       })
       .lean();
@@ -65,7 +65,7 @@ exports.getArtistBySlug = async (req, res) => {
         path: "albums",
         match: { catalogVisible: { $ne: false } },
         select:
-          "title format release_date cover_image cover spotifyUrl catalog serialNumber",
+          "title format release_date cover_image cover listenUrl spotifyUrl appleMusicUrl bandcampUrl catalog serialNumber",
         options: { sort: { release_date: -1, createdAt: -1 } },
       })
       .lean();
@@ -119,6 +119,7 @@ exports.createArtists = async (req, res) => {
 exports.updateArtist = async (req, res) => {
   try {
     const updates = { ...req.body };
+    if (updates.bio !== undefined && updates.bioHtml === undefined) updates.bioHtml = "";
 
     // Si cambia el nombre → regenerar slug (a no ser que el user lo ponga a mano)
     if (updates.name && !updates.slug) {

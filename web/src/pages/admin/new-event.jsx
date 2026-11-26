@@ -1,3 +1,4 @@
+import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 // src/pages/admin/new-event.jsx
 import React, { useEffect, useState } from "react";
@@ -193,32 +194,15 @@ export default function NewEventPage({ isEditMode = false }) {
     }
   };
 
-  const headerLabel = effectiveEditMode ? "Editar evento" : "Nuevo evento";
   const titleLabel = effectiveEditMode ? "Editar evento" : "Nuevo evento";
 
   return (
     <main className="admin-page admin-form-page">
       {/* Header */}
-      <header className="admin-form-header">
-        <button
-          type="button"
-          className="admin-back"
-          onClick={() => navigate(-1)}
-        >
-          ← Panel
-        </button>
-        <span>
-          Caribe Records · {headerLabel}
-        </span>
-        <span />
-      </header>
 
       {/* Form */}
       <div className="admin-form-container">
-        <div className="admin-form-intro">
-          <div><p>Eventos / {effectiveEditMode ? "Editar" : "Crear"}</p><h1>{titleLabel}</h1></div>
-          <span>Organiza los datos como los verá quien busca fecha, lugar y entradas.</span>
-        </div>
+        <AdminFormHeading title={titleLabel} />
 
         {loadError ? <p role="alert">{loadError}</p> : effectiveEditMode && loadingInitial ? (
           <p className="text-muted">Loading event…</p>
@@ -227,7 +211,7 @@ export default function NewEventPage({ isEditMode = false }) {
             <div className="admin-editor-layout">
               <div className="admin-editor-main">
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>01</span><div><h2>Evento</h2><p>Qué ocurre y quién actúa.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Evento</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field admin-field--wide"><label htmlFor="new-event-title" className="form-label">Título <b>Obligatorio</b></label><input id="new-event-title" className={`form-control ${errors.title ? "is-invalid" : ""}`} placeholder="Nombre del evento" {...register("title", { required: "Escribe el título del evento" })} />{errors.title && <div className="invalid-feedback">{errors.title.message}</div>}</div>
                     <AdminRelations title="Artistas del cartel" items={artists} selected={watch("lineup")} onChange={(ids) => setValue("lineup", ids)} />
@@ -237,7 +221,7 @@ export default function NewEventPage({ isEditMode = false }) {
                 </section>
 
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>02</span><div><h2>Lugar</h2><p>Datos para que el público pueda encontrarlo.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Lugar</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field admin-field--wide"><label htmlFor="new-event-venue" className="form-label">Sala o espacio</label><input id="new-event-venue" className="form-control" required placeholder="Nombre del recinto" {...register("venue")} /></div>
                     <div className="admin-field"><label htmlFor="new-event-city" className="form-label">Ciudad <b>Obligatorio</b></label><input id="new-event-city" className={`form-control ${errors.city ? "is-invalid" : ""}`} placeholder="Madrid" {...register("city", { required: "Escribe la ciudad" })} />{errors.city && <div className="invalid-feedback">{errors.city.message}</div>}</div>
@@ -247,7 +231,7 @@ export default function NewEventPage({ isEditMode = false }) {
                 </section>
 
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>03</span><div><h2>Cartel</h2><p>La imagen principal del evento.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Cartel</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field admin-field--wide"><AdminImagePreview src={posterUrl} alt="Cartel actual del evento" label="Cartel guardado" /></div>
                     <div className="admin-field"><label htmlFor="new-event-posterFile" className="form-label">Archivo</label><input id="new-event-posterFile" type="file" accept="image/*" className="form-control" {...register("posterFile")} /><div className="form-text">Déjalo vacío para conservar el cartel actual.</div></div>
@@ -256,7 +240,7 @@ export default function NewEventPage({ isEditMode = false }) {
                 </section>
 
                 <section className="admin-form-card">
-                  <div className="admin-form-card__heading"><span>04</span><div><h2>Información pública</h2><p>Venta de entradas y contexto adicional.</p></div></div>
+                  <div className="admin-form-card__heading"><h2>Información pública</h2></div>
                   <label className="admin-field">Enlace al cartel o archivo<input className="form-control" type="url" {...register("sourceUrl")} /></label>
                   <label><input type="checkbox" {...register("isActive")} /> Visible en Eventos</label>
                   <div className="admin-field"><label htmlFor="new-event-ticketUrl" className="form-label">Enlace de entradas</label><input id="new-event-ticketUrl" type="url" className="form-control" placeholder="https://…" {...register("ticketUrl")} /></div>
@@ -265,7 +249,7 @@ export default function NewEventPage({ isEditMode = false }) {
               </div>
 
               <aside className="admin-editor-sidebar">
-                <section className="admin-action-card"><span className="admin-action-card__status">{effectiveEditMode ? "Evento existente" : "Nuevo evento"}</span><h2>{effectiveEditMode ? "Guardar cambios" : "Crear evento"}</h2><p>Comprueba especialmente la fecha, la ciudad y el enlace de entradas.</p><div className="admin-action-checks"><span><i>01</i> Artista y fecha</span><span><i>02</i> Recinto y ubicación</span><span><i>03</i> Cartel</span><span><i>04</i> Entradas e información</span></div><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar evento" : "Guardar evento"}</button></section>
+                <section className="admin-action-card"><button type="submit" className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar evento" : "Guardar evento"}</button></section>
                 {effectiveEditMode && <section className="admin-danger-card"><h3>Zona sensible</h3><p>El evento desaparecerá del calendario.</p><button type="button" className="btn btn-danger" onClick={handleDelete}>Eliminar evento</button></section>}
               </aside>
             </div>

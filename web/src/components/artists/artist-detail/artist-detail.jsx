@@ -1,3 +1,5 @@
+import { releaseListenUrl } from "../../../utils/release-listen-url";
+import { cleanBiography } from "../../../utils/artist-biography";
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../../index.css";
@@ -28,10 +30,6 @@ function releaseFormat(format) {
   if (normalized === "ep") return "EP";
   if (["lp", "album", "álbum", "disco"].includes(normalized)) return "Disco";
   return "Lanzamiento";
-}
-
-function releaseUrl(release) {
-  return release.spotifyUrl || release.bandcampUrl || release.appleMusicUrl || "";
 }
 
 export default function ArtistDetail({
@@ -87,8 +85,7 @@ export default function ArtistDetail({
             {artist.formedYear && <span>Desde {artist.formedYear}</span>}
           </div>
         </div>
-        <div className={`artist-detail__visual ${hasHeroImage ? "" : "is-empty"}`}>
-          {hasHeroImage ? (
+        {hasHeroImage && <div className="artist-detail__visual">
             <img
               src={heroImage}
               alt={artist.name}
@@ -98,8 +95,7 @@ export default function ArtistDetail({
               }}
               onError={() => setFailedPhotoUrls((urls) => [...urls, heroImage])}
             />
-          ) : <span>CR</span>}
-        </div>
+        </div>}
       </header>
 
       <nav className="artist-detail__tabs" aria-label="Contenido del artista">
@@ -114,9 +110,11 @@ export default function ArtistDetail({
             <p className="detail-section-label">Biografía</p>
             {artist.bio ? (
               <>
-                <p className={expandedBio ? "is-expanded" : ""}>{artist.bio}</p>
+                {artist.bioHtml
+                  ? <div className={`artist-bio-copy${expandedBio || artist.bio.length <= 430 ? " is-expanded" : ""}`} dangerouslySetInnerHTML={{ __html: cleanBiography(artist.bioHtml) }} />
+                  : <p className={expandedBio ? "is-expanded" : ""}>{artist.bio}</p>}
                 {artist.bio.length > 430 && (
-                  <button className="artist-detail__more" onClick={() => setExpandedBio((value) => !value)}>
+                  <button className="artist-detail__more" aria-expanded={expandedBio} onClick={() => setExpandedBio((value) => !value)}>
                     {expandedBio ? "Mostrar menos −" : "Seguir leyendo +"}
                   </button>
                 )}
@@ -160,16 +158,16 @@ export default function ArtistDetail({
                 {items.map((release) => (
                   <a
                     className="artist-release"
-                    href={releaseUrl(release) || undefined}
-                    target={releaseUrl(release) ? "_blank" : undefined}
-                    rel={releaseUrl(release) ? "noopener noreferrer" : undefined}
+                    href={releaseListenUrl(release) || undefined}
+                    target={releaseListenUrl(release) ? "_blank" : undefined}
+                    rel={releaseListenUrl(release) ? "noopener noreferrer" : undefined}
                     key={release._id}
                   >
                     {(release.cover?.url || release.cover_image) ? (
                       <img src={release.cover?.url || release.cover_image} alt={release.cover?.alt || release.title} />
-                    ) : <span className="artist-release__placeholder">CR</span>}
+                    ) : <span className="artist-release__placeholder" aria-hidden="true" />}
                     <span className="artist-release__name">{release.title}</span>
-                    <small>{releaseFormat(release.format)}{releaseUrl(release) ? " ↗" : ""}</small>
+                    <small>{releaseFormat(release.format)}{releaseListenUrl(release) ? " ↗" : ""}</small>
                   </a>
                 ))}
               </div>
@@ -195,9 +193,9 @@ export default function ArtistDetail({
         <section className="artist-detail__related">
           {releases.length > 0 && (
             <div className="artist-related-block">
-              <p className="detail-section-label">Últimos lanzamientos</p>
+              <p className="detail-section-label">Catálogo</p>
               {sortedReleases.slice(0, 4).map((release) => {
-                const listenUrl = releaseUrl(release);
+                const listenUrl = releaseListenUrl(release);
                 const content = <><span>{release.title}</span><small>{releaseFormat(release.format)} · {release.release_date?.slice(0, 4) || "—"}{listenUrl ? " ↗" : ""}</small></>;
                 return listenUrl ? (
                   <a href={listenUrl} target="_blank" rel="noopener noreferrer" key={release._id}>{content}</a>

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { isListenUrl } = require("../validators/string.validators");
 
 // --- TRACKLIST ---
 const trackSchema = new mongoose.Schema(
@@ -58,7 +59,8 @@ const releaseSchema = new mongoose.Schema(
     barcode:      { type: String, trim: true },
     country:      { type: String, trim: true },
 
-    // Enlace Spotify del disco
+    listenUrl: { type: String, trim: true, validate: value => value === "" || isListenUrl(value) },
+    // Historical links remain available to older clients.
     spotifyUrl:   { type: String, trim: true },
     bandcampUrl:  { type: String, trim: true },
     appleMusicUrl: { type: String, trim: true },

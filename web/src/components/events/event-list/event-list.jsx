@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
+import PosterGallery from "../poster-gallery";
 import EventItem from "../event-item/event-item";
 import AdminEditLink from "../../admin/admin-edit-link";
 
@@ -7,12 +8,12 @@ const formatter = new Intl.DateTimeFormat("en-CA", {
 });
 const madridDate = (date) => formatter.format(date);
 
-function EventRows({ events, past = false }) {
+function EventRows({ events, past = false, onOpenPoster }) {
   return (
     <ul className="event-index">
       {events.map((event) => (
         <li className="admin-edit-context" key={event.id}>
-          <EventItem event={event} past={past} />
+          <EventItem event={event} past={past} onOpenPoster={onOpenPoster} />
           <AdminEditLink
             to={`/admin/edit-event/${event.slug || event.id}`}
             label={`el evento ${event.title || event.artist}`}
@@ -24,7 +25,8 @@ function EventRows({ events, past = false }) {
 }
 
 export default function EventList({ events = [] }) {
-  const { upcoming, history } = useMemo(() => {
+  const [openedPoster, setOpenedPoster] = useState(null);
+  const { upcoming, history, posters } = useMemo(() => {
     const today = madridDate(new Date());
     const dated = (Array.isArray(events) ? events : [])
       .filter((event) => event?.datetime)
@@ -40,7 +42,7 @@ export default function EventList({ events = [] }) {
       if (!byYear.has(year)) byYear.set(year, []);
       byYear.get(year).push(event);
     });
-    return { upcoming, history: [...byYear] };
+    return { upcoming, history: [...byYear], posters: past.filter((event) => event.posterUrl) };
   }, [events]);
 
   if (!upcoming.length && !history.length) {
@@ -51,7 +53,7 @@ export default function EventList({ events = [] }) {
     <div className="events-wrap">
       <section className="event-section" aria-labelledby="event-upcoming-title">
         <header className="event-section__heading">
-          <div><span>01 / Agenda</span><h2 id="event-upcoming-title">Próximos conciertos</h2></div>
+          <h2 id="event-upcoming-title">Próximos conciertos</h2>
           <span>{String(upcoming.length).padStart(2, "0")}</span>
         </header>
         {upcoming.length ? (
@@ -65,7 +67,7 @@ export default function EventList({ events = [] }) {
       {history.length > 0 && (
         <section className="event-section event-section--archive" aria-labelledby="event-archive-title">
           <header className="event-section__heading">
-            <div><span>02 / Archivo</span><h2 id="event-archive-title">Conciertos pasados</h2></div>
+            <h2 id="event-archive-title">Conciertos pasados</h2>
             <span>{String(history.reduce((total, [, items]) => total + items.length, 0)).padStart(2, "0")}</span>
           </header>
           {history.map(([year, items]) => (
@@ -75,10 +77,13 @@ export default function EventList({ events = [] }) {
                 <span className="event-year__count">{items.length} {items.length === 1 ? "concierto" : "conciertos"}</span>
                 <span className="event-year__toggle" aria-hidden="true">↗</span>
               </summary>
-              <EventRows events={items} past />
+              <EventRows events={items} past onOpenPoster={(id, trigger) => setOpenedPoster({ id, trigger })} />
             </details>
           ))}
         </section>
+      )}
+      {openedPoster && (
+        <PosterGallery posters={posters} opened={openedPoster} onClose={() => setOpenedPoster(null)} />
       )}
     </div>
   );
