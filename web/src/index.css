@@ -3735,6 +3735,15 @@ body {
   }
 }
 
+@media (min-width: 861px) {
+  .admin-create__grid a {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    padding-inline: clamp(14px, 1.6vw, 32px);
+  }
+  .admin-create__grid a b { grid-row: 1; justify-self: end; }
+}
+
 @media (max-width: 860px) {
   .admin-create__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-create__grid a:nth-child(2) { border-right: 0; }
