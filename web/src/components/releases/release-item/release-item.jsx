@@ -1,3 +1,4 @@
+import { releaseSlug } from "../../../analytics/measurement";
 import { releaseListenUrl } from "../../../utils/release-listen-url";
 import { Link } from "react-router-dom";
 import React, { useState } from "react";
@@ -22,7 +23,7 @@ function formatTime(t) {
   return t || "";
 }
 
-function ListenCover({ url, title, children }) {
+function ListenCover({ url, title, slug, children }) {
   const [touchInput, setTouchInput] = useState(false);
   const [tapped, setTapped] = useState(false);
 
@@ -34,6 +35,7 @@ function ListenCover({ url, title, children }) {
   return (
     <a
       className="release-cover-link"
+      data-outbound="listen" data-content-type="release" data-content-slug={slug}
       href={url}
       target="_blank"
       rel="noopener noreferrer"
@@ -106,7 +108,7 @@ export default function ReleaseItem({ release, view = "list" }) {
   );
 
   const linkedCover = listenUrl ? (
-    <ListenCover url={listenUrl} title={title}>{cover}</ListenCover>
+    <ListenCover slug={releaseSlug(release)} url={listenUrl} title={title}>{cover}</ListenCover>
   ) : cover;
 
   // Tracklist: tu API usa `tracklist`, con campos { position, title, duration }
@@ -134,7 +136,7 @@ export default function ReleaseItem({ release, view = "list" }) {
         </div>
         {buyUrl && (
           <a
-            href={buyUrl}
+            data-outbound="shop" data-content-type="release" data-content-slug={releaseSlug(release)} href={buyUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-sm btn-outline-light w-100 mt-2"
@@ -173,7 +175,7 @@ export default function ReleaseItem({ release, view = "list" }) {
 
         {buyUrl && (
           <a
-            href={buyUrl}
+            data-outbound="shop" data-content-type="release" data-content-slug={releaseSlug(release)} href={buyUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-sm btn-outline-light w-100"

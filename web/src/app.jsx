@@ -5,6 +5,10 @@ import { usePageMeta } from "./utils/page-meta";
 import { PrivateRoute } from "./guards";
 
 // UI
+import { Link } from "react-router-dom";
+import { enabled } from "./analytics/measurement";
+import { useAudience } from "./analytics/use-audience";
+const Privacy = lazy(() => import("./pages/privacy.jsx"));
 import Navbar from "./components/ui/navbar.jsx";
 import PageLayout from "./components/layouts/page-layout/page-layout.jsx";
 import PageTransition from "./components/layouts/page-transition/page-transition.jsx";
@@ -41,7 +45,8 @@ function App() {
   const location = useLocation();
   usePageMeta(location.pathname);
   const isHome = location.pathname === "/";
-  const isPrivateArea = location.pathname.startsWith("/admin");
+  const isPrivateArea = /^\/(admin(?:\/|$)|login(?:\/|$))/i.test(location.pathname);
+  const audience = useAudience(location);
 
   useLayoutEffect(() => {
     const schema = document.getElementById("page-schema");
@@ -58,12 +63,21 @@ function App() {
   return (
     <>
       {!isHome && <Navbar />}
-      {!isPrivateArea && <SiteBanner />}
+      {!isPrivateArea && !audience.show && <SiteBanner />}
+      {!isPrivateArea && audience.show && <aside className="cr-consent" aria-labelledby="cr-consent-title">
+        <div><strong id="cr-consent-title">Cookies de audiencia</strong>
+          <p>Con tu permiso, Google Analytics mide las visitas y los clics hacia escucha, entradas y tienda. <Link to="/privacidad">Privacidad y cookies</Link></p></div>
+        <div className="cr-consent__actions">
+          <button type="button" onClick={() => audience.choose("yes")}>Aceptar</button>
+          <button type="button" onClick={() => audience.choose("no")}>Rechazar</button>
+        </div>
+      </aside>}
 
       <AnimatePresence mode="wait">
         <Suspense fallback={<SiteLoader />}>
           <Routes location={location} key={location.pathname}>
           
+          <Route path="/privacidad" element={<Privacy />} />
           {/* HOME */}
           <Route
             path="/"
@@ -324,7 +338,7 @@ function App() {
           </Routes>
         </Suspense>
       </AnimatePresence>
-      {!isPrivateArea && <SiteFooter />}
+      {!isPrivateArea && <SiteFooter preferences={enabled ? audience.open : undefined} />}
     </>
   );
 }

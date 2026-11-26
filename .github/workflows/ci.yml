@@ -128,3 +128,7 @@ jobs:
           "$RUNNER_TEMP/caribe-qa/node_modules/.bin/playwright" install --with-deps chromium firefox webkit
       - name: Test production build with disposable content
         run: NODE_PATH="$RUNNER_TEMP/caribe-qa/node_modules" node api/scripts/review-browser.cjs
+      - name: Test consent and audience measurement with intercepted requests
+        run: |
+          npm run build --prefix web -- --mode analytics-test
+          NODE_PATH="$RUNNER_TEMP/caribe-qa/node_modules" node api/scripts/review-analytics.cjs

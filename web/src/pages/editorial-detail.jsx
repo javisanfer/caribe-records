@@ -1,3 +1,4 @@
+import { useContentView } from "../analytics/use-audience";
 import { usePageMeta } from "../utils/page-meta";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -22,6 +23,7 @@ export default function EditorialDetailPage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
+  useContentView("editorial", editorial);
   usePageMeta(`/editorial/${encodeURIComponent(slug)}`, editorial?.seo?.title || editorial?.title, editorial?.seo?.description || editorial?.excerpt || editorial?.subtitle, editorial?.seo?.ogImage || editorial?.hero?.url, "article");
 
   if (loading) return <SiteLoader />;
