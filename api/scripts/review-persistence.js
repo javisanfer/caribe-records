@@ -46,9 +46,9 @@ async function checkPersistence(email, password) {
     assert.equal((await request("/releases/" + release.doc._id)).listenUrl, listenUrl);
     await assert.rejects(request(release.path, "PATCH", { listenUrl: "mailto:label@example.org" }), /HTTP 400/);
     await request(release.path, "PATCH", { listenUrl: "" });
-    const cleared = await request("/releases/" + release.doc._id);
-    assert.equal(cleared.listenUrl, "");
-    assert.equal(cleared.appleMusicUrl, catalogue.appleMusicUrl);
+    const clearedRelease = await request("/releases/" + release.doc._id);
+    assert.equal(clearedRelease.listenUrl, "");
+    assert.equal(clearedRelease.appleMusicUrl, catalogue.appleMusicUrl);
 
 
     const article = await create("editorials", {
