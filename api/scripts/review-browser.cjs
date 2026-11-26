@@ -214,7 +214,7 @@ async function main() {
           const edits = [
             ["artist", "ferrocentro-club", "city", "artists/slug/ferrocentro-club"],
             ["release", releases[0]._id, "country", "releases/" + releases[0]._id],
-            ["event", event.slug, "venue", "events/slug/" + event.slug],
+            ["event", "concierto-futuro-qa", "venue", "events/slug/concierto-futuro-qa"],
             ["editorial", article, "subtitle", "editorials/slug/" + article],
           ];
           for (const [kind, id, field, endpoint] of edits) {
@@ -223,12 +223,24 @@ async function main() {
             const input = page.locator('[name="' + field + '"]');
             const disclosure = input.locator("xpath=ancestor::details[not(@open)][1]/summary");
             if (await disclosure.count()) await disclosure.click();
+            const credits = page.getByRole("group", { name: "Artistas del lanzamiento" });
+            if (kind === "release") {
+              const choices = credits.getByRole("checkbox");
+              await choices.nth(0).check();
+              await choices.nth(1).check();
+            }
             const value = kind === "release" ? "PT" : "Revisión de " + kind;
             await input.fill(value);
             const form = input.locator("xpath=ancestor::form");
             await form.getByRole("button", { name: /^Actualizar/ }).click();
             await page.getByRole("heading", { name: "Panel", exact: true }).waitFor();
             const published = await fetch(api + "/api/v1/" + endpoint).then((r) => r.json());
+            if (kind === "release") {
+              assert.ok(published.collaborators.length > 0);
+              await page.goto(base + "/admin/edit-release/" + id);
+              await expect(credits.getByRole("checkbox").nth(0)).toBeChecked();
+              await expect(credits.getByRole("checkbox").nth(1)).toBeChecked();
+            }
             assert.equal(published[field], value, kind + " debe reflejar la edición del formulario");
           }
         }
