@@ -2818,6 +2818,14 @@ html body {
   letter-spacing: -.06em;
 }
 
+@media (min-width: 901px) {
+  .artist-detail__catalogue { min-height: 0; }
+  .artist-detail__year:has(> div > .artist-release:only-child) h2 {
+    align-content: center;
+    padding-block: 0;
+  }
+}
+
 .artist-release {
   display: grid;
   grid-template-columns: 108px minmax(0, 1fr) auto;
