@@ -6446,3 +6446,14 @@ html:has(.home), body:has(.home) { background: #050505; }
 }
 .editorial-share label { flex-basis: 100%; }
 .editorial-share input { display: block; width: 100%; }
+
+@media (max-width: 560px) {
+  .editor-workspace-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .editor-workspace-header .admin-back { justify-self: start; }
+  .editor-workspace-header h1 { grid-column: 1 / -1; grid-row: 2; }
+  .editor-workspace-header .editor-settings-jump { grid-column: 2; grid-row: 1; }
+}
