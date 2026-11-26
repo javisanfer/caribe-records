@@ -22,7 +22,7 @@ export default function Privacy({ onPreferences }) {
       <section id="aviso-legal">
         <h2>Aviso legal</h2>
         <div>
-          <p>Caribe Records es un sello de música popular independiente formado por Javier Sánchez Fernández, Julia Garrido Blanco y Pablo Villalba Gil.</p>
+          <p>Caribe Records es un sello de música popular independiente formado por Julia Garrido Blanco, Javier Sánchez Fernández y Pablo Villalba Gil.</p>
           <h3>Titular de la web</h3>
           <address>
             Javier Sánchez Fernández<br />
@@ -39,7 +39,7 @@ export default function Privacy({ onPreferences }) {
         <h2>Política de privacidad</h2>
         <div>
           <h3>Quién decide qué se mide</h3>
-          <p>Javier Sánchez Fernández, Julia Garrido Blanco y Pablo Villalba Gil decidimos juntos qué medir y para qué. Somos corresponsables de la medición de audiencia. Puedes dirigirte a cualquiera de los tres en <a href="mailto:hola@caribe-records.com">hola@caribe-records.com</a>.</p>
+          <p>Julia Garrido Blanco, Javier Sánchez Fernández y Pablo Villalba Gil decidimos juntos qué medir y para qué. Somos corresponsables de la medición de audiencia. Puedes dirigirte a cualquiera de los tres en <a href="mailto:hola@caribe-records.com">hola@caribe-records.com</a>.</p>
           <h3>Qué datos tratamos y para qué</h3>
           <p>Con tu consentimiento, usamos Google Analytics 4 para saber qué artistas, discos y editoriales se visitan y desde qué páginas se abren enlaces a servicios de escucha, entradas o tienda. Registramos la página pública, el contenido y la plataforma de destino. Las compras y reproducciones tienen lugar en esas plataformas.</p>
           <p>Google recibe información técnica de la conexión, como la dirección IP y datos del navegador. El panel de administración y el acceso y la recuperación de cuentas quedan fuera de la medición. Las funciones publicitarias y las señales de Google están desactivadas.</p>
