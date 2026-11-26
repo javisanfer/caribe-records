@@ -1,3 +1,4 @@
+import PanelBackLink from "../../components/admin/panel-back-link";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -93,6 +94,8 @@ export default function NewBannerPage({ isEditMode = false }) {
 
   return (
     <main className="admin-page admin-form-page">
+      <header className="admin-form-header"><PanelBackLink /></header>
+      <div className="admin-form-container">
       <header className="admin-form-intro">
         <h1>{isEditMode ? "Editar banner" : "Nuevo banner"}</h1>
         {isEditMode && <button type="button" className="admin-delete" onClick={remove}>Borrar banner</button>}
@@ -119,6 +122,7 @@ export default function NewBannerPage({ isEditMode = false }) {
         {saveError && <p className="admin-status admin-status--error" role="alert">{saveError}</p>}
         <div className="col-12"><button className="btn admin-primary-action" disabled={isSubmitting}>{isSubmitting ? "Guardando…" : "Guardar banner"}</button></div>
       </form>}
+    </div>
     </main>
   );
 }

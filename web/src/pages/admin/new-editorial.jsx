@@ -1,3 +1,4 @@
+import PanelBackLink from "../../components/admin/panel-back-link";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import DOMPurify from "dompurify";
 import React, { useEffect, useMemo, useState } from "react";
@@ -21,7 +22,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
   const [blocks, setBlocks] = useState([createTextBlock()]);
   const [uploadingBlock, setUploadingBlock] = useState(false);
   const [artists, setArtists] = useState([]);
-  const [releases, setReleases] = useState([]);
+  const [releases, setReleases] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [optionsError, setOptionsError] = useState("");
   const { control, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { status: "draft", featured: false, title: "", credits: [], relatedArtists: [], relatedReleases: [] } });
@@ -31,6 +32,19 @@ export default function NewEditorialPage({ isEditMode = false }) {
       setArtists(people); setReleases(catalogue);
     }).catch(() => setOptionsError("No se pudieron cargar las asociaciones disponibles."));
   }, []);
+  const selectedArtists = watch("relatedArtists");
+  const selectedReleases = watch("relatedReleases");
+  const forArtists = (ids) => (releases || []).filter(({ artist }) => ids.includes(artist?._id || artist));
+  const availableReleases = forArtists(selectedArtists);
+  const eligibleIds = new Set(availableReleases.map((release) => release._id));
+  const hasLegacyLinks = releases && selectedReleases.some((id) => !eligibleIds.has(id));
+
+  function changeArtists(ids) {
+    const eligible = new Set(forArtists(ids).map((release) => release._id));
+    setValue("relatedArtists", ids);
+    setValue("relatedReleases", selectedReleases.filter((id) => eligible.has(id)));
+  }
+
   const title = watch("title") || "";
   const currentStatus = watch("status") || "draft";
   const excerpt = watch("excerpt") || "";
@@ -56,8 +70,8 @@ export default function NewEditorialPage({ isEditMode = false }) {
         const contentBlocks = data.blocks || [];
         setBlocks(contentBlocks.length ? contentBlocks.map((block, index) => ({ ...block, id: `${block.type}-${index}-${Date.now()}` })) : [createTextBlock()]);
         setValue("credits", data.credits || []);
-        setValue("relatedArtists", data.relatedArtists || []);
-        setValue("relatedReleases", data.relatedReleases || []);
+        setValue("relatedArtists", (data.relatedArtists || []).map((artist) => artist._id || artist));
+        setValue("relatedReleases", (data.relatedReleases || []).map((release) => release._id || release));
         setValue("excerpt", data.excerpt || ""); setValue("tags", data.tags?.join(", ") || "");
         if (data.seo) { setValue("seoTitle", data.seo.title || ""); setValue("seoDescription", data.seo.description || ""); setValue("seoOgImage", data.seo.ogImage || ""); }
       } catch (error) { setLoadError(error.message || "No se pudo cargar la editorial."); } finally { setLoadingInitial(false); }
@@ -125,7 +139,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
     <main className="admin-page admin-form-page admin-wordpress-page">
       <div className="admin-form-container">
         <header className="editor-workspace-header">
-          <a href="/admin" className="editor-back">← Panel</a>
+          <PanelBackLink />
           <h1>{pageTitle}</h1>
           <a className="editor-settings-jump" href="#editorial-publicacion">Publicación ↓</a>
         </header>
@@ -159,9 +173,17 @@ export default function NewEditorialPage({ isEditMode = false }) {
                 <details className="admin-form-panel admin-visible-panel">
                   <summary className="admin-visible-panel__heading"><span>Asociaciones</span></summary>
                   <div className="admin-form-panel__body admin-panel-fields">
-                    {optionsError && <p role="alert">{optionsError}</p>}
-                    <AdminRelations title="Artistas relacionados" items={artists} selected={watch("relatedArtists")} onChange={(ids) => setValue("relatedArtists", ids)} />
-                    <AdminRelations title="Lanzamientos relacionados" items={releases} selected={watch("relatedReleases")} onChange={(ids) => setValue("relatedReleases", ids)} />
+                    {optionsError ? <p role="alert">{optionsError}</p> : releases === null ? <p>Cargando catálogo…</p> : <>
+                      <AdminRelations title="Artistas relacionados" items={artists} selected={selectedArtists} onChange={changeArtists} />
+                      {availableReleases.length > 0
+                        ? <AdminRelations title="Lanzamientos relacionados" items={availableReleases} selected={selectedReleases}
+                            onChange={(ids) => setValue("relatedReleases", ids.filter((id) => eligibleIds.has(id)))} />
+                        : <p>{selectedArtists.length ? "Sin lanzamientos para los artistas seleccionados." : "Elige un artista para ver su catálogo."}</p>}
+                      {hasLegacyLinks && <div>
+                        <p>Hay asociaciones anteriores fuera de esta selección. Se conservarán hasta que cambies las asociaciones.</p>
+                        <button type="button" className="btn admin-secondary-action" onClick={() => changeArtists(selectedArtists)}>Desvincular lanzamientos fuera de la selección</button>
+                      </div>}
+                    </>}
                   </div>
                 </details>
               </div>

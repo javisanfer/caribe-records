@@ -23,7 +23,10 @@ test("la paginación devuelve enteros y mantiene el máximo", () => {
 });
 
 test("el HTML inicial incluye los metadatos y conserva los textos como datos", () => {
-  const html = renderPage({ title: 'Canciones & fotografías', description: 'Gira "2026"', type: "Article", url: "https://caribe-records.com/editorial/gira" });
+  const html = renderPage({ title: 'Canciones & fotografías', description: 'Gira "2026"', image: "/images/gira.jpg", type: "Article", url: "https://caribe-records.com/editorial/gira" });
+  assert.match(html, /twitter:card" content="summary_large_image"/);
+  assert.match(html, /twitter:image" content="https?:\/\/[^"]+\/images\/gira.jpg"/);
+  assert.match(html, /twitter:title" content="Canciones &amp; fotografías/);
   assert.match(html, /og:title" content="Canciones &amp; fotografías/);
   assert.match(html, /Gira &quot;2026&quot;/);
   assert.match(html, /application\/ld\+json/);

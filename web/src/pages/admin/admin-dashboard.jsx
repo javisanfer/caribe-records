@@ -77,7 +77,8 @@ export default function AdminDashboardPage() {
     <main className="admin-page admin-dashboard">
       <header className="admin-dashboard__hero">
         <div>
-          <h1>Panel</h1><Link to="/admin/about">Editar About</Link>
+          <h1>Panel</h1>
+          <Link className="admin-about-link" to="/admin/about">Editar About</Link>
           <span>{String(totalItems).padStart(2, "0")} registros</span>
         </div>
       </header>

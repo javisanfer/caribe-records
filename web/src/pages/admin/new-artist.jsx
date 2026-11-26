@@ -1,3 +1,4 @@
+import PanelBackLink from "../../components/admin/panel-back-link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,23 +10,16 @@ import { artistPhotoUrl } from "../../utils/artist-photo";
 import { artistLinks, serializeLinks } from "../../utils/artist-links";
 
 const defaults = { name: "", slug: "", city: "", country: "", bio: "", formedYear: "", rosterVisible: true,
-  portraitUrl: "", coverUrl: "", genres: [], members: [], links: [], gallery: [], videos: [] };
+  portraitUrl: "", coverUrl: "", genres: [], links: [] };
 
 const textRow = (value) => ({ value });
 const listFields = [
   ["genres", "Géneros", [{ key: "value", label: "Género", required: true }]],
-  ["members", "Integrantes", [{ key: "value", label: "Nombre", required: true }]],
   ["links", "Enlaces", [
     { key: "group", label: "Grupo", options: [["streaming", "Escucha"], ["social", "Redes sociales"], ["web", "Otros enlaces"]] },
     { key: "label", label: "Plataforma o nombre del enlace", required: true },
     { key: "url", label: "URL", type: "url", required: true, pattern: "https?://.+" },
   ]],
-  ["gallery", "Galería", [
-    { key: "url", label: "URL de la fotografía", type: "imageUrl" },
-    { key: "file", label: "Subir fotografía", type: "file", accept: "image/*" },
-    { key: "alt", label: "Texto alternativo" }, { key: "caption", label: "Pie de foto" },
-  ]],
-  ["videos", "Vídeos", [{ key: "title", label: "Título", required: true }, { key: "url", label: "URL del vídeo", type: "url", required: true, pattern: "https?://.+" }, { key: "year", label: "Año", type: "number" }]],
 ];
 
 async function photoUrl(url, files) {
@@ -50,8 +44,8 @@ export default function NewArtistPage({ isEditMode = false }) {
         city: artist.city || "", formedYear: artist.formedYear || "", rosterVisible: artist.rosterVisible !== false,
         portraitUrl: artistPhotoUrl(artist.photos?.portraitUrl ?? artist.portraitUrl) || "",
         coverUrl: artistPhotoUrl(artist.photos?.coverUrl ?? artist.coverUrl) || "",
-        genres: (artist.genres || []).map(textRow), members: (artist.members || []).map(textRow),
-        links: artistLinks(artist), gallery: artist.gallery || [], videos: artist.videos || [],
+        genres: (artist.genres || []).map(textRow),
+        links: artistLinks(artist),
       });
     }).catch(() => { if (active) setLoadError("No se pudo cargar el artista."); })
       .finally(() => { if (active) setLoading(false); });
@@ -61,16 +55,13 @@ export default function NewArtistPage({ isEditMode = false }) {
   async function save(data) {
     setError("");
     try {
-      if (data.gallery.some((image) => !image.url?.trim() && !image.file?.[0])) throw new Error("Selecciona una fotografía o introduce su URL en cada fila de la galería.");
-      const gallery = await Promise.all(data.gallery.map(async ({ url, file, alt, caption }) => ({ url: await photoUrl(url, file), alt, caption })));
       const payload = {
         name: data.name.trim(), slug: data.slug.trim() || undefined,
         country: data.country.trim(), city: data.city.trim(), bio: data.bio.trim(),
         formedYear: data.formedYear || null, rosterVisible: data.rosterVisible,
         genres: data.genres.map((row) => row.value.trim()).filter(Boolean),
-        members: data.members.map((row) => row.value.trim()).filter(Boolean),
         photos: { portraitUrl: await photoUrl(data.portraitUrl, data.portraitFile), coverUrl: await photoUrl(data.coverUrl, data.coverFile) },
-        gallery, videos: data.videos, ...serializeLinks(data.links),
+        ...serializeLinks(data.links),
       };
       if (isEditMode) await adminUpdateArtist(slug, payload);
       else await adminCreateArtist(payload);
@@ -85,7 +76,7 @@ export default function NewArtistPage({ isEditMode = false }) {
   }
 
   return <main className="admin-page admin-form-page">
-    <header className="admin-form-header"><button type="button" className="admin-back" onClick={() => navigate("/admin")}>← Panel</button></header>
+    <header className="admin-form-header"><PanelBackLink /></header>
     <div className="admin-form-container">
       <div className="admin-form-intro"><h1>{isEditMode ? "Editar artista" : "Nuevo artista"}</h1></div>
       {loading ? <p>Cargando artista…</p> : loadError ? <p role="alert">{loadError}</p> :
@@ -105,7 +96,7 @@ export default function NewArtistPage({ isEditMode = false }) {
                 <label className="admin-field">Subir {label.toLowerCase()}<input className="form-control" type="file" accept="image/*" {...register(key + "File")} /></label>
               </div>)}
             </div></section>
-            {listFields.map(([name, title, columns]) => <ArtistListFields key={name} {...{ name, title, columns, control, register, watch }} />)}
+            {listFields.map(([name, title, columns]) => <ArtistListFields key={name} {...{ name, title, columns, control, register }} />)}
           </div><aside className="admin-editor-sidebar"><section className="admin-action-card">
             <label><input type="checkbox" {...register("rosterVisible")} /> Visible en Artistas</label>
             {error && <p role="alert">{error}</p>}

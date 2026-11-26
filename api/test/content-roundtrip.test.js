@@ -31,13 +31,13 @@ test("editar otro campo conserva el orden de los bloques, créditos y relaciones
   ];
   const doc = new Editorial({
     title: "Archivo", slug: "archivo", status: "published", featured: true,
-    hero: { url: "/images/portada.jpg" }, blocks, relatedArtists: [artist._id],
+    hero: { url: "/images/portada.jpg" }, blocks, relatedArtists: [artist._id], relatedReleases: [new Artist()._id],
     credits: [{ role: "Autor", name: "Firma" }],
   });
   t.mock.method(Editorial, "findOne", async () => doc);
   t.mock.method(doc, "save", async () => doc.validate());
   const res = { statusCode: 200, status(code) { this.statusCode = code; return this; }, json(data) { this.data = data; } };
-  await updateEditorial({ params: { slug: "archivo" }, body: { subtitle: "Nuevo subtítulo", blocks: JSON.stringify(blocks) } }, res);
+  await updateEditorial({ params: { slug: "archivo" }, body: { subtitle: "Nuevo subtítulo", blocks: JSON.stringify(blocks), relatedReleases: String(doc.relatedReleases[0]), relatedArtists: String(artist._id) } }, res);
   assert.equal(res.statusCode, 200);
   assert.deepEqual(doc.blocks.map((block) => block.type), ["heading", "embed", "gallery", "embed"]);
   assert.equal(doc.blocks[0].level, 3);
@@ -45,6 +45,7 @@ test("editar otro campo conserva el orden de los bloques, créditos y relaciones
   assert.equal(doc.blocks[2].gallery[0].focalPoint.y, 0.2);
   assert.equal(doc.blocks[3].embed, blocks[3].embed);
   assert.equal(doc.credits[0].name, "Firma");
+  assert.equal(doc.relatedReleases.length, 1);
   assert.ok(artist._id.equals(doc.relatedArtists[0]));
   assert.equal(doc.featured, true);
   await updateEditorial({ params: { slug: "archivo" }, body: { blocks: "{incompleto" } }, res);

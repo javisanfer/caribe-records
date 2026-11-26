@@ -1,6 +1,8 @@
 const { imageUrlFor } = require("../config/storage.config");
 const Editorial = require("../models/editorial.model");
-const Artist = require("../models/artist.model"); // 👈 NUEVO
+const Artist = require("../models/artist.model");
+const Release = require("../models/release.model");
+const { isObjectIdOrHexString } = require("mongoose");
 
 // -------------------- Utilidad de paginación --------------------
 const { getPagination } = require("../utils/pagination");
@@ -23,6 +25,21 @@ function normalizeIdArray(value) {
       .filter(Boolean);
   }
   return [];
+}
+
+const associationError = "Selecciona lanzamientos del catálogo de los artistas asociados.";
+
+async function validAssociations(artists, releases) {
+  if (!artists.every(isObjectIdOrHexString) || !releases.every(isObjectIdOrHexString)) return false;
+  if (!releases.length) return true;
+  if (!artists.length) return false;
+  const count = await Release.countDocuments({ _id: { $in: releases }, artist: { $in: artists } });
+  return count === new Set(releases).size;
+}
+
+function sameIds(a, b) {
+  const ids = new Set(a);
+  return ids.size === new Set(b).size && b.every((id) => ids.has(id));
 }
 
 function normalizeEditorialBlocks(value) {
@@ -259,6 +276,9 @@ exports.createEditorial = async (req, res) => {
 
     // 👇 NUEVO: artistas relacionados
     const relatedArtistsIds = normalizeIdArray(body.relatedArtists);
+    if (!await validAssociations(relatedArtistsIds, payload.relatedReleases || [])) {
+      return res.status(400).json({ message: associationError });
+    }
     if (relatedArtistsIds.length) {
       payload.relatedArtists = relatedArtistsIds;
     }
@@ -307,7 +327,7 @@ exports.updateEditorial = async (req, res) => {
 
     // Guardamos los artistas anteriores para sincronizar
     if (body.credits !== undefined) editorial.credits = editorialCredits(body.credits);
-    if (body.relatedReleases !== undefined) editorial.relatedReleases = normalizeIdArray(body.relatedReleases);
+    const prevReleases = (editorial.relatedReleases || []).map(String);
     const prevArtists = (editorial.relatedArtists || []).map((id) => id.toString());
 
     // Si cambia el título → regenerar slug
@@ -379,11 +399,14 @@ exports.updateEditorial = async (req, res) => {
     editorial.series = body.series ?? editorial.series;
 
     // 👇 NUEVO: actualizar artistas relacionados
-    let newArtists = prevArtists;
-    if (body.relatedArtists !== undefined) {
-      newArtists = normalizeIdArray(body.relatedArtists);
-      editorial.relatedArtists = newArtists;
+    const newArtists = body.relatedArtists === undefined ? prevArtists : normalizeIdArray(body.relatedArtists);
+    const newReleases = body.relatedReleases === undefined ? prevReleases : normalizeIdArray(body.relatedReleases);
+    const changed = !sameIds(prevArtists, newArtists) || !sameIds(prevReleases, newReleases);
+    if (changed && !await validAssociations(newArtists, newReleases)) {
+      return res.status(400).json({ message: associationError });
     }
+    if (body.relatedArtists !== undefined) editorial.relatedArtists = newArtists;
+    if (body.relatedReleases !== undefined) editorial.relatedReleases = newReleases;
 
     await editorial.save();
 

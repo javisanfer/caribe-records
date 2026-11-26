@@ -45,11 +45,20 @@ async function checkPersistence(email, password) {
     const article = await create("editorials", {
       title, heroUrl: image, status: "published", credits: [{ role: "Autor", name: "Autor de prueba" }],
       blocks: [{ type: "heading", text: "Prueba", level: 3 }, { type: "gallery", gallery: [{ url: image }] }],
-      relatedArtists: [artist.doc._id],
+      relatedArtists: [artist.doc._id], relatedReleases: [release.doc._id],
     }, true);
     await request(article.path, "PATCH", { subtitle: "Edición de prueba" });
     const reading = await request("/editorials/slug/" + article.doc.slug);
     assert.equal(reading.relatedArtists[0]._id, artist.doc._id);
+    assert.deepEqual(reading.relatedReleases, [release.doc._id]);
+    const otherArtist = await create("artists", { name: title + " B" }, true);
+    await assert.rejects(request(article.path, "PATCH", { relatedArtists: [otherArtist.doc._id] }), /HTTP 400/);
+    await assert.rejects(request("/admin/editorials", "POST", {
+      title: title + " B", relatedArtists: [otherArtist.doc._id], relatedReleases: [release.doc._id],
+    }), /HTTP 400/);
+    const original = await request(article.path);
+    assert.deepEqual(original.relatedArtists, [artist.doc._id]);
+    assert.deepEqual(original.relatedReleases, [release.doc._id]);
     assert.equal(reading.blocks[1].gallery[0].url, image);
     assert.equal(reading.credits[0].name, "Autor de prueba");
 

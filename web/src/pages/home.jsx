@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "../contexts/use-auth-context";
 import mark from "../assets/brand/caribe-mark.webp";
 import runner from "../assets/brand/caribe-runner.webp";
 import SiteLoader from "../components/ui/site-loader.jsx";
@@ -12,6 +13,7 @@ const homeNavigation = [
 ];
 
 export default function HomePage() {
+  const { user } = useAuthContext();
   const [editorials, setEditorials] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -53,6 +55,7 @@ export default function HomePage() {
         <Link to="/" className="home-brand" aria-label="Caribe Records, inicio">
           <img src={mark} alt="" />
         </Link>
+        {user?.role === "admin" && <Link to="/admin" className="home-panel-link">Panel <span aria-hidden="true">↗</span></Link>}
       </header>
 
       <main

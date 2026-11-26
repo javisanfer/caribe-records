@@ -77,6 +77,18 @@ async function main() {
             console.log(engine, width, path);
             await page.goto(base + path);
             await page.locator("h1").first().waitFor({ state: "attached" });
+            if (path.startsWith("/admin/")) await page.getByRole("link", { name: "Volver al panel" }).waitFor();
+            if (path === "/") await page.getByRole("link", { name: "Panel", exact: true }).waitFor();
+            if (path === "/admin/new-artist") {
+              assert.equal(await page.getByRole("heading", { name: /^(Integrantes|Galería|Vídeos)$/ }).count(), 0);
+            }
+            if (path === "/editorial/" + article) {
+              const share = page.getByRole("group", { name: "Compartir artículo" });
+              const href = await share.getByRole("link", { name: "Compartir en X" }).getAttribute("href");
+              const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
+              assert.equal(new URL(href).searchParams.get("url"), canonical);
+              await share.getByRole("button", { name: "Copiar enlace" }).waitFor();
+            }
             const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
             if (overflow) {
               const elements = await page.evaluate(() => Array.from(document.querySelectorAll("main *"))
@@ -89,6 +101,32 @@ async function main() {
           }
         }
         if (engine === "chromium") {
+          await page.goto(base + "/admin/new-editorial");
+          await page.getByText("Asociaciones", { exact: true }).click();
+          await page.getByText("Elige un artista para ver su catálogo.").waitFor();
+          const disc = releases.find((release) => release.artist?._id);
+          const artistChoice = page.getByRole("group", { name: "Artistas relacionados" })
+            .getByRole("checkbox", { name: disc.artist.name, exact: true });
+          await artistChoice.check();
+          const linked = page.getByRole("group", { name: "Lanzamientos relacionados" });
+          await linked.getByRole("checkbox", { name: disc.title, exact: true }).check();
+          const catalogue = await (await page.request.get(base + "/api/v1/admin/releases")).json();
+          assert.equal(await linked.getByRole("checkbox").count(),
+            catalogue.filter((row) => row.artist?._id === disc.artist._id).length);
+          await artistChoice.uncheck();
+          await page.getByText("Elige un artista para ver su catálogo.").waitFor();
+          await artistChoice.check();
+          const releaseChoice = linked.getByRole("checkbox", { name: disc.title, exact: true });
+          assert.equal(await releaseChoice.isChecked(), false);
+          await releaseChoice.check();
+          await page.getByLabel("Título", { exact: true }).fill("Asociaciones de catálogo QA");
+          await page.getByRole("button", { name: "Guardar borrador" }).click();
+          await page.getByRole("heading", { name: "Panel", exact: true }).waitFor();
+          await page.goto(base + "/admin/edit-editorial/asociaciones-de-catalogo-qa");
+          await page.getByText("Asociaciones", { exact: true }).click();
+          await releaseChoice.waitFor();
+          assert.equal(await releaseChoice.isChecked(), true);
+
           const edits = [
             ["artist", "ferrocentro-club", "city", "artists/slug/ferrocentro-club"],
             ["release", releases[0]._id, "country", "releases/" + releases[0]._id],

@@ -1,3 +1,4 @@
+import PanelBackLink from "../../components/admin/panel-back-link";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 // src/pages/admin/new-event.jsx
 import React, { useEffect, useState } from "react";
@@ -199,13 +200,7 @@ export default function NewEventPage({ isEditMode = false }) {
     <main className="admin-page admin-form-page">
       {/* Header */}
       <header className="admin-form-header">
-        <button
-          type="button"
-          className="admin-back"
-          onClick={() => navigate(-1)}
-        >
-          ← Panel
-        </button>
+        <PanelBackLink />
       </header>
 
       {/* Form */}
