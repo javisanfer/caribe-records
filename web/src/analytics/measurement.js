@@ -53,12 +53,13 @@ function transmit(name, params) {
   el.hidden = true;
   el.title = "Medición de audiencia";
   el.referrerPolicy = "no-referrer";
-  el.srcdoc = '<!doctype html><html lang="es"><head><meta name="referrer" content="no-referrer"><title>Caribe Records</title></head><body></body></html>';
+  el.src = "/audience-frame.html";
   el.onload = () => {
     if (el !== frame || !granted) return;
     const win = el.contentWindow;
-    win.dataLayer = [];
-    tag = win.gtag = function () { win.dataLayer.push(arguments); };
+    tag = win.gtag;
+    if (typeof tag !== "function") { stop(); return; }
+    tag("set", "send_page_view", false);
     tag("consent", "default", { analytics_storage: "granted", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
     tag("js", new Date());
     tag("config", id, { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false,
