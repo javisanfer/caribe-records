@@ -8,9 +8,27 @@ async function checkCatalogueTouch(browser, base) {
     const cdp = await context.newCDPSession(page);
     const destination = "https://music.example.invalid/album";
     await context.route(destination, (route) => route.fulfill({ body: "Album" }));
-    await page.route("**/api/v1/releases", (route) => route.fulfill({ json: Array.from({ length: 12 }, (_, index) => ({
+    const catalogue = Array.from({ length: 12 }, (_, index) => ({
       _id: String(index + 1), title: "Disco " + (index + 1), bandcampUrl: destination, cover: { url: "/favicon.png" },
-    })) }));
+    }));
+    const serveCatalogue = (route) => route.fulfill({ json: catalogue });
+    await page.route("**/api/v1/releases", serveCatalogue);
+    const desktop = await browser.newPage();
+    try {
+      await desktop.route("**/api/v1/releases", serveCatalogue);
+      await desktop.goto(base + "/releases");
+      const cover = desktop.locator(".release-cover-link").first();
+      await cover.hover();
+      await desktop.waitForFunction(() => getComputedStyle(document.querySelector(".release-cover-link img")).filter.includes("invert(1)"));
+      await desktop.mouse.move(0, 0);
+      await cover.focus();
+      await desktop.keyboard.press("Tab");
+      await desktop.keyboard.press("Shift+Tab");
+      assert.equal(await cover.evaluate((el) => el.matches(":focus-visible")), true);
+    } finally {
+      await desktop.close();
+    }
+
     for (const view of ["Lista", "Retícula"]) {
       await page.goto(base + "/releases");
       await page.getByRole("button", { name: view }).tap();
