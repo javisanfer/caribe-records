@@ -31,6 +31,7 @@ async function main() {
   const run = (file, args, cwd, extra) => {
     const child = spawn(process.execPath, [file, ...args], { cwd, env: { ...process.env, ...extra }, stdio: "inherit" });
     children.push(child);
+    return child;
   };
   const ready = async (url) => {
     for (let i = 0; i < 80; i++) {
@@ -44,9 +45,23 @@ async function main() {
     await db.connect();
     await db.db().collection("artists").insertMany(launch.artists.map((a) => ({ name: a.slug.replaceAll("-", " "), ...a })));
     await db.db().collection("users").insertOne({ name: "QA", email, password: await bcrypt.hash(password, 10), role: "admin", active: true });
-    run("src/app.js", [], root + "/api", { NODE_ENV: "test", PORT: "3015", HOST: "127.0.0.1", CORS_ORIGINS: base, SESSION_SECRET: randomUUID(), MONGODB_URI: dbUrl, LOCAL_IMAGE_UPLOADS: "true" });
-    await ready(api + "/health");
+    const apiEnv = { NODE_ENV: "test", PORT: "3015", HOST: "127.0.0.1", CORS_ORIGINS: base,
+      SESSION_SECRET: randomUUID(), MONGODB_URI: dbUrl, LOCAL_IMAGE_UPLOADS: "true" };
+    const startApi = async () => {
+      const process = run("src/app.js", [], root + "/api", apiEnv);
+      await ready(api + "/health");
+      return process;
+    };
+    const stopApi = async (process) => {
+      const closed = once(process, "exit");
+      process.kill();
+      await closed;
+      children.splice(children.indexOf(process), 1);
+    };
+    const persistenceApi = await startApi();
     await checkPersistence(email, password);
+    await stopApi(persistenceApi);
+    let browserApi = await startApi();
     run("node_modules/vite/bin/vite.js", ["preview", "--host", "127.0.0.1", "--port", "5185", "--strictPort"], root + "/web", { VITE_API_PROXY: api });
     await ready(base);
     const releases = await fetch(api + "/api/v1/releases").then((r) => r.json());
@@ -56,6 +71,7 @@ async function main() {
     assert.ok(sitemap.includes("/editorial/" + article));
     const layoutFailures = [];
     for (const [engine, driver] of Object.entries({ chromium, firefox, webkit })) {
+      if (!browserApi) browserApi = await startApi();
       const browser = await driver.launch();
       try {
         const page = await browser.newPage({ viewport: { width: 375, height: 812 } });
@@ -186,7 +202,11 @@ async function main() {
         await db.db().collection("banners").deleteOne({ title: "Banner QA " + engine });
         assert.deepEqual(errors, []);
         console.log(engine, "OK: 18 rutas a 375 y 1280 px, About y banner con archivo");
-      } finally { await browser.close(); }
+      } finally {
+        await browser.close();
+        await stopApi(browserApi);
+        browserApi = null;
+      }
     }
     assert.deepEqual(layoutFailures, [], "Desbordamientos horizontales");
   } finally {
