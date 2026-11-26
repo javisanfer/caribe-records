@@ -21,7 +21,6 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!isOpen) return;
-    const desktop = window.matchMedia("(min-width: 900px)");
     const close = () => setIsOpen(false);
     const closeOutside = (event) => {
       if (!navRef.current.contains(event.target)) close();
@@ -31,12 +30,10 @@ export default function Navbar() {
       close();
       toggleRef.current.focus();
     };
-    desktop.addEventListener("change", close);
     document.addEventListener("pointerdown", closeOutside);
     document.addEventListener("focusin", closeOutside);
     document.addEventListener("keydown", escape);
     return () => {
-      desktop.removeEventListener("change", close);
       document.removeEventListener("pointerdown", closeOutside);
       document.removeEventListener("focusin", closeOutside);
       document.removeEventListener("keydown", escape);
@@ -49,6 +46,9 @@ export default function Navbar() {
         <Link to="/" className="cr-brand" aria-label="Caribe Records, inicio">
           <img src={whiteLogo} alt="" className="cr-brand-mark" />
         </Link>
+        {user && location.pathname.startsWith("/admin") && (
+          <button type="button" className="cr-logout" onClick={logout}>Cerrar sesión</button>
+        )}
         <button
           type="button"
           ref={toggleRef}
@@ -77,9 +77,6 @@ export default function Navbar() {
             <li><NavLink to="/admin" onClick={() => setIsOpen(false)}>Admin<span className="cr-menu-index" aria-hidden="true">06</span></NavLink></li>
           )}
         </ol>
-        {user && location.pathname.startsWith("/admin") && (
-          <button type="button" className="cr-logout" onClick={logout}>Cerrar sesión</button>
-        )}
       </nav>
     </header>
   );
