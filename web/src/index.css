@@ -5826,16 +5826,13 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   letter-spacing: .04em;
 }
 
-.home-section-nav a:is(:hover, :focus-visible) {
-  color: var(--cr-white);
-  text-decoration: underline;
-  text-decoration-thickness: .055em;
-  text-underline-offset: .1em;
+.home-section-nav a:hover {
+  color: var(--cr-blue);
+  text-decoration: none;
 }
 
-.home-section-nav a[target="_blank"]:is(:hover, :focus-visible) {
-  color: var(--cr-blue);
-  background: var(--cr-sun);
+.home-section-nav a:last-child:hover {
+  color: var(--cr-sun);
 }
 
 .home-carousel-controls {
@@ -5868,9 +5865,8 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   font-weight: 300;
 }
 
-.home-carousel-controls button:is(:hover, :focus-visible) {
-  color: var(--cr-white);
-  text-decoration: underline;
+.home-carousel-controls button:hover {
+  color: var(--cr-sun);
   background: transparent;
   transform: none;
 }
@@ -6289,6 +6285,7 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
 
 .home-editorial-carousel.is-empty .home-empty-state { color: var(--cr-white); }
 .home-editorial-carousel.is-empty .home-empty-state img { filter: brightness(0) invert(1); }
+.home-editorial-carousel.is-empty ~ .home-section-nav a:hover { color: var(--cr-sun); }
 
 .content-permalink { color: inherit; text-decoration: inherit; }
 .content-permalink:focus-visible, .event-poster-trigger:focus-visible { text-decoration: underline; }
