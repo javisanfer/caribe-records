@@ -10,6 +10,7 @@ const bcrypt = require("bcryptjs");
 const { readFileSync } = require("node:fs");
 const { gzipSync } = require("node:zlib");
 const { checkEventPosters } = require("./check-event-posters.cjs");
+const { checkArtistCatalogueLayout } = require("./check-artist-catalogue-layout.cjs");
 const { checkCatalogueTouch } = require("./check-catalogue-touch.cjs");
 const { checkPersistence } = require("./review-persistence");
 const launch = require("../src/data/launch-content.json");
@@ -164,6 +165,7 @@ async function main() {
           }
         }
         await checkEventPosters(page, base, root, expect);
+        await checkArtistCatalogueLayout(browser, base);
         if (engine === "chromium") {
           await checkCatalogueTouch(browser, base);
           await page.goto(base + "/admin/new-editorial");

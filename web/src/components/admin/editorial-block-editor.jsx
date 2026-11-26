@@ -3,6 +3,7 @@ import EditorialPlayer from "../editorials/editorial-player";
 import { editorialEmbed } from "../../utils/editorial-embed";
 import { imageUrlInput } from "./image-url-input";
 import React, { useEffect, useRef, useState } from "react";
+import { editorialPhotoTypes, prepareEditorialPhoto } from "../../utils/editorial-photo";
 import { uploadImage } from "../../services/api-services";
 import { createTextBlock, makeEditorialBlockId } from "./editorial-block-utils";
 
@@ -52,11 +53,11 @@ function ImageBlock({ block, onChange, setBusy }) {
     try {
       setBusy(true);
       setUploading(true);
-      const response = await uploadImage(file);
+      const response = await uploadImage(await prepareEditorialPhoto(file));
       updateImage("url", response.imageUrl);
     } catch (error) {
       console.error(error);
-      alert("No se pudo subir la imagen.");
+      alert(error.response?.data?.message || error.message || "No se pudo subir la imagen.");
     } finally { setUploading(false); setBusy(false); }
   };
 
@@ -66,7 +67,7 @@ function ImageBlock({ block, onChange, setBusy }) {
         {image.url ? <img src={image.url} alt={image.alt || "Vista previa"} /> : <div><span>＋</span><p>Añade una fotografía</p></div>}
       </div>
       <div className="magazine-image-block__fields">
-        <label className="magazine-file-button">{uploading ? "Subiendo…" : "Seleccionar imagen"}<input type="file" accept="image/*" disabled={uploading} onChange={handleFile} /></label>
+        <label className="magazine-file-button">{uploading ? "Subiendo…" : "Seleccionar imagen"}<input type="file" accept={editorialPhotoTypes} disabled={uploading} onChange={handleFile} /></label>
         <input {...imageUrlInput} className="form-control" value={image.url || ""} onChange={(event) => updateImage("url", event.target.value)} placeholder="O pega la URL de la imagen" aria-label="URL de imagen" />
         <input className="form-control" value={image.caption || ""} onChange={(event) => updateImage("caption", event.target.value)} placeholder="Título o pie de foto" aria-label="Título o pie de foto" />
         <div className="admin-field-grid admin-field-grid--2">

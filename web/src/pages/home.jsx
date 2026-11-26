@@ -5,7 +5,7 @@ import runner from "../assets/brand/caribe-runner.webp";
 import SiteLoader from "../components/ui/site-loader.jsx";
 import ResponsiveImage from "../components/ui/responsive-image.jsx";
 
-const coverWidths = [640, 960, 1280, 1600, 1920, 2560];
+const coverWidths = [640, 960, 1280, 1600, 1920, 2560, 3200, 3840];
 const homeNavigation = [
   { to: "/artistas", label: "Artistas" },
   { to: "/releases", label: "Catálogo" },
@@ -89,6 +89,7 @@ export default function HomePage() {
             >
               {editorial.hero?.url && (index === activeSlide || settled[index] || (index === nextSlide && (currentReady || requestedSlide === nextSlide))) && (
                 <ResponsiveImage
+                  cover
                   widths={coverWidths}
                   sizes="100vw"
                   src={editorial.hero.url}
