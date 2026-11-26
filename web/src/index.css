@@ -5835,7 +5835,8 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
 }
 
 .home-section-nav a[target="_blank"]:hover {
-  color: var(--cr-sun);
+  color: var(--cr-blue);
+  background: var(--cr-sun);
 }
 
 .home-carousel-controls {
