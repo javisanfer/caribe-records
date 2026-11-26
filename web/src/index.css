@@ -227,10 +227,6 @@ button:focus-visible {
   color: #fff;
 }
 
-a.event-row:hover {
-  background: #0d0d0d;
-}
-
 .event-row .event-cell {
   width: 28%;
 }
@@ -1597,11 +1593,6 @@ body {
     background: var(--cr-white);
   }
 
-  a.event-row:hover {
-    color: var(--cr-white);
-    background: var(--cr-blue);
-  }
-
   .editorial-item:hover {
     color: var(--cr-white) !important;
     background: var(--cr-blue);
@@ -1657,11 +1648,17 @@ body {
   transition: color .16s ease, background-color .16s ease;
 }
 .event-year > summary::-webkit-details-marker { display: none; }
-.event-year > summary:hover,
-.event-year > summary:focus-visible {
+.event-year > summary:focus-visible,
+.event-row:not(.event-row--past):has(:focus-visible) {
   color: var(--cr-white);
   background: var(--cr-blue);
-  outline: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .event-year > summary:hover,
+  .event-index > li:hover > .event-row:not(.event-row--past) {
+    color: var(--cr-white);
+    background: var(--cr-blue);
+  }
 }
 .event-year__year {
   font-size: clamp(4.5rem, 10vw, 9rem);
@@ -3321,6 +3318,7 @@ body {
 }
 
 .admin-create__grid a {
+  color: var(--cr-blue);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
@@ -3349,7 +3347,6 @@ body {
 }
 
 .admin-create__grid a b {
-  color: var(--cr-blue);
   font-size: clamp(1.8rem, 3vw, 3.2rem);
   font-weight: 400;
   line-height: .7;
@@ -3361,9 +3358,6 @@ body {
   background: var(--cr-blue);
   text-decoration: none;
 }
-
-.admin-create__grid a:hover b,
-.admin-create__grid a:focus-visible b { color: var(--cr-sun); }
 
 .admin-activity__heading > div > p {
   display: flex;
@@ -5247,18 +5241,6 @@ body {
   transition: color .14s ease, background-color .14s ease;
 }
 
-a.event-row:hover,
-a.event-row:focus-visible {
-  color: var(--cr-blue);
-  background: var(--cr-sun);
-  text-decoration: none !important;
-}
-
-a.event-row:hover *,
-a.event-row:focus-visible * {
-  text-decoration: none !important;
-}
-
 .event-row__artist,
 .event-row__place {
   display: flex;
@@ -6387,12 +6369,6 @@ html:has(.home), body:has(.home) { background: #050505; }
   .artists-page .artist-index__link:hover {
     color: var(--cr-blue) !important;
     background: var(--cr-white);
-  }
-
-  a.event-row:hover {
-    color: var(--cr-blue);
-    background: var(--cr-sun);
-    text-decoration: none !important;
   }
 
   .editorial-item:hover {

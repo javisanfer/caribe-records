@@ -16,6 +16,7 @@ const launch = require("../src/data/launch-content.json");
 async function main() {
   if (process.env.GITHUB_ACTIONS !== "true") throw new Error("Esta prueba usa el servicio MongoDB desechable de GitHub Actions.");
   const { chromium, firefox, webkit } = require("playwright");
+  const { expect } = require("playwright/test");
   const root = resolve(__dirname, "../..");
   const dist = root + "/web/dist";
   const html = readFileSync(dist + "/index.html", "utf8");
@@ -66,7 +67,12 @@ async function main() {
     run("node_modules/vite/bin/vite.js", ["preview", "--host", "127.0.0.1", "--port", "5185", "--strictPort"], root + "/web", { VITE_API_PROXY: api });
     await ready(base);
     const releases = await fetch(api + "/api/v1/releases").then((r) => r.json());
-    const event = await db.db().collection("events").findOne({ isActive: true });
+    const event = await db.db().collection("events").findOne({ isActive: true }, { projection: { _id: 0 } });
+    // Keep an upcoming row available after the last concert in the archive fixture.
+    await db.db().collection("events").insertOne({
+      ...event, slug: "concierto-futuro-qa", date: new Date(Date.now() + 7 * 86400000),
+      ticketUrl: "https://example.org/entradas",
+    });
     const article = launch.featuredEditorial.slug;
     const sitemap = await fetch(api + "/api/v1/pages/sitemap.xml").then((r) => r.text());
     assert.ok(sitemap.includes("/editorial/" + article));
@@ -96,6 +102,31 @@ async function main() {
             await page.locator("h1").first().waitFor({ state: "attached" });
             if (path.startsWith("/admin/")) await page.getByRole("link", { name: "Volver al panel" }).waitFor();
             if (path === "/") await page.getByRole("link", { name: "Panel", exact: true }).waitFor();
+            if (path === "/admin" && width === 1280) {
+              for (const card of await page.locator(".admin-create__grid a").all()) {
+                await expect(card.locator("span")).toHaveCSS("color", "rgb(0, 32, 209)");
+                await expect(card.locator("b")).toHaveCSS("color", "rgb(0, 32, 209)");
+              }
+              const artistCard = page.getByRole("link", { name: "Artista", exact: true });
+              await artistCard.hover();
+              await expect(artistCard.locator("span")).toHaveCSS("color", "rgb(255, 255, 255)");
+              await expect(artistCard.locator("b")).toHaveCSS("color", "rgb(255, 255, 255)");
+              await page.mouse.move(0, 0);
+            }
+            if (path === "/eventos" && width === 1280) {
+              const row = page.locator(".event-row").filter({ has: page.locator('a[href="/eventos/concierto-futuro-qa"]') });
+              const year = page.locator(".event-year summary").first();
+              await year.hover();
+              await expect(year).toHaveCSS("background-color", "rgb(0, 32, 209)");
+              await row.locator("time").hover();
+              await expect(row).toHaveCSS("background-color", "rgb(0, 32, 209)");
+              await expect(row.getByRole("link", { name: /Entradas/i })).toHaveCSS("color", "rgb(255, 255, 255)");
+              await page.mouse.move(0, 0);
+              await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+              await row.locator(".event-row__artist a").press("Tab");
+              await expect(row.getByRole("link", { name: /Entradas/i })).toBeFocused();
+              await expect(row).toHaveCSS("background-color", "rgb(0, 32, 209)");
+            }
             if (path === "/admin/new-artist") {
               assert.equal(await page.getByRole("heading", { name: /^(Integrantes|Galería|Vídeos)$/ }).count(), 0);
             }
