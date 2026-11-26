@@ -1135,23 +1135,26 @@ dialog.site-banner[open] { display: grid; }
 }
 
 .cr-mobile-links li {
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
-  align-items: start;
   border-bottom: 1px solid rgba(255,255,255,.7);
 }
 
-.cr-mobile-links li > span {
-  padding-top: clamp(13px, 2vw, 22px);
-  font-size: 0.68rem;
-  opacity: 0.68;
+.cr-menu-index {
+  font-size: .75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: .04em;
+  text-align: right;
 }
 
 .cr-mobile-links a {
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: clamp(1rem, 3vw, 3rem);
+  align-items: center;
   min-width: 0;
   overflow-wrap: anywhere;
-  padding: clamp(8px, 1.4vw, 16px) 0;
+  padding: clamp(8px, 1.4vw, 16px) clamp(14px, 2vw, 32px);
   color: var(--cr-white);
   font-size: clamp(2.35rem, 6.2vw, 5.8rem);
   font-weight: 600;
@@ -1230,7 +1233,6 @@ dialog.site-banner[open] { display: grid; }
 
   .cr-mobile-menu-inner { padding: 20px 14px; }
   .cr-mobile-links { margin-top: 3vh; }
-  .cr-mobile-links li { grid-template-columns: 34px minmax(0, 1fr); }
   .cr-mobile-links a { font-size: clamp(2.2rem, 10.5vw, 3.75rem); }
 
   .cr-menu-footer {
@@ -1543,7 +1545,6 @@ html body {
   background: var(--cr-white);
 }
 
-.cr-mobile-links li:has(a[aria-current="page"]) > span,
 .cr-mobile-links a[aria-current="page"] {
   color: var(--cr-blue) !important;
   opacity: 1;

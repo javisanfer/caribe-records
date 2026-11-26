@@ -94,18 +94,21 @@ export default function Navbar() {
           <ol className="cr-mobile-links">
             {navigation.map((item) => (
               <li key={item.to}>
-                <span>{item.index}</span>
-                <NavLink to={item.to} tabIndex={isOpen ? 0 : -1}>{item.label}</NavLink>
+                <NavLink to={item.to} tabIndex={isOpen ? 0 : -1}>
+                  {item.label}<span className="cr-menu-index" aria-hidden="true">{item.index}</span>
+                </NavLink>
               </li>
             ))}
             <li className="cr-menu-shop">
-              <span>05</span>
-              <a href="https://cariberecords.bigcartel.com/" target="_blank" rel="noreferrer" tabIndex={isOpen ? 0 : -1}>Tienda ↗</a>
+              <a href="https://cariberecords.bigcartel.com/" target="_blank" rel="noreferrer" tabIndex={isOpen ? 0 : -1}>
+                Tienda ↗<span className="cr-menu-index" aria-hidden="true">05</span>
+              </a>
             </li>
             {user?.role === "admin" && (
               <li>
-                <span>06</span>
-                <NavLink to="/admin" tabIndex={isOpen ? 0 : -1}>Admin</NavLink>
+                <NavLink to="/admin" tabIndex={isOpen ? 0 : -1}>
+                  Admin<span className="cr-menu-index" aria-hidden="true">06</span>
+                </NavLink>
               </li>
             )}
           </ol>
