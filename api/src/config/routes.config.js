@@ -91,7 +91,13 @@ router.get("/admin/about", adminRateLimit, about.get);
 router.put("/admin/about", adminRateLimit, about.update);
 
 const carousel = require("../controllers/home-carousel.controller");
-router.get("/home-carousel", carousel.publicList);
+const carouselReadLimit = rateLimit({
+  windowMs: 60_000,
+  limit: 120,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
+router.get("/home-carousel", carouselReadLimit, carousel.publicList);
 router.get("/admin/home-carousel", adminRateLimit, carousel.adminList);
 router.put("/admin/home-carousel", adminRateLimit, carousel.update);
 
