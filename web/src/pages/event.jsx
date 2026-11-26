@@ -56,7 +56,7 @@ export default function EventPage() {
       } catch (err) {
         console.error("Error cargando eventos", err);
         setEvents([]);
-        setError("No se pudieron cargar todas las fechas del archivo.");
+        setError("No se pudo cargar la agenda.");
       } finally {
         setLoading(false);
       }

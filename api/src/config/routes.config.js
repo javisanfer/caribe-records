@@ -120,11 +120,13 @@ router.get(
 // Público
 router.get("/artists", artistController.getArtists);
 
+const artistProfileReadLimit = rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false });
+
 // slug FIRST
-router.get("/artists/slug/:slug", artistController.getArtistBySlug);
+router.get("/artists/slug/:slug", artistProfileReadLimit, artistController.getArtistBySlug);
 
 // id AFTER
-router.get("/artists/:id", artistController.getArtistById);
+router.get("/artists/:id", artistProfileReadLimit, artistController.getArtistById);
 
 // Admin
 router.get("/admin/artists", adminRateLimit, artistController.getArtists);

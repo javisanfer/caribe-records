@@ -74,9 +74,16 @@ async function main() {
       ...event, slug: "concierto-futuro-qa", date: new Date(Date.now() + 7 * 86400000),
       ticketUrl: "https://example.org/entradas",
     });
+    await db.db().collection("events").insertMany([
+      { ...event, slug: "archivo-en-revision-qa", date: new Date("2025-06-01T18:00:00Z") },
+      { ...event, slug: "archivo-publicado-qa", date: new Date("2000-06-01T18:00:00Z") },
+    ]);
     const article = launch.featuredEditorial.slug;
     const sitemap = await fetch(api + "/api/v1/pages/sitemap.xml").then((r) => r.text());
     assert.ok(sitemap.includes("/editorial/" + article));
+    assert.ok(!sitemap.includes("/eventos/archivo-en-revision-qa"));
+    assert.ok(sitemap.includes("/eventos/concierto-futuro-qa"));
+    assert.equal((await fetch(api + "/api/v1/events/slug/archivo-en-revision-qa")).status, 404);
     const layoutFailures = [];
     for (const [engine, driver] of Object.entries({ chromium, firefox, webkit })) {
       if (!browserApi) browserApi = await startApi();
@@ -93,7 +100,7 @@ async function main() {
         await page.locator('button[type="submit"]').click();
         await page.getByRole("heading", { name: "Panel", exact: true }).waitFor();
         const paths = ["/", "/artistas", "/artistas/ferrocentro-club", "/editoriales", "/editorial/" + article,
-          "/eventos", "/eventos/" + event.slug, "/releases", "/releases/" + releases[0]._id, "/about",
+          "/eventos", "/eventos/concierto-futuro-qa", "/releases", "/releases/" + releases[0]._id, "/about",
           "/admin", "/admin/new-artist", "/admin/new-release", "/admin/new-editorial", "/admin/new-event", "/admin/new-banner", "/admin/portada", "/admin/about"];
         for (const width of [375, 1280]) {
           await page.setViewportSize({ width, height: 850 });
@@ -115,7 +122,11 @@ async function main() {
               await page.mouse.move(0, 0);
             }
             if (path === "/eventos" && width === 1280) {
-              const row = page.locator(".event-row").filter({ has: page.locator('a[href="/eventos/concierto-futuro-qa"]') });
+              const artistTicket = page.locator('a.event-row__artist[data-content-slug="concierto-futuro-qa"]');
+              const row = page.locator(".event-row").filter({ has: artistTicket });
+              await expect(artistTicket).toHaveAttribute("href", "https://example.org/entradas");
+              await expect(row.getByRole("link", { name: /^Entradas/i })).toHaveAttribute("href", "https://example.org/entradas");
+              await expect(page.locator(".event-year summary").filter({ hasText: "2025" })).toHaveCount(0);
               const year = page.locator(".event-year summary").first();
               const mouseHover = await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches);
               console.log(engine, "Eventos: puntero fino con hover", mouseHover);
@@ -127,7 +138,7 @@ async function main() {
               await expect(row.getByRole("link", { name: /Entradas/i })).toHaveCSS("color", mouseHover ? "rgb(255, 255, 255)" : "rgb(0, 32, 209)");
               await page.mouse.move(0, 0);
               await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-              await row.locator(".event-row__artist a").press("Tab");
+              await artistTicket.press("Tab");
               await expect(row.getByRole("link", { name: /Entradas/i })).toBeFocused();
               await expect(row).toHaveCSS("background-color", "rgb(0, 32, 209)");
             }
@@ -203,7 +214,7 @@ async function main() {
           const edits = [
             ["artist", "ferrocentro-club", "city", "artists/slug/ferrocentro-club"],
             ["release", releases[0]._id, "country", "releases/" + releases[0]._id],
-            ["event", event.slug, "venue", "events/slug/" + event.slug],
+            ["event", "concierto-futuro-qa", "venue", "events/slug/concierto-futuro-qa"],
             ["editorial", article, "subtitle", "editorials/slug/" + article],
           ];
           for (const [kind, id, field, endpoint] of edits) {
@@ -212,12 +223,24 @@ async function main() {
             const input = page.locator('[name="' + field + '"]');
             const disclosure = input.locator("xpath=ancestor::details[not(@open)][1]/summary");
             if (await disclosure.count()) await disclosure.click();
+            const credits = page.getByRole("group", { name: "Artistas del lanzamiento" });
+            if (kind === "release") {
+              const choices = credits.getByRole("checkbox");
+              await choices.nth(0).check();
+              await choices.nth(1).check();
+            }
             const value = kind === "release" ? "PT" : "Revisión de " + kind;
             await input.fill(value);
             const form = input.locator("xpath=ancestor::form");
             await form.getByRole("button", { name: /^Actualizar/ }).click();
             await page.getByRole("heading", { name: "Panel", exact: true }).waitFor();
             const published = await fetch(api + "/api/v1/" + endpoint).then((r) => r.json());
+            if (kind === "release") {
+              assert.ok(published.collaborators.length > 0);
+              await page.goto(base + "/admin/edit-release/" + id);
+              await expect(credits.getByRole("checkbox").nth(0)).toBeChecked();
+              await expect(credits.getByRole("checkbox").nth(1)).toBeChecked();
+            }
             assert.equal(published[field], value, kind + " debe reflejar la edición del formulario");
           }
         }

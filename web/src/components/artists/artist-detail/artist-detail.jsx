@@ -4,6 +4,7 @@ import { cleanBiography } from "../../../utils/artist-biography";
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../../index.css";
+import "./julia-garblan.css";
 import { sortReleases } from "../../../utils/release-order";
 
 import { artistPhotoUrl } from "../../../utils/artist-photo";

@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { useAuthContext } from "../contexts/use-auth-context";
 import runner from "../assets/brand/caribe-runner.webp";
 import SiteLoader from "../components/ui/site-loader.jsx";
+import ResponsiveImage from "../components/ui/responsive-image.jsx";
 
+const coverWidths = [640, 960, 1280, 1600, 1920, 2560];
 const homeNavigation = [
   { to: "/artistas", label: "Artistas" },
   { to: "/releases", label: "Catálogo" },
@@ -15,6 +17,8 @@ export default function HomePage() {
   const { user } = useAuthContext();
   const [editorials, setEditorials] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [settled, setSettled] = useState({});
+  const [requestedSlide, setRequestedSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -31,22 +35,31 @@ export default function HomePage() {
         if (active) setEditorials(items);
       })
       .finally(() => {
-      if (active) {
-        setLoading(false);
-      }
+        if (active) setLoading(false);
       });
     return () => {
       active = false;
     };
   }, []);
 
+  const nextSlide = (activeSlide + 1) % (editorials.length || 1);
+  const ready = (index) => !editorials[index]?.hero?.url || Boolean(settled[index]);
+  const currentReady = ready(activeSlide);
+  const nextReady = ready(nextSlide);
+
   useEffect(() => {
-    if (editorials.length < 2 || isPaused) return undefined;
-    const timer = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % editorials.length);
-    }, 6000);
-    return () => window.clearInterval(timer);
-  }, [editorials.length, isPaused]);
+    if (editorials.length < 2 || isPaused || !currentReady) return;
+    const timer = window.setTimeout(() => setRequestedSlide(nextSlide), 6000);
+    return () => window.clearTimeout(timer);
+  }, [editorials.length, isPaused, currentReady, nextSlide]);
+
+  useEffect(() => {
+    if (requestedSlide === nextSlide && nextReady) setActiveSlide(requestedSlide);
+  }, [requestedSlide, nextSlide, nextReady]);
+
+  function finishImage(index) {
+    setSettled((previous) => previous[index] ? previous : { ...previous, [index]: true });
+  }
 
   return (
     <div className={`home${loading ? " is-loading" : ""}`}>
@@ -74,13 +87,16 @@ export default function HomePage() {
               tabIndex={index === activeSlide ? 0 : -1}
               aria-label="Abrir publicación editorial"
             >
-              {editorial.hero?.url && (
-                <img
+              {editorial.hero?.url && (index === activeSlide || settled[index] || (index === nextSlide && (currentReady || requestedSlide === nextSlide))) && (
+                <ResponsiveImage
+                  widths={coverWidths}
+                  sizes="100vw"
                   src={editorial.hero.url}
-                  fetchPriority={index === 0 ? "high" : "auto"}
-                  loading={index === 0 ? "eager" : "lazy"}
+                  fetchPriority={index === activeSlide ? "high" : "low"}
+                  decoding="async"
+                  onLoad={() => finishImage(index)}
                   alt={editorial.hero.alt || ""}
-                  onError={(event) => { event.currentTarget.hidden = true; }}
+                  onError={(event) => { event.currentTarget.hidden = true; finishImage(index); }}
                 />
               )}
               <span className="home-slide-label">{editorial.title}</span>
@@ -118,7 +134,7 @@ export default function HomePage() {
           <span>{String(activeSlide + 1).padStart(2, "0")} / {String(editorials.length).padStart(2, "0")}</span>
           <button
             type="button"
-            onClick={() => setActiveSlide((activeSlide + 1) % editorials.length)}
+            onClick={() => setRequestedSlide(nextSlide)}
             aria-label="Siguiente imagen"
           >
             ↓

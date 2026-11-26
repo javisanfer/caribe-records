@@ -32,6 +32,8 @@ const releaseSchema = new mongoose.Schema(
       ref: "Artist",
     },
 
+    collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: "Artist" }],
+
     // Nombre plano del artista (opcional)
     artistName: { type: String, trim: true },
 

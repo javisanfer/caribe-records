@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import React from "react";
 
 export default function EventItem({ event = {}, past = false, onOpenPoster }) {
@@ -31,15 +30,20 @@ export default function EventItem({ event = {}, past = false, onOpenPoster }) {
     (value) => typeof value === "string" && /^https?:\/\//i.test(value)
   );
 
+  const ticketProps = {
+    href: url, target: "_blank", rel: "noopener noreferrer nofollow",
+    "data-outbound": "ticket", "data-content-type": "event", "data-content-slug": event.slug,
+  };
+  const heading = <><strong>{artist}</strong>{event.title && <span>{event.title}</span>}</>;
+
   return (
     <article
       className={`event-row${past ? " event-row--past" : ""}`}
       aria-label={`${artist} en ${city}${country ? ", " + country : ""} — ${dateLabel}`}
     >
-      <div className="event-row__artist">
-        <strong>{event.slug ? <Link className="content-permalink" to={`/eventos/${encodeURIComponent(event.slug)}`}>{artist}</Link> : artist}</strong>
-        {event.title && <span>{event.title}</span>}
-      </div>
+      {!past && url ? (
+        <a className="event-row__artist content-permalink" {...ticketProps}>{heading}</a>
+      ) : <div className="event-row__artist">{heading}</div>}
 
       <div className="event-row__place">
         <strong>{venue}</strong>
@@ -56,7 +60,7 @@ export default function EventItem({ event = {}, past = false, onOpenPoster }) {
             onClick={(click) => onOpenPoster(event.id, click.currentTarget)}>
             Ver cartel
           </button>
-        ) : url ? <a data-outbound={past ? undefined : "ticket"} data-content-type="event" data-content-slug={event.slug} className="content-permalink" href={url} target="_blank" rel="noopener noreferrer nofollow">{past ? "Ver cartel" : "Entradas"} <span aria-hidden="true">↗</span></a> : <span>{past ? "Finalizado" : "Próximamente"}</span>}
+        ) : url ? <a {...ticketProps} data-outbound={past ? undefined : "ticket"} className="content-permalink">{past ? "Ver cartel" : "Entradas"} <span aria-hidden="true">↗</span></a> : <span>{past ? "Finalizado" : "Próximamente"}</span>}
       </div>
     </article>
   );

@@ -1,3 +1,4 @@
+import { releaseArtistCredit } from "../../../utils/release-artists";
 import { releaseSlug } from "../../../analytics/measurement";
 import { releaseListenUrl } from "../../../utils/release-listen-url";
 import { Link } from "react-router-dom";
@@ -33,12 +34,7 @@ export default function ReleaseItem({ release, view = "list" }) {
   // Nombre de artista: viene ya normalizado desde ReleasePage,
   // pero por si acaso usamos varios fallbacks
   const titleLink = release.managed ? <Link className="content-permalink" to={`/releases/${release.id}`}>{title}</Link> : title;
-  const artistName =
-    release.artistName ||
-    (typeof release.artist === "string"
-      ? release.artist
-      : release.artist?.name) ||
-    "Unknown artist";
+  const artistName = releaseArtistCredit(release) || "Artista por confirmar";
 
   // Catálogo / label
   const catalog = release.catalog || release.catNo || release.cat || "";

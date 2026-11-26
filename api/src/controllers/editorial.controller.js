@@ -33,7 +33,7 @@ async function validAssociations(artists, releases) {
   if (!artists.every(isObjectIdOrHexString) || !releases.every(isObjectIdOrHexString)) return false;
   if (!releases.length) return true;
   if (!artists.length) return false;
-  const count = await Release.countDocuments({ _id: { $in: releases }, artist: { $in: artists } });
+  const count = await Release.countDocuments({ _id: { $in: releases }, $or: [{ artist: { $in: artists } }, { collaborators: { $in: artists } }] });
   return count === new Set(releases).size;
 }
 

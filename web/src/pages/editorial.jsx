@@ -21,7 +21,7 @@ export default function EditorialPage() {
       className="editorial-page"
       title="Editorial"
       count={loading ? null : editorials.length}
-      countLabel="historias"
+      countLabel={editorials.length === 1 ? "artículo" : "artículos"}
     >
       {loading ? <SiteLoader /> : error ? <p role="alert">{error}</p> : <EditorialList editorials={editorials} />}
     </PublicIndexPage>

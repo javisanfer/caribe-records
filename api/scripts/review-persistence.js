@@ -71,6 +71,24 @@ async function checkPersistence(email, password) {
     assert.equal(reading.blocks[1].gallery[0].url, image);
     assert.equal(reading.credits[0].name, "Autor de prueba");
 
+    const collaboration = await create("releases", {
+      title: title + " Dúo", format: "single", artist: artist.doc._id,
+      collaborators: [otherArtist.doc._id, artist.doc._id, otherArtist.doc._id],
+    });
+    const creditedIds = () => request(collaboration.path).then((record) => record.collaborators.map((person) => person._id));
+    assert.deepEqual(await creditedIds(), [otherArtist.doc._id]);
+    for (const person of [artist.doc, otherArtist.doc]) {
+      assert.ok((await request("/releases?artist=" + person._id)).some((item) => item._id === collaboration.doc._id));
+      assert.ok((await request("/artists/slug/" + person.slug)).albums.some((item) => item._id === collaboration.doc._id));
+    }
+    await request(collaboration.path, "PATCH", { country: "ES" });
+    assert.deepEqual(await creditedIds(), [otherArtist.doc._id]);
+    await assert.rejects(request(collaboration.path, "PATCH", { collaborators: ["unknown"] }), /HTTP 400/);
+    assert.deepEqual(await creditedIds(), [otherArtist.doc._id]);
+    await request(collaboration.path, "PATCH", { artist: otherArtist.doc._id, collaborators: [] });
+    assert.deepEqual(await creditedIds(), []);
+    assert.ok(!(await request("/releases?artist=" + artist.doc._id)).some((item) => item._id === collaboration.doc._id));
+
     const newer = await create("editorials", {
       title: title + " [segunda]", heroUrl: image, status: "published", blocks: [{ type: "paragraph", text: "Texto" }],
     }, true);

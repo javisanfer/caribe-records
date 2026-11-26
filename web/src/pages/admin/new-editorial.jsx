@@ -1,3 +1,4 @@
+import { releaseArtists } from "../../utils/release-artists";
 import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import DOMPurify from "dompurify";
@@ -34,7 +35,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
   }, []);
   const selectedArtists = watch("relatedArtists");
   const selectedReleases = watch("relatedReleases");
-  const forArtists = (ids) => (releases || []).filter(({ artist }) => ids.includes(artist?._id || artist));
+  const forArtists = (ids) => (releases || []).filter((release) => releaseArtists(release).some((artist) => ids.includes(artist._id || artist)));
   const availableReleases = forArtists(selectedArtists);
   const eligibleIds = new Set(availableReleases.map((release) => release._id));
   const hasLegacyLinks = releases && selectedReleases.some((id) => !eligibleIds.has(id));

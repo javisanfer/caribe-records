@@ -10,6 +10,16 @@ function artistObjectId(value) {
   return new mongoose.Types.ObjectId(value);
 }
 
+async function collaboratorIds(values, primary) {
+  if (!Array.isArray(values)) throw new Error("Selecciona artistas válidos");
+  const ids = [...new Set(values.map((value) => artistObjectId(value).toHexString()))]
+    .filter((id) => id !== String(primary).toLowerCase());
+  if (ids.length && await Artist.countDocuments({ _id: { $in: ids } }) !== ids.length) {
+    throw new Error("Colaborador desconocido");
+  }
+  return ids;
+}
+
 function validateSpotifyUrl(value) {
   if (value === undefined || value === null || value === "") return;
   if (!isSpotifyUrl(value)) throw new Error("Spotify URL must be a valid album or track link");
@@ -25,10 +35,11 @@ exports.getReleases = async (req, res) => {
     const filter = req.path.startsWith("/admin/") ? {} : { catalogVisible: { $ne: false } };
     if (req.query.artist !== undefined) {
       if (!mongoose.isObjectIdOrHexString(req.query.artist)) return res.status(400).json({ message: "Artista no válido" });
-      filter.artist = new mongoose.Types.ObjectId(req.query.artist);
+      const id = new mongoose.Types.ObjectId(req.query.artist);
+      filter.$or = [{ artist: id }, { collaborators: id }];
     }
     const releases = await Release.find(filter)
-      .populate("artist", "name slug")
+      .populate("artist collaborators", "name slug")
       .populate({ path: "label", model: Label, select: "name" })
       .sort({ release_date: -1, createdAt: -1 })
       .lean();
@@ -44,7 +55,7 @@ exports.getReleases = async (req, res) => {
 exports.getReleaseById = async (req, res) => {
   try {
     const release = await Release.findById(req.params.id)
-      .populate("artist", "name slug")
+      .populate("artist collaborators", "name slug")
       .populate({ path: "label", model: Label, select: "name" });
 
     if (!release || (release.catalogVisible === false && !req.path.startsWith("/admin/"))) return res.status(404).json({ message: "Release not found" });
@@ -64,7 +75,7 @@ exports.getReleaseById = async (req, res) => {
 exports.getReleaseBySlugAdmin = async (req, res) => {
   try {
     const release = await Release.findOne({ slug: req.params.slug })
-      .populate("artist", "name slug")
+      .populate("artist collaborators", "name slug")
       .populate({ path: "label", model: Label, select: "name" });
 
     if (!release) {
@@ -85,7 +96,7 @@ exports.getReleaseBySlugAdmin = async (req, res) => {
 // POST /admin/releases
 exports.createRelease = async (req, res) => {
   try {
-    const { artistId, artist, ...rest } = req.body;
+    const { artistId, artist, collaborators, ...rest } = req.body;
     validateSpotifyUrl(rest.spotifyUrl);
 
     const artistRef = artistId || artist || null;
@@ -102,6 +113,7 @@ exports.createRelease = async (req, res) => {
     const release = await Release.create({
       ...rest,
       artist: artistRef,
+      collaborators: await collaboratorIds(collaborators ?? [], artistRef),
     });
 
     // Añadir a Artist.albums
@@ -114,7 +126,7 @@ exports.createRelease = async (req, res) => {
     }
 
     const populated = await Release.findById(release._id)
-      .populate("artist", "name slug")
+      .populate("artist collaborators", "name slug")
       .populate({ path: "label", model: Label, select: "name" });
 
     res.status(201).json(populated);
@@ -131,7 +143,7 @@ exports.createRelease = async (req, res) => {
 // PATCH /admin/releases/:id
 exports.updateRelease = async (req, res) => {
   try {
-    const { artistId, artist, ...rest } = req.body;
+    const { artistId, artist, collaborators, ...rest } = req.body;
     validateSpotifyUrl(rest.spotifyUrl);
 
     const release = await Release.findById(req.params.id);
@@ -145,6 +157,8 @@ exports.updateRelease = async (req, res) => {
     // Actualizamos cuerpo
     Object.assign(release, rest);
     release.artist = newArtist;
+    if (collaborators !== undefined) release.collaborators = await collaboratorIds(collaborators, newArtist);
+    else if (newArtist !== prevArtist) release.collaborators = release.collaborators.filter((id) => String(id) !== newArtist);
 
     await release.save();
 
@@ -160,7 +174,7 @@ exports.updateRelease = async (req, res) => {
     }
 
     const updated = await Release.findById(release._id)
-      .populate("artist", "name slug")
+      .populate("artist collaborators", "name slug")
       .populate({ path: "label", model: Label, select: "name" });
 
     res.json(updated);
