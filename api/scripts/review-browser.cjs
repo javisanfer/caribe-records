@@ -116,11 +116,14 @@ async function main() {
             if (path === "/eventos" && width === 1280) {
               const row = page.locator(".event-row").filter({ has: page.locator('a[href="/eventos/concierto-futuro-qa"]') });
               const year = page.locator(".event-year summary").first();
+              const mouseHover = await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches);
+              console.log(engine, "Eventos: puntero fino con hover", mouseHover);
+              const background = mouseHover ? "rgb(0, 32, 209)" : "rgba(0, 0, 0, 0)";
               await year.hover();
-              await expect(year).toHaveCSS("background-color", "rgb(0, 32, 209)");
+              await expect(year).toHaveCSS("background-color", background);
               await row.locator("time").hover();
-              await expect(row).toHaveCSS("background-color", "rgb(0, 32, 209)");
-              await expect(row.getByRole("link", { name: /Entradas/i })).toHaveCSS("color", "rgb(255, 255, 255)");
+              await expect(row).toHaveCSS("background-color", background);
+              await expect(row.getByRole("link", { name: /Entradas/i })).toHaveCSS("color", mouseHover ? "rgb(255, 255, 255)" : "rgb(0, 32, 209)");
               await page.mouse.move(0, 0);
               await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
               await row.locator(".event-row__artist a").press("Tab");
