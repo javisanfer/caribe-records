@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useLayoutEffect } from "react";
+import React, { lazy, Suspense, useLayoutEffect, useRef } from "react";
 import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { usePageMeta } from "./utils/page-meta";
@@ -47,6 +47,16 @@ function App() {
   const isHome = location.pathname === "/";
   const isPrivateArea = /^\/(admin(?:\/|$)|login(?:\/|$))/i.test(location.pathname);
   const audience = useAudience(location);
+  const consentButton = useRef(null);
+  const preferencesTrigger = useRef(null);
+  useLayoutEffect(() => {
+    if (!preferencesTrigger.current) return;
+    if (audience.show) consentButton.current?.focus();
+    else {
+      preferencesTrigger.current.focus();
+      preferencesTrigger.current = null;
+    }
+  }, [audience.show]);
 
   useLayoutEffect(() => {
     if (location.pathname !== "/") document.getElementById("site-schema")?.remove();
@@ -57,6 +67,11 @@ function App() {
     document.body.scrollTop = 0;
   }, [location.pathname, location.search]);
 
+  function openPreferences(event) {
+    preferencesTrigger.current = event.currentTarget;
+    audience.open();
+  }
+
   if (import.meta.env.DEV && location.pathname === "/demo-carga") {
     return <SiteLoader delay={0} fullPage />;
   }
@@ -64,12 +79,12 @@ function App() {
   return (
     <>
       {!isHome && <Navbar />}
-      {!isPrivateArea && !audience.show && <SiteBanner />}
+      {!isPrivateArea && location.pathname !== "/legal" && !audience.show && <SiteBanner />}
       {!isPrivateArea && audience.show && <aside className="cr-consent" aria-labelledby="cr-consent-title">
-        <div><strong id="cr-consent-title">Cookies de audiencia</strong>
-          <p>Con tu permiso, Google Analytics mide las visitas y los clics hacia escucha, entradas y tienda. <Link to="/privacidad">Privacidad y cookies</Link></p></div>
+        <div><strong id="cr-consent-title" className="visually-hidden">Cookies de audiencia</strong>
+          <p>Usamos cookies de Google Analytics para medir visitas y clics en enlaces externos. <Link to="/legal#cookies">Política de cookies</Link></p></div>
         <div className="cr-consent__actions">
-          <button type="button" onClick={() => audience.choose("yes")}>Aceptar</button>
+          <button type="button" ref={consentButton} onClick={() => audience.choose("yes")}>Aceptar</button>
           <button type="button" onClick={() => audience.choose("no")}>Rechazar</button>
         </div>
       </aside>}
@@ -78,7 +93,8 @@ function App() {
         <Suspense fallback={<SiteLoader />}>
           <Routes location={location} key={location.pathname}>
           
-          <Route path="/privacidad" element={<Privacy />} />
+          <Route path="/legal" element={<Privacy onPreferences={enabled ? openPreferences : undefined} />} />
+          <Route path="/privacidad" element={<Navigate to="/legal" replace />} />
           {/* HOME */}
           <Route
             path="/"
@@ -339,7 +355,7 @@ function App() {
           </Routes>
         </Suspense>
       </AnimatePresence>
-      {!isPrivateArea && <SiteFooter preferences={enabled ? audience.open : undefined} />}
+      {!isPrivateArea && <SiteFooter />}
     </>
   );
 }

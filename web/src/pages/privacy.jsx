@@ -1,30 +1,71 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import "./privacy.css";
 
-export default function Privacy() {
-  return <main className="cr-privacy">
-    <h1>Aviso legal, privacidad y cookies</h1>
-    <h2>Titular de la web</h2>
-    <p>Javier Sánchez Fernández explota esta web como trabajador autónomo bajo el nombre comercial Caribe Records.</p>
-    <address>
-      {import.meta.env.VITE_LEGAL_NIF && <>NIF {import.meta.env.VITE_LEGAL_NIF}<br /></>}
-      {import.meta.env.VITE_LEGAL_ADDRESS && <>{import.meta.env.VITE_LEGAL_ADDRESS}<br /></>}
-      <a href="mailto:hola@caribe-records.com">hola@caribe-records.com</a>
-    </address>
-    <h2>Cookies técnicas</h2>
-    <p>Caribe Records utiliza una cookie técnica para el acceso al panel. El navegador también recuerda durante la sesión si has cerrado un anuncio.</p>
-    <h2>Medición de audiencia</h2>
-    <p>Javier Sánchez Fernández, Julia Garrido Blanco y Pablo Villalba Gil decidimos conjuntamente qué actividad medimos en esta web y con qué finalidad. Los tres somos corresponsables del tratamiento de los datos de audiencia. La base jurídica de esta medición es tu consentimiento.</p>
-    <p>Si aceptas, Google Analytics 4 recibe las páginas públicas visitadas, el identificador público del contenido y los clics hacia servicios de escucha, entradas y tienda. Estas estadísticas nos ayudan a conocer el interés por los artistas, los lanzamientos y las editoriales. Un clic indica que has abierto un enlace. Las reproducciones y compras ocurren en las otras plataformas.</p>
-    <p>Google presta el servicio de medición y recibe información técnica, como la dirección IP durante la conexión y datos del navegador. Usamos las cookies propias <code>_ga</code> y <code>_ga_…</code> para distinguir navegadores y sesiones, con una duración configurada de hasta 180 días. La integración está configurada sin señales de Google ni personalización de anuncios.</p>
-    <p>En GA4, el plazo de conservación es de dos meses para los datos de eventos y de catorce meses para los datos de usuario. Un nuevo evento reinicia el plazo del identificador de usuario. Los informes agregados pueden conservarse durante más tiempo.</p>
-    <p>Google puede tratar datos fuera del Espacio Económico Europeo. Para las transferencias a Estados Unidos cubiertas por el Marco de Privacidad de Datos UE-EE. UU., Google se basa en la decisión de adecuación de la Comisión Europea. Cuando proceda, utiliza cláusulas contractuales tipo. Puedes consultar los mecanismos y las garantías en la <a href="https://business.safety.google/intl/es/adsdatatransfers/">información de Google sobre transferencias internacionales</a>.</p>
-    <p>Puedes aceptar, rechazar o retirar el consentimiento desde «Preferencias de cookies» en el pie. Guardamos tu elección en este navegador durante 180 días. Al retirar el permiso detenemos la medición y eliminamos las cookies analíticas del sitio.</p>
-    <p>Puedes consultar también la <a href="https://policies.google.com/privacy?hl=es" rel="noreferrer" target="_blank">política de privacidad de Google</a>.</p>
-    <h2>Reproductores externos</h2>
-    <p>Algunos artículos incluyen música o vídeos de YouTube, Spotify o Internet Archive. Al elegir cargar un reproductor, tu navegador se conecta con ese proveedor, que recibe tu dirección IP y puede usar cookies. Puedes seguir leyendo sin cargarlo.</p>
-    <h2>Tus derechos</h2>
-    <p>Puedes solicitar acceso a tus datos, su rectificación o supresión y, cuando corresponda, la limitación del tratamiento o la portabilidad. Puedes dirigirte a cualquiera de los tres corresponsables a través de nuestro correo común, <a href="mailto:hola@caribe-records.com">hola@caribe-records.com</a>. También puedes presentar una reclamación ante la <a href="https://www.aepd.es/">Agencia Española de Protección de Datos</a>.</p>
-    <Link to="/">Volver a la portada</Link>
-  </main>;
+export default function Privacy({ onPreferences }) {
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
+  }, [hash]);
+
+  return (
+    <main className="public-index legal-page" aria-labelledby="legal-title">
+      <header className="public-index__hero">
+        <h1 className="public-index__title" id="legal-title">Información legal</h1>
+        <nav className="legal-index" aria-label="Apartados de información legal">
+          <a href="#aviso-legal">Aviso legal</a>
+          <a href="#privacidad">Privacidad</a>
+          <a href="#cookies">Cookies</a>
+        </nav>
+      </header>
+
+      <section id="aviso-legal">
+        <h2>Aviso legal</h2>
+        <div>
+          <p>Caribe Records es un sello de música popular independiente formado por Javier Sánchez Fernández, Julia Garrido Blanco y Pablo Villalba Gil.</p>
+          <h3>Titular de la web</h3>
+          <address>
+            Javier Sánchez Fernández<br />
+            {import.meta.env.VITE_LEGAL_NIF && <>NIF {import.meta.env.VITE_LEGAL_NIF}<br /></>}
+            {import.meta.env.VITE_LEGAL_ADDRESS && <>{import.meta.env.VITE_LEGAL_ADDRESS}<br /></>}
+            <a href="mailto:hola@caribe-records.com">hola@caribe-records.com</a>
+          </address>
+          <h3>Catálogo, entradas y tienda</h3>
+          <p>En esta web puedes conocer a nuestros artistas, consultar el catálogo y los conciertos y leer las editoriales. Si pulsas «Escuchar», «Entradas» o «Tienda», irás al servicio enlazado. Aquí no se tramitan pedidos ni se recogen datos de pago. Antes de comprar, puedes consultar las condiciones que figuran en la tienda o en la plataforma de entradas.</p>
+        </div>
+      </section>
+
+      <section id="privacidad">
+        <h2>Política de privacidad</h2>
+        <div>
+          <h3>Quién decide qué se mide</h3>
+          <p>Javier Sánchez Fernández, Julia Garrido Blanco y Pablo Villalba Gil decidimos juntos qué medir y para qué. Somos corresponsables de la medición de audiencia. Puedes dirigirte a cualquiera de los tres en <a href="mailto:hola@caribe-records.com">hola@caribe-records.com</a>.</p>
+          <h3>Qué datos tratamos y para qué</h3>
+          <p>Con tu consentimiento, usamos Google Analytics 4 para saber qué artistas, discos y editoriales se visitan y desde qué páginas se abren enlaces a servicios de escucha, entradas o tienda. Registramos la página pública, el contenido y la plataforma de destino. Las compras y reproducciones tienen lugar en esas plataformas.</p>
+          <p>Google recibe información técnica de la conexión, como la dirección IP y datos del navegador. El panel de administración y el acceso y la recuperación de cuentas quedan fuera de la medición. Las funciones publicitarias y las señales de Google están desactivadas.</p>
+          <h3>Conservación y transferencias</h3>
+          <p>En GA4 conservamos los datos de eventos durante dos meses y los datos de usuario durante catorce meses. Un nuevo evento reinicia el plazo del identificador de usuario. Los informes agregados pueden conservarse durante más tiempo.</p>
+          <p>Google puede tratar datos fuera del Espacio Económico Europeo. Para las transferencias a Estados Unidos cubiertas por el Marco de Privacidad de Datos UE-EE. UU., Google se basa en la decisión de adecuación de la Comisión Europea. Cuando procede, utiliza cláusulas contractuales tipo. Puedes consultar sus <a href="https://business.safety.google/intl/es/adsdatatransfers/">garantías para transferencias internacionales</a> y su <a href="https://policies.google.com/privacy?hl=es">política de privacidad</a>.</p>
+          <h3>Tus derechos</h3>
+          <p>Puedes solicitar el acceso, la rectificación o la supresión de tus datos y, cuando corresponda, su portabilidad o la limitación del tratamiento. Puedes retirar tu consentimiento en cualquier momento. La retirada se aplica desde ese momento. Para ejercer tus derechos, escribe a <a href="mailto:hola@caribe-records.com">hola@caribe-records.com</a>. También puedes reclamar ante la <a href="https://www.aepd.es/">Agencia Española de Protección de Datos</a>.</p>
+        </div>
+      </section>
+
+      <section id="cookies">
+        <h2>Política de cookies</h2>
+        <div>
+          {onPreferences
+            ? <button className="legal-preferences" type="button" onClick={onPreferences}>Preferencias de cookies</button>
+            : <p>La medición de audiencia está desactivada en este dominio.</p>}
+          <h3>Funcionamiento de la web</h3>
+          <p>Una cookie técnica permite iniciar sesión en el panel de administración. Si cierras un anuncio, el navegador lo recuerda durante esa sesión.</p>
+          <h3>Cookies de audiencia</h3>
+          <p>Solo si aceptas, Google Analytics utiliza las cookies <code>_ga</code> y <code>_ga_…</code> en nuestro dominio para distinguir navegadores y sesiones. Duran hasta 180 días. Si rechazas, puedes seguir navegando por toda la web.</p>
+          <p>Guardamos tu elección en este navegador durante 180 días. Puedes cambiarla desde el botón «Preferencias de cookies» de este apartado. Al retirar el permiso detenemos la medición y borramos las cookies analíticas de nuestro dominio.</p>
+          <h3>Reproductores externos</h3>
+          <p>Algunas editoriales incluyen reproductores de YouTube, Spotify o Internet Archive. Si eliges cargar uno, tu navegador se conecta con ese proveedor, que recibe tu dirección IP y puede usar sus propias cookies. También puedes leer el artículo sin cargar el reproductor.</p>
+        </div>
+      </section>
+    </main>
+  );
 }

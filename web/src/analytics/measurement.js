@@ -77,7 +77,7 @@ function transmit(name, params) {
   document.body.appendChild(el);
 }
 
-const sections = { "/": "home", "/artistas": "artists", "/releases": "catalogue", "/editoriales": "editorials", "/eventos": "events", "/about": "about", "/privacidad": "privacy" };
+const sections = { "/": "home", "/artistas": "artists", "/releases": "catalogue", "/editoriales": "editorials", "/eventos": "events", "/about": "about", "/legal": "privacy" };
 const details = { artistas: "artist", releases: "release", editorial: "editorial", eventos: "event" };
 let route;
 export function visit(key, pathname) {
