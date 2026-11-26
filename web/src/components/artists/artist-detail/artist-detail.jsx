@@ -1,3 +1,4 @@
+import ListenLink from "../../releases/listen-link";
 import { releaseListenUrl } from "../../../utils/release-listen-url";
 import { cleanBiography } from "../../../utils/artist-biography";
 import React, { useMemo, useState } from "react";
@@ -156,11 +157,9 @@ export default function ArtistDetail({
               <h2>{year}</h2>
               <div>
                 {items.map((release) => (
-                  <a
+                  <ListenLink
                     className="artist-release"
-                    data-outbound="listen" href={releaseListenUrl(release) || undefined}
-                    target={releaseListenUrl(release) ? "_blank" : undefined}
-                    rel={releaseListenUrl(release) ? "noopener noreferrer" : undefined}
+                    href={releaseListenUrl(release) || undefined}
                     key={release._id}
                   >
                     {(release.cover?.url || release.cover_image) ? (
@@ -168,7 +167,7 @@ export default function ArtistDetail({
                     ) : <span className="artist-release__placeholder" aria-hidden="true" />}
                     <span className="artist-release__name">{release.title}</span>
                     <small>{releaseFormat(release.format)}{releaseListenUrl(release) ? " ↗" : ""}</small>
-                  </a>
+                  </ListenLink>
                 ))}
               </div>
             </div>

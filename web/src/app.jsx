@@ -49,6 +49,7 @@ function App() {
   const audience = useAudience(location);
 
   useLayoutEffect(() => {
+    if (location.pathname !== "/") document.getElementById("site-schema")?.remove();
     const schema = document.getElementById("page-schema");
     if (schema && document.querySelector('link[rel="canonical"]')?.pathname !== location.pathname) schema.remove();
     window.scrollTo(0, 0);

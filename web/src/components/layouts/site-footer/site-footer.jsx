@@ -8,7 +8,7 @@ export default function SiteFooter({ preferences }) {
         <a href="https://instagram.com/cariberecords" target="_blank" rel="noreferrer">
           Seguir <span aria-hidden="true">↗</span>
         </a>
-        <Link to="/privacidad">Privacidad</Link>
+        <Link to="/privacidad">Aviso legal y privacidad</Link>
         {preferences && <button type="button" onClick={preferences}>Preferencias de cookies</button>}
         <Link to="/about">About</Link>
         <a href="mailto:hola@caribe-records.com">Contacto</a>

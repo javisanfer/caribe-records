@@ -18,17 +18,36 @@ export function publicPages(siteOrigin) {
       this.emitFile({ type: "asset", fileName: "page-entry.js", source: `import "/${entry.fileName}";\n` });
       this.emitFile({ type: "asset", fileName: "page-entry.css", source: styles.map((file) => `@import url("/${file}");`).join("\n") });
       this.emitFile({ type: "asset", fileName: "robots.txt", source: `User-agent: *\nDisallow: /admin\nDisallow: /api/\nSitemap: ${origin}/sitemap.xml\n` });
-      for (const [path, [label, summary]] of Object.entries(sections)) {
+      for (const [path, [label, summary, socialSummary = summary]] of Object.entries(sections)) {
         const title = escape(path === "/" ? label : label + " · Caribe Records");
         const url = escape(origin + path);
-        const html = template.replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
+        let html = template.replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
           .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${escape(summary)}" />`)
           .replace("</head>", `<link rel="canonical" href="${url}" />
-    <meta property="og:title" content="${title}" /><meta property="og:description" content="${escape(summary)}" />
+    <meta property="og:title" content="${title}" /><meta property="og:description" content="${escape(socialSummary)}" />
     <meta property="og:type" content="website" /><meta property="og:url" content="${url}" />
     <meta property="og:image" content="${escape(origin)}/favicon.png" /></head>`);
-        if (path === "/") index.source = html;
-        else this.emitFile({ type: "asset", fileName: path.slice(1) + ".html", source: html });
+        if (path === "/") {
+          const schema = JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: label,
+            url: origin + "/",
+            publisher: {
+              "@type": "Organization",
+              name: label,
+              url: origin + "/",
+              logo: origin + "/favicon.png",
+            },
+          }).replaceAll("<", "\\u003c");
+          const links = Object.entries(sections)
+            .filter(([route]) => route !== "/")
+            .map(([route, [name]]) => `<a href="${escape(route)}">${escape(name)}</a>`)
+            .join(" · ");
+          html = html.replace("</head>", `<script id="site-schema" type="application/ld+json">${schema}</script></head>`)
+            .replace('<div id="root"></div>', `<div id="root"><noscript><main><h1>${title}</h1><p>${escape(summary)}</p><nav aria-label="Secciones">${links}</nav></main></noscript></div>`);
+          index.source = html;
+        } else this.emitFile({ type: "asset", fileName: path.slice(1) + ".html", source: html });
       }
     },
   };
