@@ -1117,11 +1117,7 @@ dialog.site-banner[open] { display: grid; }
   min-height: 3.75rem;
   padding: .65rem 1.5rem;
   color: var(--cr-ink);
-  font-family: inherit;
   font-size: clamp(1.5rem, 2.1vw, 2rem);
-  font-weight: 600;
-  letter-spacing: -.045em;
-  line-height: 1.1;
   text-transform: none;
   text-decoration: none;
 }
@@ -1136,7 +1132,6 @@ dialog.site-banner[open] { display: grid; }
   gap: .65rem;
   font-size: .72rem;
   font-variant-numeric: tabular-nums;
-  letter-spacing: .04em;
 }
 .cr-mobile-links a[aria-current="page"] .cr-menu-index::before {
   content: "";
@@ -5809,24 +5804,33 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   align-items: flex-start;
 }
 
+.cr-mobile-links a,
+.home-section-nav a {
+  font-family: inherit;
+  font-weight: 500;
+  line-height: .86;
+  letter-spacing: -.065em;
+}
+
+.cr-menu-index,
+.home-section-nav a small {
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: .04em;
+}
+
 .home-section-nav a {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   color: var(--cr-white);
   font-size: clamp(2.4rem, 4.2vw, 5.2rem);
-  font-weight: 500;
-  line-height: .86;
-  letter-spacing: -.065em;
   text-decoration: none;
 }
 
 .home-section-nav a small {
   padding-top: .25em;
   font-size: clamp(.55rem, .8vw, .8rem);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: .04em;
 }
 
 .home-section-nav a:hover {
