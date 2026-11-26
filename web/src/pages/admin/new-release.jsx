@@ -1,3 +1,5 @@
+import AdminRelations from "../../components/admin/admin-relations";
+import { releaseArtists, releaseArtistCredit } from "../../utils/release-artists";
 import { isListenUrl, releaseListenUrl } from "../../utils/release-listen-url";
 import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
@@ -17,8 +19,12 @@ export default function NewReleasePage() {
   const [loadingRelease, setLoadingRelease] = useState(isEditMode);
   const [loadError, setLoadError] = useState("");
   const [initialRelease, setInitialRelease] = useState(null);
-  const { register, handleSubmit, control, reset, watch, formState: { errors, isSubmitting } } = useForm({ defaultValues: { catalogType: "own", catalogVisible: true, tracklist: [{ title: "", duration: "" }] } });
+  const { register, handleSubmit, control, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm({ defaultValues: { artistIds: [], catalogType: "own", catalogVisible: true, tracklist: [{ title: "", duration: "" }] } });
   const { fields, append, remove } = useFieldArray({ control, name: "tracklist" });
+  const selectedArtists = watch("artistIds");
+  const knownArtists = [...artists, ...releaseArtists(initialRelease || {})];
+  const automaticCredit = selectedArtists.map((id) => knownArtists.find((artist) => artist._id === id)?.name)
+    .filter(Boolean).join(" + ");
   const currentCoverUrl = watch("coverUrl") || "";
 
   useEffect(() => {
@@ -35,9 +41,9 @@ export default function NewReleasePage() {
         const data = await response.json();
         setInitialRelease(data);
         reset({
-          title: data.title || "", artist: data.artist?._id || data.artist || "", catalog: data.catalog || "", serialNumber: data.serialNumber || "", format: data.format || "",
+          title: data.title || "", artistIds: releaseArtists(data).map((artist) => artist._id || artist), catalog: data.catalog || "", serialNumber: data.serialNumber || "", format: data.format || "",
           labelName: data.labelName || "", catalogType: data.catalogType || "own", catalogVisible: data.catalogVisible !== false,
-          artistName: data.artistName || "", barcode: data.barcode || "",
+          artistName: data.artistName === releaseArtistCredit({ ...data, artistName: "" }) ? "" : data.artistName || "", barcode: data.barcode || "",
           listenUrl: releaseListenUrl(data),
           release_date: data.release_date ? data.release_date.slice(0, 10) : "", country: data.country || "",
           coverUrl: data.cover?.url || data.cover_image || "", coverAlt: data.cover?.alt || "",
@@ -53,9 +59,9 @@ export default function NewReleasePage() {
       let coverUrl = data.coverUrl?.trim() || "";
       if (data.coverFile?.[0]) { const uploadResponse = await uploadImage(data.coverFile[0]); coverUrl = uploadResponse.imageUrl || coverUrl; }
       const payload = {
-        title: data.title.trim(), artist: data.artist || null, format: data.format.trim().toLowerCase(), release_date: data.release_date || null,
+        title: data.title.trim(), artist: data.artistIds[0] || null, collaborators: data.artistIds.slice(1), format: data.format.trim().toLowerCase(), release_date: data.release_date || null,
         labelName: data.labelName?.trim() || "", catalogType: data.catalogType || "own", catalogVisible: data.catalogVisible !== false,
-        artistName: data.artistName.trim(), barcode: data.barcode.trim(),
+        artistName: data.artistName.trim() || automaticCredit, barcode: data.barcode.trim(),
         country: data.country?.trim() || "", catalog: data.catalog?.trim() || "", serialNumber: data.serialNumber?.trim() || "",
         tracklist: (data.tracklist || []).filter((track) => track.title?.trim()).map((track, index) => ({ position: Number(track.position) || index + 1, title: track.title.trim(), duration: track.duration?.trim() || "" })),
       };
@@ -91,8 +97,11 @@ export default function NewReleasePage() {
                   <div className="admin-form-card__heading"><h2>Datos principales</h2></div>
                   <div className="admin-field-grid admin-field-grid--2">
                     <div className="admin-field"><label htmlFor="new-release-title" className="form-label">Título <b>Obligatorio</b></label><input id="new-release-title" className={`form-control ${errors.title ? "is-invalid" : ""}`} placeholder="Título del lanzamiento" {...register("title", { required: "Escribe un título" })} />{errors.title && <div className="invalid-feedback">{errors.title.message}</div>}</div>
-                    <div className="admin-field"><label htmlFor="new-release-artist" className="form-label">Artista</label><select id="new-release-artist" className={`form-select ${errors.artist ? "is-invalid" : ""}`} {...register("artist")}><option value="">Seleccionar artista…</option>{artists.map((artist) => <option key={artist._id} value={artist._id}>{artist.name}</option>)}</select>{errors.artist && <div className="invalid-feedback">{errors.artist.message}</div>}</div>
-                    <label className="admin-field">Crédito de artista<input className="form-control" {...register("artistName")} /></label>
+                    <AdminRelations title="Artistas del lanzamiento" items={artists} selected={selectedArtists}
+                      onChange={(ids) => setValue("artistIds", ids, { shouldDirty: true })} />
+                    <label className="admin-field">Crédito de artista<input className="form-control" placeholder={automaticCredit} {...register("artistName")} />
+                      <span className="form-text">Si lo dejas vacío, se usarán los nombres en el orden de selección.</span>
+                    </label>
                     <div className="admin-field"><label htmlFor="new-release-format" className="form-label">Formato <b>Obligatorio</b></label><select id="new-release-format" className={`form-select ${errors.format ? "is-invalid" : ""}`} {...register("format", { required: "Selecciona un formato" })}><option value="">Seleccionar formato…</option><option value="single">Single</option><option value="ep">EP</option><option value="lp">LP</option><option value="recopilatorio">Recopilatorio</option></select>{errors.format && <div className="invalid-feedback">{errors.format.message}</div>}</div>
                     <div className="admin-field"><label htmlFor="new-release-release_date" className="form-label">Fecha de lanzamiento</label><input id="new-release-release_date" type="date" className="form-control" {...register("release_date")} /></div>
                   </div>

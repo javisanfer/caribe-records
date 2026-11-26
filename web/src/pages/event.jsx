@@ -3,6 +3,8 @@ import EventList from "../components/events/event-list/event-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
 import SiteLoader from "../components/ui/site-loader.jsx";
 
+import { isPublicEventDate, madridDate } from "../utils/public-event-date";
+
 export default function EventPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,8 +28,9 @@ export default function EventPage() {
           page += 1;
         } while (page <= totalPages);
 
+        const today = madridDate(new Date());
         const normalized = rawEvents
-          .filter(Boolean)
+          .filter((event) => isPublicEventDate(event?.date || event?.datetime, today))
           .map((e, idx) => {
             const mainArtist =
               Array.isArray(e.lineup) && e.lineup.length > 0
@@ -56,7 +59,7 @@ export default function EventPage() {
       } catch (err) {
         console.error("Error cargando eventos", err);
         setEvents([]);
-        setError("No se pudieron cargar todas las fechas del archivo.");
+        setError("No se pudo cargar la agenda.");
       } finally {
         setLoading(false);
       }

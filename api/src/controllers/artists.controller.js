@@ -1,4 +1,5 @@
 const Artist = require("../models/artist.model");
+const Release = require("../models/release.model");
 const slugify = require("slugify");
 
 // Helper para generar slug
@@ -11,6 +12,16 @@ function ensureSlug(artist = {}) {
     strict: true,
     trim: true,
   });
+}
+
+async function withAlbums(artist) {
+  // Imported records can carry older album links on the artist itself.
+  artist.albums = await Release.find({
+    catalogVisible: { $ne: false },
+    $or: [{ _id: { $in: artist.albums || [] } }, { artist: artist._id }, { collaborators: artist._id }],
+  }).select("title format release_date cover_image cover listenUrl spotifyUrl appleMusicUrl bandcampUrl catalog serialNumber")
+    .sort({ release_date: -1, createdAt: -1 }).lean();
+  return artist;
 }
 
 /* ======================================================
@@ -34,21 +45,13 @@ exports.getArtists = async (req, res) => {
 ====================================================== */
 exports.getArtistById = async (req, res) => {
   try {
-    const artist = await Artist.findById(req.params.id)
-      .populate({
-        path: "albums",
-        match: { catalogVisible: { $ne: false } },
-        select:
-          "title format release_date cover_image cover listenUrl spotifyUrl appleMusicUrl bandcampUrl catalog serialNumber",
-        options: { sort: { release_date: -1, createdAt: -1 } },
-      })
-      .lean();
+    const artist = await Artist.findById(req.params.id).lean();
 
     if (!artist || artist.rosterVisible === false) {
       return res.status(404).json({ message: "Artist not found" });
     }
 
-    res.json(artist);
+    res.json(await withAlbums(artist));
   } catch (error) {
     console.error("Error obteniendo artista por ID:", error.name);
     throw error;
@@ -60,21 +63,13 @@ exports.getArtistById = async (req, res) => {
 ====================================================== */
 exports.getArtistBySlug = async (req, res) => {
   try {
-    const artist = await Artist.findOne({ slug: req.params.slug })
-      .populate({
-        path: "albums",
-        match: { catalogVisible: { $ne: false } },
-        select:
-          "title format release_date cover_image cover listenUrl spotifyUrl appleMusicUrl bandcampUrl catalog serialNumber",
-        options: { sort: { release_date: -1, createdAt: -1 } },
-      })
-      .lean();
+    const artist = await Artist.findOne({ slug: req.params.slug }).lean();
 
     if (!artist || (artist.rosterVisible === false && !req.path.startsWith("/admin/"))) {
       return res.status(404).json({ message: "Artist not found" });
     }
 
-    res.json(artist);
+    res.json(await withAlbums(artist));
   } catch (error) {
     console.error("Error obteniendo artista por slug:", error.name);
     throw error;

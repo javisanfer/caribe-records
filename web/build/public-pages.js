@@ -44,7 +44,7 @@ export function publicPages(siteOrigin) {
             .filter(([route]) => route !== "/")
             .map(([route, [name]]) => `<a href="${escape(route)}">${escape(name)}</a>`)
             .join(" · ");
-          html = html.replace("</head>", `<script id="site-schema" type="application/ld+json">${schema}</script></head>`)
+          html = html.replace("</head>", `<link rel="preload" as="fetch" href="/api/v1/home-carousel" crossorigin="anonymous"><script id="site-schema" type="application/ld+json">${schema}</script></head>`)
             .replace('<div id="root"></div>', `<div id="root"><noscript><main><h1>${title}</h1><p>${escape(summary)}</p><nav aria-label="Secciones">${links}</nav></main></noscript></div>`);
           index.source = html;
         } else this.emitFile({ type: "asset", fileName: path.slice(1) + ".html", source: html });

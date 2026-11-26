@@ -1,3 +1,4 @@
+import { releaseArtistCredit } from "../utils/release-artists";
 import { releaseListenUrl } from "../utils/release-listen-url";
 import React, { useEffect, useState } from "react";
 import ReleaseList from "../components/releases/release-list/release-list";
@@ -27,8 +28,7 @@ export default function ReleasePage() {
         const normalized = (data || []).map((r, idx) => {
           const artistObj = r.artist;
 
-          const artistName =
-            r.artistName || (typeof artistObj === "object" && artistObj?.name) || "Artista por confirmar";
+          const artistName = releaseArtistCredit(r) || "Artista por confirmar";
 
           return {
             id: r._id || idx,

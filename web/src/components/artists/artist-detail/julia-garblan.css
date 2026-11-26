@@ -1,0 +1,24 @@
+.artist-detail--julia-garblan .artist-detail__related {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 901px) {
+  .artist-detail--julia-garblan.artist-detail--overview {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  }
+  .artist-detail--julia-garblan > :is(header, nav) { grid-column: 1 / -1; }
+  .artist-detail--julia-garblan .artist-detail__overview { display: contents; }
+  .artist-detail--julia-garblan .artist-detail__bio {
+    grid-column: 1;
+    grid-row: 3 / span 2;
+  }
+  .artist-detail--julia-garblan .artist-detail__bio .artist-bio-copy {
+    max-width: none;
+    font-size: clamp(1.2rem, 1.65vw, 1.7rem);
+    line-height: 1.35;
+  }
+  .artist-detail--julia-garblan :is(.artist-detail__rail, .artist-detail__related) { grid-column: 2; }
+  .artist-detail--julia-garblan .artist-detail__related { border-left: 1px solid var(--cr-ink); }
+  .artist-detail--julia-garblan .artist-related-block { border: 0; padding-top: 0; }
+}
