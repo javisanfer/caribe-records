@@ -33,7 +33,7 @@ export default function CatalogueDetail({ event = false }) {
       {item.description && <p>{item.description}</p>}
       {item.posterUrl && <img className="img-fluid" src={item.posterUrl} alt={`Cartel de ${item.title}`} />}
       {[[item.ticketUrl, "Entradas"], [item.sourceUrl, "Ver cartel"]].map(([href, label]) =>
-        /^https?:\/\//i.test(href || "") && <p key={label}><a data-outbound={label === "Entradas" ? "ticket" : undefined} href={href} target="_blank" rel="noreferrer">{label} ↗</a></p>)}
+        /^https?:\/\//i.test(href || "") && <p key={label}><a className="event-detail-action" data-outbound={label === "Entradas" ? "ticket" : undefined} href={href} target="_blank" rel="noreferrer">{label} ↗</a></p>)}
     </article> : <ReleaseItem release={item} />}
   </main>;
 }
