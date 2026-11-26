@@ -9,6 +9,7 @@ const assert = require("node:assert/strict");
 const bcrypt = require("bcryptjs");
 const { readFileSync } = require("node:fs");
 const { gzipSync } = require("node:zlib");
+const { checkCatalogueTouch } = require("./check-catalogue-touch.cjs");
 const { checkPersistence } = require("./review-persistence");
 const launch = require("../src/data/launch-content.json");
 
@@ -117,6 +118,7 @@ async function main() {
           }
         }
         if (engine === "chromium") {
+          await checkCatalogueTouch(browser, base);
           await page.goto(base + "/admin/new-editorial");
           await page.getByText("Asociaciones", { exact: true }).click();
           await page.getByText("Elige un artista para ver su catálogo.").waitFor();

@@ -38,8 +38,9 @@ export default function EditCarousel() {
 
   const available = config?.options.filter((item) => !entries.includes(item._id)) || [];
   return <main className="admin-page admin-form-page">
-    <AdminFormHeading title="Carrusel de portada" />
-    <div className="admin-form-container"><section className="admin-form admin-form-card carousel-settings">
+    <div className="admin-form-container">
+      <AdminFormHeading title="Carrusel de portada" />
+      <section className="admin-form admin-form-card carousel-settings">
       {config ? <fieldset disabled={saving}>
         <legend>Editoriales en portada</legend>
         <p>El primer artículo abre la portada. Puedes elegir hasta {config.maximum}. Los programados aparecerán en su fecha de publicación.</p>

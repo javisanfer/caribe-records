@@ -305,9 +305,6 @@ a.event-row:hover {
   letter-spacing: 0.04em;
 }
 
-.tracktable-row:hover {
-  background: #0d0d0d;
-}
 
 .tracktable-row .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
@@ -3688,7 +3685,8 @@ body {
   padding: 0;
 }
 
-.admin-form .form-check-input {
+.admin-form .form-check .form-check-input {
+  float: none;
   width: 22px;
   height: 22px;
   margin: 0;
@@ -4016,7 +4014,7 @@ body {
   height: 46px;
   margin: -11px 13px -11px -13px;
   border-color: var(--admin-line);
-  border-radius: 6px 0 0 6px;
+  border-radius: 0;
   color: var(--cr-ink);
   background: #efefe9;
   text-transform: none;
@@ -4205,81 +4203,88 @@ body {
 .admin-switch input:checked + span::after { transform: translateX(16px); }
 .admin-switch b { font-size: .72rem; font-weight: 650; }
 
-/* Premium technology layer */
+/* Content management shares the typography, rules and palette of the public index. */
 .admin-form-page {
-  position: relative;
-  background: #f3f3ee;
+  --admin-surface: var(--cr-paper);
+  --admin-line: #c3c3bf;
+  --admin-muted: #53534f;
+  background: var(--admin-surface);
+  padding: 0 clamp(14px, 4vw, 64px) 64px;
 }
 
+.admin-form-container {
+  max-width: 76rem;
+  margin-inline: auto;
+}
 
-.admin-form-page .admin-form-header,
-.admin-form-page .admin-form-container { position: relative; }
-
+.admin-form-container .admin-editor-form { padding: 0; }
 
 .admin-form-card,
 .admin-action-card,
 .admin-danger-card,
 .admin-form-panel,
-.admin-editorial-document {
-  position: relative;
-  overflow: hidden;
-  border-color: rgba(9, 9, 9, .11);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, .9) inset,
-    0 18px 50px rgba(16, 18, 44, .055);
+.admin-wordpress-page .admin-editorial-document {
+  min-width: 0;
+  border: 0;
+  border-top: 1px solid var(--cr-ink);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-.admin-form-card::before,
-.admin-action-card::before,
-.admin-editorial-document::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 2px;
-  background: var(--cr-blue);
+.admin-form-card,
+.admin-danger-card {
+  padding: clamp(16px, 2vw, 28px) 0;
 }
 
-.admin-action-card::before { background: var(--cr-blue); }
+.admin-editor-main, .admin-editorial-canvas { gap: 8px; }
 
-.admin-form-card__heading > span,
-.admin-action-card__status,
-.admin-editorial-document__meta,
-.admin-document-footer,
-.admin-visible-panel__heading small {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+.admin-form-page .admin-action-card {
+  padding: 18px;
+  border-top: 2px solid var(--cr-blue);
+  background: var(--cr-white);
 }
 
-.admin-form-card__heading > span {
-  display: grid;
-  width: 26px;
-  height: 26px;
-  place-items: center;
-  border: 1px solid rgba(24, 29, 196, .24);
-  border-radius: 6px;
-  background: rgba(24, 29, 196, .055);
+.admin-form-page .admin-form-card h2,
+.admin-form-page .admin-action-card h2 {
+  margin: 0 0 14px;
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  font-weight: 650;
+  letter-spacing: -.035em;
+  text-transform: none;
 }
 
-.admin-form-page .admin-form .form-control,
-.admin-form-page .admin-form .form-select {
-  background: #fbfbf8 !important;
-  box-shadow: 0 1px 2px rgba(9, 9, 9, .025) inset;
+.admin-field { display: block; min-width: 0; }
+.admin-field-grid { gap: 14px 20px; }
+.admin-form label.admin-field, .admin-panel-fields > label {
+  color: var(--cr-ink);
+  font-weight: 600;
+  font-size: .82rem;
 }
+.admin-field > :is(input, textarea, select), .admin-panel-fields > label > .form-control { margin-top: 5px; }
+.admin-field > .form-label + :is(input, textarea, select) { margin-top: 0; }
 
-.admin-form-page .admin-form .form-control:focus,
-.admin-form-page .admin-form .form-select:focus {
-  box-shadow: 0 0 0 3px rgba(24, 29, 196, .09), 0 8px 24px rgba(24, 29, 196, .06);
+.admin-form-page .admin-form :is(.form-control, .form-select) {
+  max-width: 100%;
+  min-width: 0;
+  border-radius: 0;
+  background-color: var(--cr-white) !important;
+  box-shadow: none;
 }
-
-.admin-form-page .admin-primary-action {
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 10px 26px rgba(24, 29, 196, .2);
+.admin-form-page .admin-form :is(.form-control, .form-select):focus {
+  outline: 2px solid var(--cr-blue);
+  outline-offset: -2px;
+  box-shadow: none;
 }
-
-.admin-form-page .admin-primary-action::after {
-  content: "↗";
-  margin-left: 9px;
+.admin-form-page .admin-form .btn,
+.admin-form-page .admin-form input::file-selector-button {
+  border-radius: 0;
+  box-shadow: none;
 }
+.admin-form-page .admin-primary-action { font-size: .8rem; letter-spacing: 0; }
+.admin-form-page .admin-switch input:focus-visible + span { outline: 2px solid var(--cr-blue); outline-offset: 3px; }
+.admin-form-page .admin-visible-panel__heading { background: transparent; }
+.admin-form-page .admin-form-panel__body { background: var(--cr-white); }
 
 .admin-action-checks {
   display: grid;
@@ -4414,7 +4419,7 @@ body {
 .editor-workspace-header a { color: var(--cr-blue); font-size: .875rem; font-weight: 600; text-decoration: none; }
 .editor-workspace-header a:hover { text-decoration: underline; }
 .editor-settings-jump { display: none; margin-left: auto; }
-.admin-wordpress-page .admin-editorial-document { background: #fff; border-radius: 6px; padding: clamp(20px, 3.6vw, 52px); }
+.admin-wordpress-page .admin-editorial-document { background: var(--cr-white); border-radius: 0; padding: clamp(20px, 3.6vw, 52px); }
 .admin-wordpress-page .admin-form .form-control.admin-title-input,
 .admin-wordpress-page .admin-form .form-control.admin-subtitle-input {
   width: 100%; border: 0 !important; border-radius: 0; background: transparent !important;
@@ -5032,7 +5037,10 @@ body {
   text-transform: inherit;
 }
 
-.index-toolbar__views button:hover,
+@media (hover: hover) and (pointer: fine) {
+  .index-toolbar__views button:hover { color: var(--cr-white); background: var(--cr-blue); transform: none; }
+}
+
 .index-toolbar__views button.is-active {
   color: var(--cr-white);
   background: var(--cr-blue);
@@ -5090,15 +5098,35 @@ body {
   transition: filter .12s ease;
 }
 
-.release-cover-link:hover,
-.release-cover-link:focus-visible {
+@media (any-hover: hover) {
+  .release-cover-link:not([data-touch]):hover {
+    background: var(--cr-blue);
+  }
+
+  .release-cover-link:not([data-touch]):hover img {
+    filter: grayscale(1) contrast(2) invert(1);
+    mix-blend-mode: screen;
+  }
+}
+
+.release-cover-link:focus-visible,
+.release-cover-link[data-tapped] {
   background: var(--cr-blue);
 }
 
-.release-cover-link:hover img,
-.release-cover-link:focus-visible img {
+.release-cover-link:focus-visible img,
+.release-cover-link[data-tapped] img {
   filter: grayscale(1) contrast(2) invert(1);
   mix-blend-mode: screen;
+}
+
+.release-cover-link[data-tapped] {
+  animation: cover-tap 220ms ease-out;
+}
+
+@keyframes cover-tap {
+  from, 70% { background-color: var(--cr-blue); }
+  to { background-color: transparent; }
 }
 
 .release-cover-link:focus-visible {
@@ -5673,8 +5701,8 @@ a.event-row:focus-visible * {
   border-color: var(--cr-ink);
 }
 
-.tracktable-row:hover {
-  background: var(--cr-white);
+@media (hover: hover) and (pointer: fine) {
+  .tracktable-row:hover { background: var(--cr-white); }
 }
 
 .release-page .btn-outline-light,
@@ -6436,25 +6464,34 @@ html:has(.home), body:has(.home) { background: #050505; }
 
 .cms-form-heading {
   display: flex;
+  align-items: baseline;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 18px;
-  padding: 18px clamp(16px, 2.6vw, 40px);
-  border-bottom: 1px solid var(--admin-line);
+  gap: 10px 20px;
+  padding: clamp(20px, 3vw, 40px) 0 clamp(16px, 2vw, 26px);
 }
 .cms-form-heading h1 {
   margin: 0;
   color: var(--cr-ink);
-  font-family: inherit;
+  font: inherit;
   font-weight: 650;
-  font-size: clamp(1.2rem, 2vw, 1.65rem);
-  line-height: 1.15;
-  letter-spacing: -.035em;
+  font-size: clamp(1.7rem, 3.7vw, 3.25rem);
+  line-height: 1;
+  letter-spacing: -.055em;
 }
 .cms-form-heading .admin-back {
-  display: inline-flex; align-items: center; gap: .3em; min-height: 36px;
-  font-size: .68rem; line-height: 1; flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  min-height: 44px;
+  padding: 0 12px 0 0;
+  color: var(--cr-blue);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: .72rem;
+  box-shadow: none;
 }
+.cms-form-heading .admin-back:is(:hover, :focus-visible) { color: var(--cr-blue); text-decoration: underline; }
 .cms-form-heading .admin-delete { margin-left: auto; }
 .cms-form-heading .editor-settings-jump { color: var(--cr-blue); font-size: .8rem; }
 .artist-bio-editor { min-width: 0; margin-top: 1.5rem; }
@@ -6488,7 +6525,9 @@ html:has(.home), body:has(.home) { background: #050505; }
 .editorial-share :is(button, a) { width: 44px; height: 44px; justify-content: center; }
 .editorial-share svg { width: 22px; height: 22px; }
 .editorial-share :is(button, a):hover { color: var(--cr-ink); }
-.carousel-settings { max-width: 760px; margin: 24px auto; }
+.carousel-settings, .admin-form-container > .admin-form:not(.admin-editor-form) { max-width: 55rem; margin: 0; }
+.admin-form-container > [role="status"]:empty { display: none; }
+.admin-form-card fieldset.admin-panel-fields { border-top: 1px solid var(--admin-line); padding-block: 18px; }
 .carousel-settings fieldset { min-width: 0; padding: 0; border: 0; }
 .carousel-settings legend { font-size: 1.3rem; font-weight: 650; }
 .carousel-settings ol { padding-left: 2rem; list-style-type: decimal; }

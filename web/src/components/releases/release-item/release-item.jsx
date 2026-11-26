@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { useState } from "react";
 
 function formatDate(d) {
   if (!d) return "";
@@ -19,6 +19,37 @@ function formatTime(t) {
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   }
   return t || "";
+}
+
+function ListenCover({ url, title, children }) {
+  const [touchInput, setTouchInput] = useState(false);
+  const [tapped, setTapped] = useState(false);
+
+  function rememberPointer(event) {
+    setTouchInput(event.pointerType === "touch");
+    setTapped(false);
+  }
+
+  return (
+    <a
+      className="release-cover-link"
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Escuchar ${title}`}
+      data-touch={touchInput || undefined}
+      data-tapped={tapped || undefined}
+      onPointerEnter={rememberPointer}
+      onPointerDown={rememberPointer}
+      onClick={(event) => {
+        // A native click follows a completed tap. A scroll or pinch cancels it.
+        if (event.detail > 0 && touchInput) setTapped(true);
+      }}
+      onAnimationEnd={() => setTapped(false)}
+    >
+      {children}
+    </a>
+  );
 }
 
 export default function ReleaseItem({ release, view = "list" }) {
@@ -74,15 +105,7 @@ export default function ReleaseItem({ release, view = "list" }) {
   );
 
   const linkedCover = listenUrl ? (
-    <a
-      className="release-cover-link"
-      href={listenUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Escuchar ${title}`}
-    >
-      {cover}
-    </a>
+    <ListenCover url={listenUrl} title={title}>{cover}</ListenCover>
   ) : cover;
 
   // Tracklist: tu API usa `tracklist`, con campos { position, title, duration }
