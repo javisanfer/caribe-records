@@ -23,3 +23,13 @@ module.exports.isSpotifyUrl = (value) => {
     return false;
   }
 };
+
+module.exports.isListenUrl = (value) => {
+  if (typeof value !== "string" || !/^https?:\/\//i.test(value.trim())) return false;
+  try {
+    const url = new URL(value);
+    return Boolean(url.hostname && !url.username && !url.password);
+  } catch {
+    return false;
+  }
+};

@@ -19,7 +19,7 @@ async function checkCatalogueTouch(browser, base) {
     const destination = "https://music.example.invalid/album";
     await context.route(destination, (route) => route.fulfill({ body: "Album" }));
     const catalogue = Array.from({ length: 12 }, (_, index) => ({
-      _id: String(index + 1), title: "Disco " + (index + 1), bandcampUrl: destination, cover: { url: "/favicon.png" },
+      _id: String(index + 1), title: "Disco " + (index + 1), listenUrl: destination, cover: { url: "/favicon.png" },
     }));
     const serveCatalogue = (route) => route.fulfill({ json: catalogue });
     await page.route("**/api/v1/releases", serveCatalogue);

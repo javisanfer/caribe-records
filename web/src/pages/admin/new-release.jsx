@@ -1,3 +1,4 @@
+import { isListenUrl, releaseListenUrl } from "../../utils/release-listen-url";
 import AdminFormHeading from "../../components/admin/admin-form-heading";
 import { imageUrlInput } from "../../components/admin/image-url-input";
 import React, { useEffect, useState } from "react";
@@ -36,9 +37,9 @@ export default function NewReleasePage() {
         reset({
           title: data.title || "", artist: data.artist?._id || data.artist || "", catalog: data.catalog || "", serialNumber: data.serialNumber || "", format: data.format || "",
           labelName: data.labelName || "", catalogType: data.catalogType || "own", catalogVisible: data.catalogVisible !== false,
-          artistName: data.artistName || "", appleMusicUrl: data.appleMusicUrl || "", barcode: data.barcode || "",
-          bandcampUrl: data.bandcampUrl || "",
-          release_date: data.release_date ? data.release_date.slice(0, 10) : "", country: data.country || "", spotifyUrl: data.spotifyUrl || "",
+          artistName: data.artistName || "", barcode: data.barcode || "",
+          listenUrl: releaseListenUrl(data),
+          release_date: data.release_date ? data.release_date.slice(0, 10) : "", country: data.country || "",
           coverUrl: data.cover?.url || data.cover_image || "", coverAlt: data.cover?.alt || "",
           tracklist: data.tracklist?.length ? data.tracklist.map((track) => ({ position: track.position, title: track.title || "", duration: track.duration || "" })) : [{ title: "", duration: "" }],
         });
@@ -54,11 +55,12 @@ export default function NewReleasePage() {
       const payload = {
         title: data.title.trim(), artist: data.artist || null, format: data.format.trim().toLowerCase(), release_date: data.release_date || null,
         labelName: data.labelName?.trim() || "", catalogType: data.catalogType || "own", catalogVisible: data.catalogVisible !== false,
-        artistName: data.artistName.trim(), appleMusicUrl: data.appleMusicUrl.trim(), barcode: data.barcode.trim(),
-        bandcampUrl: data.bandcampUrl?.trim() || "",
-        country: data.country?.trim() || "", spotifyUrl: data.spotifyUrl?.trim() || "", catalog: data.catalog?.trim() || "", serialNumber: data.serialNumber?.trim() || "",
+        artistName: data.artistName.trim(), barcode: data.barcode.trim(),
+        country: data.country?.trim() || "", catalog: data.catalog?.trim() || "", serialNumber: data.serialNumber?.trim() || "",
         tracklist: (data.tracklist || []).filter((track) => track.title?.trim()).map((track, index) => ({ position: Number(track.position) || index + 1, title: track.title.trim(), duration: track.duration?.trim() || "" })),
       };
+      const listenUrl = data.listenUrl?.trim() || "";
+      if (!isEditMode || listenUrl !== releaseListenUrl(initialRelease)) payload.listenUrl = listenUrl;
       if (isEditMode && initialRelease?.release_date?.slice(0, 10) === data.release_date) delete payload.release_date;
       payload.cover = { url: coverUrl, alt: data.coverAlt?.trim() || "" };
       payload.cover_image = coverUrl;
@@ -104,10 +106,15 @@ export default function NewReleasePage() {
                     <div className="admin-field"><label className="form-label"><input type="checkbox" {...register("catalogVisible")} /> Visible en el catálogo público</label></div>
                     <div className="admin-field"><label htmlFor="new-release-serialNumber" className="form-label">Número de serie</label><input id="new-release-serialNumber" className="form-control" placeholder="#023/300" {...register("serialNumber")} /></div>
                     <div className="admin-field"><label htmlFor="new-release-country" className="form-label">País</label><input id="new-release-country" className="form-control" placeholder="ES" {...register("country")} /></div>
-                    <div className="admin-field"><label htmlFor="new-release-spotifyUrl" className="form-label">Spotify</label><input id="new-release-spotifyUrl" type="url" className={`form-control ${errors.spotifyUrl ? "is-invalid" : ""}`} placeholder="https://open.spotify.com/album/…" {...register("spotifyUrl", { validate: (value) => !value || /^https:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(?:album|track)\/[A-Za-z0-9]{22}(?:\?.*)?$/i.test(value.trim()) || "Introduce un enlace válido de álbum o canción de Spotify" })} />{errors.spotifyUrl && <div className="invalid-feedback">{errors.spotifyUrl.message}</div>}</div>
+                    <div className="admin-field">
+                      <label htmlFor="new-release-listenUrl" className="form-label">Enlace de escucha</label>
+                      <input id="new-release-listenUrl" type="url" className={`form-control ${errors.listenUrl ? "is-invalid" : ""}`}
+                        placeholder="https://…" aria-invalid={Boolean(errors.listenUrl)}
+                        aria-describedby={errors.listenUrl ? "release-listen-error" : undefined}
+                        {...register("listenUrl", { validate: value => !value?.trim() || isListenUrl(value) || "Introduce un enlace http o https válido." })} />
+                      {errors.listenUrl && <div id="release-listen-error" className="invalid-feedback">{errors.listenUrl.message}</div>}
+                    </div>
                     <label className="admin-field">Código de barras<input className="form-control" {...register("barcode")} /></label>
-                    <label className="admin-field">Apple Music<input type="url" className="form-control" {...register("appleMusicUrl")} /></label>
-                    <div className="admin-field"><label htmlFor="new-release-bandcampUrl" className="form-label">Bandcamp</label><input id="new-release-bandcampUrl" type="url" className="form-control" placeholder="https://artista.bandcamp.com/album/…" {...register("bandcampUrl")} /></div>
                   </div>
                 </section>
                 <section className="admin-form-card">

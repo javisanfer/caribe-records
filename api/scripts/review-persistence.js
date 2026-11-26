@@ -41,6 +41,15 @@ async function checkPersistence(email, password) {
     const catalogue = await request("/releases/" + release.doc._id);
     assert.equal(catalogue.tracklist[0].position, 2);
     assert.equal(catalogue.appleMusicUrl, "https://music.apple.com/es/");
+    const listenUrl = "https://listen.example.org/disco";
+    await request(release.path, "PATCH", { listenUrl });
+    assert.equal((await request("/releases/" + release.doc._id)).listenUrl, listenUrl);
+    await assert.rejects(request(release.path, "PATCH", { listenUrl: "mailto:label@example.org" }), /HTTP 400/);
+    await request(release.path, "PATCH", { listenUrl: "" });
+    const cleared = await request("/releases/" + release.doc._id);
+    assert.equal(cleared.listenUrl, "");
+    assert.equal(cleared.appleMusicUrl, catalogue.appleMusicUrl);
+
 
     const article = await create("editorials", {
       title, heroUrl: image, status: "published", credits: [{ role: "Autor", name: "Autor de prueba" }],

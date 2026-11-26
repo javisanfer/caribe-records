@@ -1,3 +1,4 @@
+import { releaseListenUrl } from "../utils/release-listen-url";
 import React, { useEffect, useState } from "react";
 import ReleaseList from "../components/releases/release-list/release-list";
 import PublicIndexPage from "../components/layouts/public-index-page/public-index-page";
@@ -65,9 +66,7 @@ export default function ReleasePage() {
             // label / catálogo
             label: r.labelName || r.label?.name || "",
             catalogType: r.catalogType || "own",
-            spotifyUrl: r.spotifyUrl || "",
-            bandcampUrl: r.bandcampUrl || "",
-            appleMusicUrl: r.appleMusicUrl || "",
+            listenUrl: releaseListenUrl(r),
             catalog: r.catalog || r.catNo || null,
           };
         });

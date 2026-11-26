@@ -1,3 +1,4 @@
+import { releaseListenUrl } from "../../../utils/release-listen-url";
 import { Link } from "react-router-dom";
 import React, { useState } from "react";
 
@@ -70,7 +71,7 @@ export default function ReleaseItem({ release, view = "list" }) {
 
   // Catálogo / label
   const catalog = release.catalog || release.catNo || release.cat || "";
-  const listenUrl = release.bandcampUrl || release.spotifyUrl || release.appleMusicUrl;
+  const listenUrl = releaseListenUrl(release);
 
   // Fecha: tu API usa release_date
   const date =
