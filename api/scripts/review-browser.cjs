@@ -220,8 +220,8 @@ async function main() {
             const published = await fetch(api + "/api/v1/" + endpoint).then((r) => r.json());
             assert.equal(published[field], value, kind + " debe reflejar la edición del formulario");
           }
-          await page.goto(base + "/admin/about");
         }
+        await page.goto(base + "/admin/about");
         await page.getByLabel("Título", { exact: true }).fill("Música independiente · QA");
         await page.getByRole("button", { name: "Guardar cambios" }).click();
         await page.getByText("Cambios guardados en About.").waitFor();
