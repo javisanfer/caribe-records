@@ -1,5 +1,15 @@
 const assert = require("node:assert/strict");
 
+function centreAndObserve(cover) {
+  return cover.evaluate((link) => {
+    link.scrollIntoView({ block: "center", behavior: "instant" });
+    window.tapFeedback = false;
+    new MutationObserver(() => {
+      if (link.hasAttribute("data-tapped")) window.tapFeedback = true;
+    }).observe(link, { attributes: true, attributeFilter: ["data-tapped"] });
+  });
+}
+
 // Exercise a browser-recognised pan, which cancels the click, and a completed tap.
 async function checkCatalogueTouch(browser, base) {
   const context = await browser.newContext({ isMobile: true, hasTouch: true, viewport: { width: 390, height: 640 } });
@@ -33,29 +43,30 @@ async function checkCatalogueTouch(browser, base) {
       await page.goto(base + "/releases");
       await page.getByRole("button", { name: view }).tap();
       const cover = page.locator(".release-cover-link").first();
-      await cover.evaluate((link) => {
-        link.scrollIntoView({ block: "center" });
-        window.tapFeedback = false;
-        new MutationObserver(() => {
-          if (link.hasAttribute("data-tapped")) window.tapFeedback = true;
-        }).observe(link, { attributes: true, attributeFilter: ["data-tapped"] });
-      });
+      await centreAndObserve(cover);
       const rect = await cover.boundingBox();
       const x = Math.round(rect.x + rect.width / 2);
       const y = Math.round(rect.y + rect.height / 2);
-      const before = await page.evaluate(() => scrollY);
+      const before = await page.evaluate(() => {
+        window.panEnded = false;
+        document.addEventListener("scrollend", () => { window.panEnded = true; }, { once: true });
+        return scrollY;
+      });
       await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
       for (const dy of [12, 32, 64, 96]) {
         await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: y - dy }] });
       }
       await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-      await page.waitForFunction((initial) => scrollY > initial, before);
+      await page.waitForFunction((initial) => window.panEnded && scrollY > initial, before);
       assert.equal(await page.evaluate(() => window.tapFeedback), false, view + ": deslizar activa el efecto");
       assert.equal(await cover.locator("img").evaluate((img) => getComputedStyle(img).filter), "none");
       assert.equal(context.pages().length, 1);
-      const popup = page.waitForEvent("popup");
-      await cover.tap();
-      const opened = await popup;
+      // Tapping while the list is still coasting only stops the scroll on touch devices.
+      // Start the independent tap case with the cover centred and the document stationary.
+      await page.reload();
+      await page.getByRole("button", { name: view }).tap();
+      await centreAndObserve(cover);
+      const [opened] = await Promise.all([context.waitForEvent("page"), cover.tap()]);
       await opened.waitForURL(destination);
       assert.equal(await page.evaluate(() => window.tapFeedback), true);
       await opened.close();
