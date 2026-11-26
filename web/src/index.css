@@ -1767,6 +1767,15 @@ html body {
   text-decoration: none;
 }
 
+.public-index > .detail-back-link {
+  position: static;
+  display: inline-block;
+  margin: 14px 0;
+  color: var(--cr-blue);
+}
+
+.public-index .event-detail-action { color: var(--cr-blue); }
+
 .detail-back-link:hover,
 .detail-back-link:focus-visible {
   color: var(--cr-blue);
@@ -1833,6 +1842,7 @@ html body {
 }
 
 .editorial-detail__read {
+  color: var(--cr-white);
   position: absolute;
   right: clamp(20px, 2.6vw, 40px);
   bottom: clamp(20px, 2.6vw, 40px);
@@ -1846,9 +1856,9 @@ html body {
   text-decoration: none;
 }
 
-.editorial-detail__read:hover {
-  color: var(--cr-sun);
-  text-decoration: none;
+.editorial-detail__read:is(:hover, :focus-visible) {
+  color: var(--cr-white);
+  text-decoration: underline;
 }
 
 .editorial-detail__layout {
@@ -2133,7 +2143,7 @@ html body {
   bottom: -7px;
   left: 0;
   height: 2px;
-  background: var(--cr-sun);
+  background: currentColor;
   content: "";
   transform: scaleX(0);
   transform-origin: left;
@@ -2141,7 +2151,7 @@ html body {
 }
 
 .cr-site-footer__links a:hover,
-.cr-site-footer__links a:focus-visible { color: var(--cr-sun); }
+.cr-site-footer__links a:focus-visible { color: var(--cr-white); }
 .cr-site-footer__links a:hover::after,
 .cr-site-footer__links a:focus-visible::after { transform: scaleX(1); }
 .cr-site-footer__links a:focus-visible { outline: none; }
@@ -2870,7 +2880,7 @@ html body {
 }
 
 .artist-detail .artist-release {
-  color: var(--release-ink, var(--bs-link-color, var(--cr-blue)));
+  color: var(--release-ink, var(--cr-blue));
   background-color: var(--release-surface, transparent);
 }
 .artist-release img {
@@ -5816,13 +5826,16 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   letter-spacing: .04em;
 }
 
-.home-section-nav a:hover {
-  color: var(--cr-blue);
-  text-decoration: none;
+.home-section-nav a:is(:hover, :focus-visible) {
+  color: var(--cr-white);
+  text-decoration: underline;
+  text-decoration-thickness: .055em;
+  text-underline-offset: .1em;
 }
 
-.home-section-nav a:last-child:hover {
-  color: var(--cr-sun);
+.home-section-nav a[target="_blank"]:is(:hover, :focus-visible) {
+  color: var(--cr-blue);
+  background: var(--cr-sun);
 }
 
 .home-carousel-controls {
@@ -5855,8 +5868,9 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   font-weight: 300;
 }
 
-.home-carousel-controls button:hover {
-  color: var(--cr-sun);
+.home-carousel-controls button:is(:hover, :focus-visible) {
+  color: var(--cr-white);
+  text-decoration: underline;
   background: transparent;
   transform: none;
 }
@@ -6275,7 +6289,6 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
 
 .home-editorial-carousel.is-empty .home-empty-state { color: var(--cr-white); }
 .home-editorial-carousel.is-empty .home-empty-state img { filter: brightness(0) invert(1); }
-.home-editorial-carousel.is-empty ~ .home-section-nav a:hover { color: var(--cr-sun); }
 
 .content-permalink { color: inherit; text-decoration: inherit; }
 .content-permalink:focus-visible, .event-poster-trigger:focus-visible { text-decoration: underline; }
@@ -6286,6 +6299,7 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   text-underline-offset: .09em;
   text-decoration-thickness: 1px;
 }
+.event-row--past .event-row__ticket :is(a, button) { color: var(--cr-blue); }
 .event-row__artist > strong:has(a) { padding-bottom: .12em; margin-bottom: -.12em; }
 .event-poster-trigger {
   min-height: 44px;
@@ -6381,8 +6395,6 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
 .artist-bio-editor .tiptap { min-height: 10rem; padding: 1rem; }
 .artist-bio-copy > :last-child { margin-bottom: 0; }
 .artist-bio-copy :is(ol, ul) { padding-inline-start: 1.5em; }
-.cr-navbar .cr-logout { color: #a61b22; }
-.cr-navbar .cr-logout:is(:hover, :focus-visible) { color: white; background: #a61b22; }
 
 .admin-page-tools, .activity-filters {
   display: flex; flex-wrap: wrap; align-items: end; gap: 12px 18px;
@@ -6465,7 +6477,7 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
 }
 .cr-site-footer__credit { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; }
 .cr-site-footer__credit a { border-left: 1px solid #888; padding: .25rem 0 .25rem .6rem; text-decoration: none; }
-.cr-site-footer__credit a:is(:hover,:focus-visible) { color: var(--cr-sun); text-decoration: underline; }
+.cr-site-footer__credit a:is(:hover,:focus-visible) { color: var(--cr-white); text-decoration: underline; }
 
 @media (max-width: 640px) {
   .cr-consent { flex-direction: column; align-items: stretch; max-height: 65dvh; overflow: auto; }
