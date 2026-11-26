@@ -22,7 +22,11 @@ async function checkEventPosters(page, base, root, expect) {
       await page.setViewportSize({ width, height: 812 });
       await page.goto(base + "/eventos");
       const year = page.locator(".event-year").filter({ has: page.locator("summary", { hasText: "2002" }) });
-      await year.locator("summary").click();
+      const summary = year.locator("summary");
+      await summary.click();
+      await page.mouse.move(0, 0);
+      await expect(summary).toHaveCSS("background-color", "rgb(0, 32, 209)");
+      await expect(summary).toHaveCSS("color", "rgb(255, 255, 255)");
       const trigger = year.getByRole("button", { name: "Ver cartel" });
       await trigger.click();
       const dialog = page.getByRole("dialog", { name: "Galería de carteles" });
@@ -36,6 +40,10 @@ async function checkEventPosters(page, base, root, expect) {
       await page.keyboard.press("Escape");
       await expect(dialog).toHaveCount(0);
       await expect(trigger).toBeFocused();
+      await expect(summary).toHaveCSS("background-color", "rgb(0, 32, 209)");
+      await summary.click();
+      await page.mouse.move(0, 0);
+      await expect(summary).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       if (width === 1280) {
         const label = await page.locator(".event-index__labels span").last().boundingBox();
         const ticket = await page.locator(".event-row:not(.event-row--past) .event-row__ticket a").first().boundingBox();

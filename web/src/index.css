@@ -1648,6 +1648,7 @@ body {
   transition: color .16s ease, background-color .16s ease;
 }
 .event-year > summary::-webkit-details-marker { display: none; }
+.event-year[open] > summary,
 .event-year > summary:focus-visible,
 .event-row:not(.event-row--past):has(:focus-visible) {
   color: var(--cr-white);
