@@ -62,8 +62,8 @@ export default function Privacy({ onPreferences }) {
           <h3>Cookies de audiencia</h3>
           <p>Solo si aceptas, Google Analytics utiliza las cookies <code>_ga</code> y <code>_ga_…</code> en nuestro dominio para distinguir navegadores y sesiones. Duran hasta 180 días. Si rechazas, puedes seguir navegando por toda la web.</p>
           <p>Guardamos tu elección en este navegador durante 180 días. Puedes cambiarla desde el botón «Preferencias de cookies» de este apartado. Al retirar el permiso detenemos la medición y borramos las cookies analíticas de nuestro dominio.</p>
-          <h3>Reproductores externos</h3>
-          <p>Algunas editoriales incluyen reproductores de YouTube, Spotify o Internet Archive. Si eliges cargar uno, tu navegador se conecta con ese proveedor, que recibe tu dirección IP y puede usar sus propias cookies. También puedes leer el artículo sin cargar el reproductor.</p>
+          <h3>Servicios externos</h3>
+          <p>La web enlaza a servicios externos como Spotify, Bandcamp, Apple Music y YouTube. Algunas editoriales también incluyen un reproductor que puedes elegir cargar. Al abrir un enlace o cargar un reproductor, tu navegador se conecta con el servicio, que recibe tu dirección IP y puede utilizar sus propias cookies. Puedes leer la editorial sin activar el reproductor.</p>
         </div>
       </section>
     </main>
