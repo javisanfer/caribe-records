@@ -2039,22 +2039,39 @@ html body {
 }
 
 .editorial-body figcaption {
-  margin-top: 9px;
-  font-size: .6rem;
-  letter-spacing: .07em;
-  text-transform: uppercase;
+  display: grid;
+  gap: .15rem;
+  margin-top: .5rem;
+  max-width: 65ch;
+  font-size: .875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.editorial-body figcaption small {
+  color: #555;
+  font-size: .8125rem;
 }
 
 .editorial-body__gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--cr-ink);
+  align-items: start;
+  gap: clamp(1.5rem, 3vw, 3rem) clamp(.875rem, 2vw, 2rem);
 }
 
-.editorial-body__gallery figure {
-  margin: 0;
-  background: var(--cr-paper);
+.editorial-body__gallery figure { min-width: 0; margin: 0; }
+.editorial-body__gallery figure:only-child { grid-column: 1 / -1; }
+
+@media (max-width: 640px) {
+  .editorial-body__gallery { grid-template-columns: minmax(0, 1fr); }
+}
+
+.editorial-body__rich-text a[href], .magazine-rich-block .tiptap a[href] {
+  color: var(--cr-blue);
+  text-decoration: underline;
+  text-underline-offset: .15em;
+  overflow-wrap: anywhere;
 }
 
 .editorial-body__external a {
@@ -4510,6 +4527,10 @@ html body {
 .editorial-body__rich-text { max-width: 900px; margin: 0 auto; }
 .editorial-body__rich-text > *:first-child { margin-top: 0; }
 .editorial-body__rich-text p { margin: 0 0 1.5em; white-space: normal; }
+.editorial-body__rich-text li > p { margin-block: 0; }
+.editorial-body__rich-text li > p + p { margin-block-start: .45em; }
+.editorial-body__rich-text li + li,
+.magazine-block--paragraph .tiptap li + li { margin-block-start: .2em; }
 .editorial-body__rich-text h2 { margin: 1.7em 0 .55em; font-size: clamp(2.2rem, 5vw, 5rem); font-weight: 560; line-height: .95; letter-spacing: -.05em; }
 .editorial-body__rich-text h3 { margin: 2em 0 .65em; font-size: clamp(1.2rem, 2vw, 1.65rem); }
 .editorial-body__rich-text blockquote { margin: 2.2em 0; padding-left: clamp(22px, 4vw, 54px); border-left: 5px solid var(--cr-blue); color: var(--cr-blue); font-size: clamp(1.65rem, 3.6vw, 3.5rem); font-style: italic; line-height: 1.08; letter-spacing: -.035em; }
