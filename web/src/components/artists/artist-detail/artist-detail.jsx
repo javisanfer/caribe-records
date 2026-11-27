@@ -236,8 +236,24 @@ export default function ArtistDetail({
 
       {(prevNext?.prev || prevNext?.next) && (
         <nav className="detail-pagination artist-detail__pagination" aria-label="Más artistas">
-          {prevNext.prev ? <Link to={`/artistas/${prevNext.prev.slug}`}><small>Anterior</small><span>← {prevNext.prev.name}</span></Link> : <span />}
-          {prevNext.next ? <Link to={`/artistas/${prevNext.next.slug}`}><small>Siguiente</small><span>{prevNext.next.name} →</span></Link> : <span />}
+          {prevNext.prev ? (
+            <Link to={`/artistas/${prevNext.prev.slug}`}>
+              <small>Anterior</small>
+              <span className="artist-neighbour">
+                <span aria-hidden="true">←</span>
+                <span className="artist-neighbour__name">{prevNext.prev.name}</span>
+              </span>
+            </Link>
+          ) : <span />}
+          {prevNext.next ? (
+            <Link to={`/artistas/${prevNext.next.slug}`}>
+              <small>Siguiente</small>
+              <span className="artist-neighbour">
+                <span className="artist-neighbour__name">{prevNext.next.name}</span>
+                <span aria-hidden="true">→</span>
+              </span>
+            </Link>
+          ) : <span />}
         </nav>
       )}
     </main>
