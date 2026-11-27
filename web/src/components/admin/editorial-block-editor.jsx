@@ -135,7 +135,7 @@ export default function EditorialBlockEditor({ blocks, onChange, busy, setBusy }
               </div>
             </div>
             <div className="magazine-block__content">
-              {block.type === "paragraph" && <RichTextEditor label="Cuerpo del artículo" value={block.text} onChange={(text) => updateBlock(index, { ...block, text })} />}
+              {block.type === "paragraph" && <RichTextEditor allowLinks label="Cuerpo del artículo" value={block.text} onChange={(text) => updateBlock(index, { ...block, text })} />}
               {block.type === "image" && <ImageBlock setBusy={setBusy} block={block} onChange={(next) => updateBlock(index, next)} />}
               {block.type === "heading" && <div className="admin-field-grid">
                 <label>Nivel<select value={block.level || 2} onChange={(event) => updateBlock(index, { ...block, level: Number(event.target.value) })}><option value={2}>H2</option><option value={3}>H3</option></select></label>
