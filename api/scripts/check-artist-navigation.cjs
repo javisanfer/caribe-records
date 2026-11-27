@@ -13,6 +13,7 @@ async function checkArtistNavigation(browser, base) {
       json: { ...artists[1], _id: "000000000000000000000001" },
     }));
     await page.goto(base + "/artistas/daddy-san");
+    await page.getByRole("button", { name: "Rechazar", exact: true }).click();
     const nav = page.getByRole("navigation", { name: "Más artistas" });
     const previous = nav.getByRole("link", { name: "Anterior Aeronave Adolescente", exact: true });
     const next = nav.getByRole("link", { name: "Siguiente ferrocentro club", exact: true });
