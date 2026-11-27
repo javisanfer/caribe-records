@@ -132,3 +132,26 @@ jobs:
         run: |
           npm run build --prefix web -- --mode analytics-test
           NODE_PATH="$RUNNER_TEMP/caribe-qa/node_modules" node api/scripts/review-analytics.cjs
+
+  platform-layout:
+    name: Public layout (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.20.0
+      - run: npm ci && npm run build
+      - name: Check rendered fonts and responsive artist layout
+        run: |
+          npm install --prefix "$RUNNER_TEMP/caribe-qa" --no-audit --no-fund playwright@1.56.1
+          node "$RUNNER_TEMP/caribe-qa/node_modules/playwright/cli.js" install chromium
+          NODE_PATH="$RUNNER_TEMP/caribe-qa/node_modules" node ../api/scripts/check-platform-layout.cjs
