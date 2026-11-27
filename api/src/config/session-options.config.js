@@ -12,7 +12,7 @@ const allowLocalHttp = !production && ["127.0.0.1", "localhost", "::1"].includes
 
 const sessionCookieOptions = {
   httpOnly: true,
-  secure: allowLocalHttp ? false : true,
+  secure: !allowLocalHttp,
   sameSite: process.env.SESSION_SAME_SITE || "lax",
   maxAge: sessionIdleMinutes * 60 * 1000,
 };
