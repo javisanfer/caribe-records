@@ -82,7 +82,7 @@ function App() {
       {!isPrivateArea && location.pathname !== "/legal" && !audience.show && <SiteBanner />}
       {!isPrivateArea && audience.show && <aside className="cr-consent" aria-labelledby="cr-consent-title">
         <div><strong id="cr-consent-title" className="visually-hidden">Cookies y reproductores externos</strong>
-          <p>Al aceptar, se cargarán los reproductores de YouTube, Spotify e Internet Archive que aparezcan en los artículos. Estos servicios recibirán tu IP y pueden usar cookies.{enabled && " También usaremos Google Analytics para medir visitas y clics."} <Link to="/legal#cookies">Política de cookies</Link></p></div>
+          <p>Utilizamos cookies para mostrar contenido multimedia{enabled && " y analizar el uso de la web"}. <Link to="/legal#cookies">Política de cookies</Link></p></div>
         <div className="cr-consent__actions">
           <button type="button" ref={consentButton} onClick={() => audience.choose("yes")}>Aceptar</button>
           <button type="button" onClick={() => audience.choose("no")}>Rechazar</button>
