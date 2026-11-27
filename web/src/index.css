@@ -1,5 +1,4 @@
-@import "@fontsource-variable/inter/standard.css";
-@import "@fontsource-variable/inter/standard-italic.css";
+@import "./fonts.css";
 
 /* =========================
    RESET / BASE GLOBAL
@@ -28,7 +27,7 @@
 /* Keep the Apple face where available. Bootstrap's body and form controls
    inherit the same stack even when its reset is bundled after this file. */
 html:root {
-  --bs-font-sans-serif: -apple-system, BlinkMacSystemFont, "Inter Variable", system-ui, sans-serif;
+  --bs-font-sans-serif: -apple-system, BlinkMacSystemFont, "Caribe Inter", system-ui, sans-serif;
   font-family: var(--bs-font-sans-serif);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;

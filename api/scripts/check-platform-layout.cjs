@@ -12,9 +12,11 @@ async function main() {
     try {
       const page = await browser.newPage({ reducedMotion: "reduce" });
       const artist = { _id: "1", slug: "los-reels", name: "Los reels", bio: "Una biografía", bioHtml: "<p>Una <em>biografía</em></p>" };
+      const artists = [{ name: "humilde paprika", slug: "humilde-paprika" }, artist,
+        { name: "Un nombre largo", slug: "un-nombre-largo" }];
       await page.route("**/api/v1/**", route => {
         const path = new URL(route.request().url()).pathname;
-        const json = path === "/api/v1/artists" ? [artist] : path === "/api/v1/artists/slug/los-reels" ? artist : [];
+        const json = path === "/api/v1/artists" ? artists : path === "/api/v1/artists/slug/los-reels" ? artist : [];
         return route.fulfill({ json });
       });
       await page.goto(server.resolvedUrls.local[0] + "artistas/los-reels");
@@ -35,6 +37,15 @@ async function main() {
           assert.ok(primary && (apple ? !primary.isCustomFont && /SF|system/i.test(primary.familyName + primary.postScriptName)
             : primary.isCustomFont && /Inter/.test(primary.familyName)), JSON.stringify({ width, selector, fonts }));
         }
+        const neighbours = await page.locator(".artist-neighbour").evaluateAll(items => items.map(item => {
+          const link = item.closest("a").getBoundingClientRect();
+          const name = item.querySelector(".artist-neighbour__name").getBoundingClientRect();
+          const arrow = item.querySelector("[aria-hidden]").getBoundingClientRect();
+          return name.left >= link.left && name.right <= link.right
+            && arrow.left >= link.left && arrow.right <= link.right
+            && Math.abs(arrow.top + arrow.bottom - name.top - name.bottom) <= 2;
+        }));
+        assert.deepEqual(neighbours, [true, true], 'Artist navigation at ' + width);
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Overflow at ' + width);
       }
     } finally {
