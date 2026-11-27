@@ -4,7 +4,6 @@ import { cleanBiography } from "../../../utils/artist-biography";
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../../index.css";
-import "./julia-garblan.css";
 import { sortReleases } from "../../../utils/release-order";
 
 import { artistPhotoUrl } from "../../../utils/artist-photo";
@@ -72,10 +71,13 @@ export default function ArtistDetail({
   const validEvents = events.filter((event) => event && (event.title || event.city || event.venue));
   const location = [artist.city, artist.country].filter(Boolean).join(", ");
   const members = artist.members || [];
+  const hasLongBio = artist.bio?.length > 430;
+  const bioClassName = !hasLongBio ? "artist-bio-copy" :
+    expandedBio ? "artist-bio-copy is-expanded" : "artist-bio-copy is-collapsed";
 
   return (
     <main
-      className={`artist-detail artist-detail--${tab} artist-detail--${artist.slug}${hasHeroImage ? " artist-detail--has-photo" : ""}`}
+      className={`artist-detail artist-detail--${tab}${hasHeroImage ? " artist-detail--has-photo" : ""}`}
       style={hasHeroImage ? { "--artist-photo-ratio": heroRatio } : undefined}
     >
       <header className="artist-detail__hero">
@@ -113,9 +115,9 @@ export default function ArtistDetail({
             {artist.bio ? (
               <>
                 {artist.bioHtml
-                  ? <div className={`artist-bio-copy${expandedBio || artist.bio.length <= 430 ? " is-expanded" : ""}`} dangerouslySetInnerHTML={{ __html: cleanBiography(artist.bioHtml) }} />
-                  : <p className={expandedBio ? "is-expanded" : ""}>{artist.bio}</p>}
-                {artist.bio.length > 430 && (
+                  ? <div className={bioClassName} dangerouslySetInnerHTML={{ __html: cleanBiography(artist.bioHtml) }} />
+                  : <p className={bioClassName}>{artist.bio}</p>}
+                {hasLongBio && (
                   <button className="artist-detail__more" aria-expanded={expandedBio} onClick={() => setExpandedBio((value) => !value)}>
                     {expandedBio ? "Mostrar menos −" : "Seguir leyendo +"}
                   </button>
@@ -148,7 +150,7 @@ export default function ArtistDetail({
       )}
 
       {tab === "releases" && (
-        <section className="artist-detail__catalogue">
+        <section className="artist-detail__catalogue" data-single-release={sortedReleases.length === 1 || undefined}>
           <div className="artist-detail__catalogue-heading">
             <p className="detail-section-label">Catálogo</p>
             <span>{String(releases.length).padStart(2, "0")}</span>

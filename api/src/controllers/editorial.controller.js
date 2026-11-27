@@ -71,7 +71,13 @@ function validatePublishableEditorial({ status, publishAt, hero, blocks }) {
 // GET /api/editorials
 exports.getEditorialsPublic = async (req, res) => {
   try {
-    const { tag, q } = req.query;
+    const { tag, q, artist } = req.query;
+    if ([tag, q, artist].some((value) => value !== undefined && typeof value !== "string")) {
+      return res.status(400).json({ message: "Filtro editorial no válido" });
+    }
+    if (artist && !isObjectIdOrHexString(artist)) {
+      return res.status(400).json({ message: "Identificador de artista no válido" });
+    }
     const { page, limit, skip } = getPagination(req.query);
     const now = new Date();
 
@@ -84,9 +90,9 @@ exports.getEditorialsPublic = async (req, res) => {
 
     const filter = { ...visibility };
     if (req.query.featured === "true") filter.featured = true;
-    if (req.query.artist) filter.relatedArtists = req.query.artist;
-    if (tag) filter.tags = tag;
-    if (q) filter.$text = { $search: q };
+    if (artist) filter.relatedArtists = { $eq: String(artist) };
+    if (tag) filter.tags = { $eq: String(tag) };
+    if (q) filter.$text = { $search: String(q) };
 
     const [total, items] = await Promise.all([
       Editorial.countDocuments(filter),

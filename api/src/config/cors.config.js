@@ -17,3 +17,4 @@ const corsMiddleware = cors({
 });
 
 module.exports = corsMiddleware;
+module.exports.isTrustedOrigin = (origin) => CORS_ORIGINS.includes(origin);

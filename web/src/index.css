@@ -1061,9 +1061,12 @@ dialog.site-banner[open] { display: grid; }
   background: var(--cr-white);
   border: 0;
   border-left: 1px solid var(--cr-line);
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: uppercase;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -.035em;
+  text-transform: none;
 }
 
 .cr-menu-toggle:hover { background: var(--cr-white); transform: none; }
@@ -1117,7 +1120,11 @@ dialog.site-banner[open] { display: grid; }
   min-height: 3.75rem;
   padding: .65rem 1.5rem;
   color: var(--cr-ink);
+  font-family: inherit;
   font-size: clamp(1.5rem, 2.1vw, 2rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -.035em;
   text-transform: none;
   text-decoration: none;
 }
@@ -1533,13 +1540,17 @@ html body {
 .event-year > summary::-webkit-details-marker { display: none; }
 .event-year[open] > summary,
 .event-year > summary:focus-visible,
-.event-row:not(.event-row--past):has(:focus-visible) {
+.event-index > li[data-tapped] > .event-row,
+.event-index .event-row:has(:focus-visible) {
+  --event-action-color: var(--cr-white);
   color: var(--cr-white);
   background: var(--cr-blue);
 }
-@media (hover: hover) and (pointer: fine) {
-  .event-year > summary:hover,
-  .event-index > li:hover > .event-row:not(.event-row--past) {
+.event-index > li[data-tapped] > .event-row { transition: none; }
+@media (any-hover: hover) {
+  .events-wrap[data-mouse] .event-year > summary:hover,
+  .events-wrap[data-mouse] .event-row:has(a[href], button):hover {
+    --event-action-color: var(--cr-white);
     color: var(--cr-white);
     background: var(--cr-blue);
   }
@@ -1571,12 +1582,6 @@ html body {
 .event-year[open] .event-year__toggle { transform: rotate(135deg); }
 .event-year .event-index { border-top: 1px solid var(--cr-line); }
 .event-year .event-index > li:last-child { border-bottom: 0; }
-.event-year a.event-row--past:hover,
-.event-year a.event-row--past:focus-visible {
-  color: var(--cr-blue);
-  background: var(--cr-white);
-}
-.event-year a.event-row--past { cursor: pointer; }
 
 @media (max-width: 640px) {
   .event-section__heading { align-items: end; padding-block: 24px; }
@@ -2656,7 +2661,9 @@ html body {
   line-height: .77;
   letter-spacing: -.075em;
   text-transform: uppercase;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 
 .artist-detail__identity h1 span {
@@ -2717,12 +2724,12 @@ html body {
   margin: 0;
   white-space: pre-line;
   font-size: clamp(1.45rem, 2.35vw, 2.7rem);
-  font-weight: 540;
-  line-height: 1.02;
-  letter-spacing: -.043em;
+  font-weight: 580;
+  line-height: 1.15;
+  letter-spacing: -.035em;
 }
 
-.artist-detail__bio > :is(p:not(.detail-section-label), .artist-bio-copy):not(.is-expanded) {
+.artist-detail__bio > .artist-bio-copy.is-collapsed {
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
@@ -2818,8 +2825,37 @@ html body {
   letter-spacing: -.06em;
 }
 
-@media (min-width: 901px) {
-  .artist-detail__catalogue { min-height: 0; }
+.page-transition:has(.artist-detail),
+.page-transition__content:has(.artist-detail),
+.admin-edit-detail:has(> .artist-detail),
+.artist-detail {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+
+.artist-detail > * { flex-shrink: 0; }
+.artist-detail__overview,
+.artist-detail__links-view { flex-grow: 1; }
+
+.artist-detail__catalogue {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.artist-detail__year { flex-grow: 1; }
+.artist-detail__year > div {
+  display: grid;
+  grid-auto-rows: 1fr;
+}
+
+@media (width > 760px) {
+  .artist-detail__year {
+    grid-template-columns: clamp(180px, 18vw, 300px) minmax(0, 1fr);
+  }
+
   .artist-detail__year:has(> div > .artist-release:only-child) h2 {
     align-content: center;
     padding-block: 0;
@@ -2827,11 +2863,13 @@ html body {
 }
 
 .artist-release {
+  --cover-min: 108px;
+  --cover-max: 42vw;
   display: grid;
-  grid-template-columns: 108px minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 20px;
-  min-height: 108px;
+  min-height: var(--cover-min);
   border-bottom: 1px solid var(--cr-line);
   text-decoration: none;
 }
@@ -2842,8 +2880,13 @@ html body {
 .artist-release__placeholder {
   display: grid;
   place-items: center;
-  width: 108px;
-  height: 108px;
+  /* Use the same limit on both axes, even when a short catalogue stretches its rows. */
+  width: auto;
+  height: 0;
+  min-width: var(--cover-min);
+  max-width: var(--cover-max);
+  min-height: clamp(var(--cover-min), 100%, var(--cover-max));
+  aspect-ratio: 1;
   object-fit: cover;
   color: var(--cr-white);
   background: var(--cr-blue);
@@ -2856,6 +2899,7 @@ html body {
 }
 
 .artist-release__name {
+  overflow-wrap: anywhere;
   font-size: clamp(1.35rem, 2.6vw, 2.8rem);
   font-weight: 650;
   line-height: .95;
@@ -3004,9 +3048,6 @@ html body {
   .editorial-body__media,
   .editorial-body__gallery { width: 100%; }
 
-  .artist-detail__hero { height: auto; grid-template-columns: 1fr; }
-  .artist-detail__identity { min-height: 340px; }
-  .artist-detail__visual { min-height: 55svh; border-top: 1px solid var(--cr-ink); border-left: 0; }
   .artist-detail__overview { grid-template-columns: 1fr; }
   .artist-detail__rail { border-top: 1px solid var(--cr-ink); border-left: 0; }
   .artist-detail__related,
@@ -3020,10 +3061,7 @@ html body {
   .artist-detail__tabs { display: grid; grid-template-columns: repeat(3, 1fr); }
   .artist-detail__tabs button { padding: 0 8px; }
   .artist-detail__identity h1 {
-    overflow-wrap: anywhere;
     font-size: clamp(2.55rem, 12vw, 3.75rem);
-    hyphens: none;
-    word-break: normal;
   }
   .editorial-detail__headline h1 {
     overflow-wrap: anywhere;
@@ -3032,9 +3070,7 @@ html body {
   .artist-detail__facts { flex-direction: column; gap: 5px; }
   .artist-detail__year { grid-template-columns: 84px minmax(0, 1fr); }
   .artist-detail__year h2 { padding: 20px 12px; font-size: 2rem; }
-  .artist-release { grid-template-columns: 72px minmax(0, 1fr); min-height: 72px; gap: 12px; }
-  .artist-release img,
-  .artist-release__placeholder { width: 72px; height: 72px; }
+  .artist-release { --cover-min: 72px; grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
   .artist-release small { display: none; }
   .detail-pagination > a,
   .detail-pagination > span { min-height: 124px; padding: 18px; }
@@ -3045,10 +3081,32 @@ html body {
   .editorial-detail { scroll-behavior: auto; }
 }
 
+@media (max-width: 760px) and (orientation: portrait) {
+  .artist-detail__catalogue[data-single-release] .artist-release {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(min-content, 1fr);
+    gap: 0;
+    padding: 0;
+  }
+
+  .artist-detail__catalogue[data-single-release] .artist-release :is(img, .artist-release__placeholder) {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    max-width: none;
+    min-height: 0;
+  }
+
+  .artist-detail__catalogue[data-single-release] .artist-release__name { padding: 16px 18px; }
+  .artist-detail__catalogue[data-single-release] .artist-release small { display: block; }
+}
+
 /* Artist profiles: compact reading rhythm on phones. */
 @media (max-width: 760px) {
   .artist-detail__year {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
   }
 
   .artist-detail__year h2 {
@@ -3118,10 +3176,6 @@ html body {
 
   .artist-detail__visual {
     width: calc(100% - 36px);
-    height: auto;
-    min-height: 0;
-    max-height: 48svh;
-    aspect-ratio: 4 / 3;
     margin: 0 18px;
     border: 0;
   }
@@ -3140,6 +3194,13 @@ html body {
     line-height: 1.5;
     letter-spacing: -.015em;
     font-weight: 400;
+  }
+
+  .artist-detail__bio > .artist-bio-copy:not(.is-expanded) {
+    font-size: clamp(1.15rem, 4.8vw, 1.45rem);
+    line-height: 1.35;
+    font-weight: 580;
+    letter-spacing: -.025em;
   }
 
   .artist-detail__bio .detail-section-label {
@@ -5200,6 +5261,7 @@ html body {
 }
 
 .event-row.event-row--past {
+  --event-action-color: var(--cr-blue);
   color: #626262;
   background: #e3e3e3;
   cursor: default;
@@ -5774,6 +5836,7 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   transition-delay: 0s;
 }
 
+.home-slide picture { display: block; width: 100%; height: 100%; }
 .home-slide img {
   width: 100%;
   height: 100%;
@@ -5812,7 +5875,6 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   align-items: flex-start;
 }
 
-.cr-mobile-links a,
 .home-section-nav a {
   font-family: inherit;
   font-weight: 500;
@@ -5931,30 +5993,22 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
   }
 }
 
-/* Size every artist hero to the image's own proportions. */
-
-@media (min-width: 901px) {
+/* The photo sets the height of the two-column header once the name has its space. */
+@media (width > 760px) {
   .artist-detail--has-photo .artist-detail__hero {
-    grid-template-columns: minmax(0, 1fr) calc(clamp(360px, 44svh, 470px) * var(--artist-photo-ratio));
+    height: auto;
+    grid-template-columns: minmax(min-content, 1fr) minmax(0, calc(clamp(360px, 44svh, 470px) * var(--artist-photo-ratio)));
   }
 }
 
 .artist-detail--has-photo .artist-detail__visual {
+  height: auto;
+  aspect-ratio: var(--artist-photo-ratio);
   background: transparent;
 }
 
 .artist-detail--has-photo .artist-detail__visual img {
   object-fit: contain;
-  object-position: center;
-}
-
-@media (max-width: 900px) {
-  .artist-detail--has-photo .artist-detail__visual {
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    aspect-ratio: var(--artist-photo-ratio);
-  }
 }
 
 /* Artist index keeps the Warp-like two-colour composition. */
@@ -6304,15 +6358,20 @@ html:has(.cr-site-footer) { --cr-page-edge: var(--cr-footer); }
 .home-editorial-carousel.is-empty ~ .home-section-nav a:not([target="_blank"]):hover { background: var(--cr-white); }
 
 .content-permalink { color: inherit; text-decoration: inherit; }
-.content-permalink:focus-visible, .event-poster-trigger:focus-visible { text-decoration: underline; }
+.content-permalink:focus-visible { text-decoration: underline; }
 @media (hover: hover) and (pointer: fine) {
-  .content-permalink:hover, .event-poster-trigger:hover { text-decoration: underline; }
+  .content-permalink:hover { text-decoration: underline; }
 }
-.event-row .content-permalink, .event-poster-trigger {
-  text-underline-offset: .09em;
-  text-decoration-thickness: 1px;
+.event-row :is(.content-permalink, .event-poster-trigger) {
+  color: var(--event-action-color, inherit);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.event-row--past .event-row__ticket :is(a, button) { color: var(--cr-blue); }
+.event-row :is(a, button):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.event-row .event-poster-trigger:hover { background: transparent; transform: none; }
 .event-row__artist > strong:has(a) { padding-bottom: .12em; margin-bottom: -.12em; }
 .event-poster-trigger {
   min-height: 44px;

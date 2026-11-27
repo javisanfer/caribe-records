@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const logger = require("morgan");
+const { listenHost } = require("./config/session-options.config");
 const createSessionMiddleware = require("./config/session.config");
 const { apiError } = require("./utils/http");
 const corsMiddleware = require("./config/cors.config"); // ✅ Corregido
@@ -62,7 +63,7 @@ connectDatabase()
     }
   })
   .then(() => {
-    app.listen(port, process.env.HOST || undefined, () => console.info(`🚀 Application running at port ${port}`));
+    app.listen(port, listenHost, () => console.info(`🚀 Application running at port ${port}`));
   })
   .catch((error) => {
     console.error("Error al iniciar la API", error.name);
