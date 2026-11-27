@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PosterGallery from "../poster-gallery";
 import EventItem from "../event-item/event-item";
 import AdminEditLink from "../../admin/admin-edit-link";
@@ -8,11 +8,11 @@ const formatter = new Intl.DateTimeFormat("en-CA", {
 });
 const madridDate = (date) => formatter.format(date);
 
-function EventRows({ events, past = false, onOpenPoster }) {
+function EventRows({ events, tappedId, past = false, onOpenPoster }) {
   return (
     <ul className="event-index">
       {events.map((event) => (
-        <li className="admin-edit-context" key={event.id}>
+        <li className="admin-edit-context" key={event.id} data-event-id={event.id} data-tapped={String(event.id) === tappedId || undefined}>
           <EventItem event={event} past={past} onOpenPoster={onOpenPoster} />
           <AdminEditLink
             to={`/admin/edit-event/${event.slug || event.id}`}
@@ -26,6 +26,21 @@ function EventRows({ events, past = false, onOpenPoster }) {
 
 export default function EventList({ events = [] }) {
   const [openedPoster, setOpenedPoster] = useState(null);
+  const [pointerType, setPointerType] = useState("");
+  const [tappedId, setTappedId] = useState(null);
+
+  useEffect(() => {
+    if (tappedId === null) return;
+    const timeout = setTimeout(() => setTappedId(null), 240);
+    return () => clearTimeout(timeout);
+  }, [tappedId]);
+
+  function confirmTap(event) {
+    if (!event.detail || pointerType !== "touch") return;
+    const action = event.target.closest(".event-row a[href], .event-row button");
+    if (action) setTappedId(action.closest("[data-event-id]").dataset.eventId);
+  }
+
   const { upcoming, history, posters } = useMemo(() => {
     const today = madridDate(new Date());
     const dated = (Array.isArray(events) ? events : [])
@@ -50,7 +65,15 @@ export default function EventList({ events = [] }) {
   }
 
   return (
-    <div className="events-wrap">
+    <div className="events-wrap"
+      data-mouse={pointerType === "mouse" || undefined}
+      onPointerOverCapture={(event) => setPointerType(event.pointerType)}
+      onPointerDownCapture={(event) => {
+        setPointerType(event.pointerType);
+        setTappedId(null);
+      }}
+      onClickCapture={confirmTap}
+    >
       <section className="event-section" aria-labelledby="event-upcoming-title">
         <header className="event-section__heading">
           <h2 id="event-upcoming-title">Próximos conciertos</h2>
@@ -59,7 +82,7 @@ export default function EventList({ events = [] }) {
         {upcoming.length ? (
           <>
             <div className="event-index__labels" aria-hidden="true"><span>Artista</span><span>Lugar</span><span>Fecha</span><span>Entradas</span></div>
-            <EventRows events={upcoming} />
+            <EventRows events={upcoming} tappedId={tappedId} />
           </>
         ) : <p className="event-section__empty">Próximas fechas por anunciar.</p>}
       </section>
@@ -77,7 +100,7 @@ export default function EventList({ events = [] }) {
                 <span className="event-year__count">{items.length} {items.length === 1 ? "concierto" : "conciertos"}</span>
                 <span className="event-year__toggle" aria-hidden="true">↗</span>
               </summary>
-              <EventRows events={items} past onOpenPoster={(id, trigger) => setOpenedPoster({ id, trigger })} />
+              <EventRows events={items} tappedId={tappedId} past onOpenPoster={(id, trigger) => setOpenedPoster({ id, trigger })} />
             </details>
           ))}
         </section>

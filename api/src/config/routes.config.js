@@ -7,6 +7,7 @@ const router = express.Router();
 // -------------------- Middlewares --------------------
 const auth = require("../middlewares/session.middleware");
 const upload = require("../config/storage.config");
+const { protectSessionWrites, sendCsrfToken } = require("../middlewares/csrf.middleware");
 
 const adminRateLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -34,6 +35,7 @@ router.use((req, res, next) => {
   }
   next();
 });
+router.use(protectSessionWrites);
 router.use(auth.loadSessionUser);
 
 // -------------------- Controllers --------------------
@@ -66,6 +68,7 @@ router.post("/users/password-reset/complete", authenticationRateLimit, users.com
 
 // Sesiones
 router.get("/sessions/current", (req, res) => {
+  if (req.user) sendCsrfToken(req, res);
   res.set("Cache-Control", "no-store").json(req.user || null);
 });
 router.post("/sessions", authenticationRateLimit, sessions.create);
@@ -155,8 +158,9 @@ router.delete(
 // ======================================================
 
 // Público
-router.get("/releases", releaseController.getReleases);
-router.get("/releases/:id", releaseController.getReleaseById);
+const catalogueReadLimit = rateLimit({ windowMs: 60_000, limit: 240, standardHeaders: "draft-8", legacyHeaders: false });
+router.get("/releases", catalogueReadLimit, releaseController.getReleases);
+router.get("/releases/:id", catalogueReadLimit, releaseController.getReleaseById);
 
 // Admin
 router.get(

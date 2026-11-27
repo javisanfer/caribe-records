@@ -22,7 +22,11 @@ module.exports = (client) => expressSession({
   resave: false,
   saveUninitialized: false,
   rolling: true,
-  cookie: sessionCookieOptions,
+  cookie: {
+    ...sessionCookieOptions,
+    // Loopback development may use HTTP. Keep Secure even there when served over TLS.
+    secure: sessionCookieOptions.secure ? true : "auto",
+  },
   store: MongoStore.create({
     client,
     collectionName: "sessions",

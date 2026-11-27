@@ -5,14 +5,19 @@ const { randomUUID } = require("node:crypto");
 async function checkPersistence(email, password) {
   const api = "http://127.0.0.1:3015/api/v1";
   const session = await fetch(api + "/sessions", {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }),
+    method: "POST", headers: { Origin: "http://127.0.0.1:5185", "Content-Type": "application/json" }, body: JSON.stringify({ email, password }),
   });
   assert.equal(session.status, 201, "Acceso al panel de revisión");
   const cookie = session.headers.getSetCookie()[0].split(";")[0];
+  const current = await fetch(api + "/sessions/current", { headers: { Cookie: cookie } });
+  const csrfToken = current.headers.get("X-CSRF-Token");
+  assert.ok(csrfToken);
+  const rejected = await fetch(api + "/sessions", { method: "DELETE", headers: { Cookie: cookie } });
+  assert.equal(rejected.status, 403);
   const fixtures = [];
   async function request(path, method = "GET", payload) {
     const response = await fetch(api + path, {
-      method, headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify(payload),
+      method, headers: { Cookie: cookie, "X-CSRF-Token": csrfToken, "Content-Type": "application/json" }, body: JSON.stringify(payload),
     });
     if (!response.ok) throw new Error(method + " " + path + " · HTTP " + response.status + " · " + await response.text());
     return response.status === 204 ? null : response.json();

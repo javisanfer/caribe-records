@@ -7,7 +7,8 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import EditorialBlockEditor from "../../components/admin/editorial-block-editor";
 import { createTextBlock } from "../../components/admin/editorial-block-utils";
-import AdminImagePreview from "../../components/admin/admin-image-preview";
+import EditorialCoverPreview from "../../components/admin/editorial-cover-preview";
+import { checkEditorialPhoto, editorialPhotoTypes, prepareEditorialPhoto } from "../../utils/editorial-photo";
 
 import { adminListArtists, adminListReleases } from "../../services/api-services";
 import AdminRelations from "../../components/admin/admin-relations";
@@ -50,6 +51,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
   const currentStatus = watch("status") || "draft";
   const excerpt = watch("excerpt") || "";
   const heroUrl = watch("heroUrl") || "";
+  const heroFile = watch("heroFile")?.[0];
   const tags = watch("tags") || "";
   const seoTitle = watch("seoTitle") || "";
   const seoDescription = watch("seoDescription") || "";
@@ -118,7 +120,7 @@ export default function NewEditorialPage({ isEditMode = false }) {
       if (lastBlock?.type === "embed") {
         formData.append("embedHtml", lastBlock.embed);
       }
-      if (data.heroFile?.[0]) formData.append("heroFile", data.heroFile[0]);
+      if (data.heroFile?.[0]) formData.append("heroFile", await prepareEditorialPhoto(data.heroFile[0]));
       const response = await fetch(effectiveEditMode ? `${API_BASE}/admin/editorials/slug/${encodeURIComponent(slug)}` : `${API_BASE}/admin/editorials`, { method: effectiveEditMode ? "PATCH" : "POST", credentials: "include", body: formData });
       if (!response.ok) {
         const result = await response.json().catch(() => ({}));
@@ -195,7 +197,9 @@ export default function NewEditorialPage({ isEditMode = false }) {
                   <button type="submit" className="btn admin-primary-action" disabled={isSubmitting || uploadingBlock}>{isSubmitting ? "Guardando…" : effectiveEditMode ? "Actualizar editorial" : currentStatus === "published" ? "Publicar editorial" : currentStatus === "scheduled" ? "Programar editorial" : "Guardar borrador"}</button>
                 </section>
 
-                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>Imagen principal</span></div><div className="admin-form-panel__body admin-panel-fields"><AdminImagePreview src={heroUrl} alt="Imagen principal actual del artículo" label="Imagen guardada" /><div className="admin-field"><label htmlFor="new-editorial-heroFile" className="form-label">Subir imagen</label><input id="new-editorial-heroFile" type="file" accept="image/*" className="form-control" {...register("heroFile")} /><div className="form-text">Déjalo vacío para conservar la imagen actual.</div></div><div className="admin-field"><label htmlFor="new-editorial-heroUrl" className="form-label">O usar URL</label><input id="new-editorial-heroUrl" {...imageUrlInput} className="form-control" placeholder="https://…" {...register("heroUrl")} /></div><div className="admin-field"><label htmlFor="new-editorial-heroAlt" className="form-label">Texto alternativo</label><input id="new-editorial-heroAlt" className="form-control" placeholder="Describe lo que aparece en la imagen" {...register("heroAlt")} /></div><div className="admin-field-grid admin-field-grid--2"><div className="admin-field"><label htmlFor="new-editorial-heroCaption" className="form-label">Pie</label><input id="new-editorial-heroCaption" className="form-control" {...register("heroCaption")} /></div><div className="admin-field"><label htmlFor="new-editorial-heroCredit" className="form-label">Crédito</label><input id="new-editorial-heroCredit" className="form-control" {...register("heroCredit")} /></div></div></div></section>
+                <section className="admin-form-panel admin-visible-panel"><div className="admin-visible-panel__heading"><span>Imagen principal</span></div><div className="admin-form-panel__body admin-panel-fields"><EditorialCoverPreview url={heroUrl} file={checkEditorialPhoto(heroFile) === true ? heroFile : null} /><div className="admin-field"><label htmlFor="new-editorial-heroFile" className="form-label">Subir imagen</label><input id="new-editorial-heroFile" type="file" accept={editorialPhotoTypes} className="form-control" aria-describedby="editorial-cover-help" {...register("heroFile", { validate: files => checkEditorialPhoto(files?.[0]) })} />
+                    <div className="form-text" id="editorial-cover-help">JPG, PNG o WebP de hasta 40 MiB. Para la portada, elige una foto horizontal de 2560 px de ancho o más.</div>
+                    {errors.heroFile && <div role="alert">{errors.heroFile.message}</div>}</div><div className="admin-field"><label htmlFor="new-editorial-heroUrl" className="form-label">O usar URL</label><input id="new-editorial-heroUrl" {...imageUrlInput} className="form-control" placeholder="https://…" {...register("heroUrl")} /></div><div className="admin-field"><label htmlFor="new-editorial-heroAlt" className="form-label">Texto alternativo</label><input id="new-editorial-heroAlt" className="form-control" placeholder="Describe lo que aparece en la imagen" {...register("heroAlt")} /></div><div className="admin-field-grid admin-field-grid--2"><div className="admin-field"><label htmlFor="new-editorial-heroCaption" className="form-label">Pie</label><input id="new-editorial-heroCaption" className="form-control" {...register("heroCaption")} /></div><div className="admin-field"><label htmlFor="new-editorial-heroCredit" className="form-label">Crédito</label><input id="new-editorial-heroCredit" className="form-control" {...register("heroCredit")} /></div></div></div></section>
 
                 <details className="admin-form-panel admin-visible-panel"><summary className="admin-visible-panel__heading"><span>Organización</span><small>Ruta, sección y etiquetas</small></summary><div className="admin-form-panel__body admin-panel-fields"><div className="admin-field"><label htmlFor="new-editorial-slug" className="form-label">Slug <em>Automático si está vacío</em></label><input id="new-editorial-slug" className="form-control" placeholder="titulo-del-articulo" {...register("slug")} /></div><div className="admin-field-grid admin-field-grid--2"><div className="admin-field"><label htmlFor="new-editorial-section" className="form-label">Sección</label><input id="new-editorial-section" className="form-control" placeholder="Editorial" {...register("section")} /></div><div className="admin-field"><label htmlFor="new-editorial-series" className="form-label">Serie</label><input id="new-editorial-series" className="form-control" placeholder="Memory of Music" {...register("series")} /></div></div><div className="admin-field"><label htmlFor="new-editorial-tags" className="form-label">Etiquetas</label><input id="new-editorial-tags" className="form-control" placeholder="Galicia, shoegaze, entrevista" {...register("tags")} /><div className="form-text">{tags ? `${tags.split(",").filter(Boolean).length} etiquetas` : "Separa cada etiqueta con una coma."}</div></div></div></details>
 
