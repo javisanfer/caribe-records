@@ -27,6 +27,7 @@ async function checkCatalogueTouch(browser, base) {
     try {
       await desktop.route("**/api/v1/releases", serveCatalogue);
       await desktop.goto(base + "/releases");
+      await desktop.getByRole("button", { name: "Rechazar", exact: true }).click();
       const cover = desktop.locator(".release-cover-link").first();
       await cover.hover();
       await desktop.waitForFunction(() => getComputedStyle(document.querySelector(".release-cover-link img")).filter.includes("invert(1)"));
@@ -41,6 +42,7 @@ async function checkCatalogueTouch(browser, base) {
 
     for (const view of ["Lista", "Retícula"]) {
       await page.goto(base + "/releases");
+      if (view === "Lista") await page.getByRole("button", { name: "Rechazar", exact: true }).tap();
       await page.getByRole("button", { name: view }).tap();
       const cover = page.locator(".release-cover-link").first();
       await centreAndObserve(cover);
@@ -64,6 +66,7 @@ async function checkCatalogueTouch(browser, base) {
       // Tapping while the list is still coasting only stops the scroll on touch devices.
       // Start the independent tap case with the cover centred and the document stationary.
       await page.reload();
+      if (view === "Lista") await page.getByRole("button", { name: "Rechazar", exact: true }).tap();
       await page.getByRole("button", { name: view }).tap();
       await centreAndObserve(cover);
       const [opened] = await Promise.all([context.waitForEvent("page"), cover.tap()]);
