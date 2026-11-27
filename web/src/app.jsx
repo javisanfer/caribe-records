@@ -7,7 +7,7 @@ import { PrivateRoute } from "./guards";
 // UI
 import { Link } from "react-router-dom";
 import { enabled } from "./analytics/measurement";
-import { useAudience } from "./analytics/use-audience";
+import { PlayerConsent, useAudience } from "./analytics/use-audience";
 const Privacy = lazy(() => import("./pages/privacy.jsx"));
 import Navbar from "./components/ui/navbar.jsx";
 import PageLayout from "./components/layouts/page-layout/page-layout.jsx";
@@ -77,12 +77,12 @@ function App() {
   }
 
   return (
-    <>
+    <PlayerConsent.Provider value={audience.allowPlayers}>
       {!isHome && <Navbar />}
       {!isPrivateArea && location.pathname !== "/legal" && !audience.show && <SiteBanner />}
       {!isPrivateArea && audience.show && <aside className="cr-consent" aria-labelledby="cr-consent-title">
-        <div><strong id="cr-consent-title" className="visually-hidden">Cookies de audiencia</strong>
-          <p>Usamos cookies de Google Analytics para medir visitas y clics en enlaces externos. <Link to="/legal#cookies">Política de cookies</Link></p></div>
+        <div><strong id="cr-consent-title" className="visually-hidden">Cookies y reproductores externos</strong>
+          <p>Al aceptar, se cargarán los reproductores de YouTube, Spotify e Internet Archive que aparezcan en los artículos. Estos servicios recibirán tu IP y pueden usar cookies.{enabled && " También usaremos Google Analytics para medir visitas y clics."} <Link to="/legal#cookies">Política de cookies</Link></p></div>
         <div className="cr-consent__actions">
           <button type="button" ref={consentButton} onClick={() => audience.choose("yes")}>Aceptar</button>
           <button type="button" onClick={() => audience.choose("no")}>Rechazar</button>
@@ -93,7 +93,7 @@ function App() {
         <Suspense fallback={<SiteLoader />}>
           <Routes location={location} key={location.pathname}>
           
-          <Route path="/legal" element={<Privacy onPreferences={enabled ? openPreferences : undefined} />} />
+          <Route path="/legal" element={<Privacy onPreferences={openPreferences} />} />
           <Route path="/privacidad" element={<Navigate to="/legal" replace />} />
           {/* HOME */}
           <Route
@@ -356,7 +356,7 @@ function App() {
         </Suspense>
       </AnimatePresence>
       {!isPrivateArea && <SiteFooter />}
-    </>
+    </PlayerConsent.Provider>
   );
 }
 

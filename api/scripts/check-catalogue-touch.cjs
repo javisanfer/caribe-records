@@ -27,6 +27,7 @@ async function checkCatalogueTouch(browser, base) {
     try {
       await desktop.route("**/api/v1/releases", serveCatalogue);
       await desktop.goto(base + "/releases");
+      await desktop.getByRole("button", { name: "Rechazar", exact: true }).click();
       const cover = desktop.locator(".release-cover-link").first();
       await cover.hover();
       await desktop.waitForFunction(() => getComputedStyle(document.querySelector(".release-cover-link img")).filter.includes("invert(1)"));
@@ -41,6 +42,7 @@ async function checkCatalogueTouch(browser, base) {
 
     for (const view of ["Lista", "Retícula"]) {
       await page.goto(base + "/releases");
+      if (view === "Lista") await page.getByRole("button", { name: "Rechazar", exact: true }).tap();
       await page.getByRole("button", { name: view }).tap();
       const cover = page.locator(".release-cover-link").first();
       await centreAndObserve(cover);

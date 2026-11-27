@@ -10,6 +10,7 @@ const bcrypt = require("bcryptjs");
 const { readFileSync } = require("node:fs");
 const { gzipSync } = require("node:zlib");
 const { checkEventPosters } = require("./check-event-posters.cjs");
+const { checkEditorialConsent } = require("./check-editorial-consent.cjs");
 const { checkArtistNavigation } = require("./check-artist-navigation.cjs");
 const { checkArtistCatalogueLayout } = require("./check-artist-catalogue-layout.cjs");
 const { checkCatalogueTouch } = require("./check-catalogue-touch.cjs");
@@ -111,6 +112,7 @@ async function main() {
             await page.goto(base + path);
             await page.locator("h1").first().waitFor({ state: "attached" });
             if (path.startsWith("/admin/")) await page.getByRole("link", { name: "Volver al panel" }).waitFor();
+            if (path === "/" && width === 375) await page.getByRole("button", { name: "Rechazar", exact: true }).click();
             if (path === "/") await page.getByRole("link", { name: "Panel", exact: true }).waitFor();
             if (path === "/admin" && width === 1280) {
               for (const card of await page.locator(".admin-create__grid a").all()) {
@@ -169,6 +171,7 @@ async function main() {
         await checkEventPosters(page, base, root, expect);
         await checkArtistCatalogueLayout(browser, base);
         await checkArtistNavigation(browser, base);
+        await checkEditorialConsent(browser, base);
         if (engine === "chromium") {
           await checkCatalogueTouch(browser, base);
           await page.goto(base + "/admin/new-editorial");

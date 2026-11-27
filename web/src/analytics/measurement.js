@@ -3,19 +3,33 @@ const testing = import.meta.env.MODE === "analytics-test" && ["localhost", "127.
 const configured = import.meta.env.VITE_GA_MEASUREMENT_ID || "";
 const id = testing ? "G-TEST000001" : official && /^G-[A-Z0-9]{4,20}$/.test(configured) ? configured : "";
 export const enabled = Boolean(id);
-export const preferenceKey = "caribe.analytics.v1";
+export const preferenceKey = "caribe.privacy.v2";
 const lifetime = 180 * 86400;
+let sessionChoice;
+
+function currentChoice(saved) {
+  return saved?.until > Date.now() && ["yes", "no"].includes(saved.value) ? saved.value : "";
+}
+
 export function choice() {
+  if (sessionChoice) return currentChoice(sessionChoice);
   try {
-    const saved = JSON.parse(localStorage.getItem(preferenceKey));
-    if (saved?.until > Date.now() && ["yes", "no"].includes(saved.value)) return saved.value;
-  } catch { /* Consent defaults to undecided. */ }
-  return "";
+    const saved = localStorage.getItem(preferenceKey);
+    if (saved !== null) return currentChoice(JSON.parse(saved));
+    // The previous notice only covered analytics. Keep an existing refusal.
+    const previous = JSON.parse(localStorage.getItem("caribe.analytics.v1"));
+    return currentChoice(previous) === "no" ? "no" : "";
+  } catch { return ""; }
 }
 
 export function saveChoice(value) {
-  try { localStorage.setItem(preferenceKey, JSON.stringify({ value, until: Date.now() + lifetime * 1000 })); }
-  catch { /* An unavailable store never grants persistent consent. */ }
+  const saved = { value, until: Date.now() + lifetime * 1000 };
+  try {
+    localStorage.setItem(preferenceKey, JSON.stringify(saved));
+    sessionChoice = undefined;
+  } catch {
+    sessionChoice = saved;
+  }
 }
 
 // The tag lives in its own disposable document. Removing it also removes its
