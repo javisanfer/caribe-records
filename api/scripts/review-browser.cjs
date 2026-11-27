@@ -10,6 +10,7 @@ const bcrypt = require("bcryptjs");
 const { readFileSync } = require("node:fs");
 const { gzipSync } = require("node:zlib");
 const { checkEventPosters } = require("./check-event-posters.cjs");
+const { checkEditorialAuthoring } = require("./check-editorial-authoring.cjs");
 const { checkEditorialConsent } = require("./check-editorial-consent.cjs");
 const { checkArtistNavigation } = require("./check-artist-navigation.cjs");
 const { checkArtistCatalogueLayout } = require("./check-artist-catalogue-layout.cjs");
@@ -174,6 +175,7 @@ async function main() {
         await checkEditorialConsent(browser, base);
         if (engine === "chromium") {
           await checkCatalogueTouch(browser, base);
+          await checkEditorialAuthoring(page, base);
           await page.goto(base + "/admin/new-editorial");
           await page.getByText("Asociaciones", { exact: true }).click();
           await page.getByText("Elige un artista para ver su catálogo.").waitFor();

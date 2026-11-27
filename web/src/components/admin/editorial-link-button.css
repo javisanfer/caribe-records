@@ -1,0 +1,15 @@
+.editor-link-dialog {
+  width: min(26rem, calc(100% - 2rem));
+  max-height: 90dvh;
+  padding: 1.25rem;
+  border: 1px solid var(--admin-line);
+  border-radius: .4rem;
+  color: var(--cr-ink);
+  background: var(--cr-paper);
+}
+.editor-link-dialog::backdrop { background: rgb(0 0 0 / 45%); }
+.editor-link-dialog h3 { margin: 0 0 1rem; font-size: 1.2rem; }
+.editor-link-dialog label { display: grid; gap: .35rem; }
+.editor-link-dialog p { margin: .5rem 0 0; font-size: .875rem; }
+.editor-link-dialog__actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .4rem; margin-top: 1rem; }
+.editor-link-dialog__actions button { min-height: 44px; }

@@ -10,6 +10,21 @@ function getBlockImage(block) {
   return block.image || (block.url ? block : null);
 }
 
+function EditorialPhoto({ image, className }) {
+  if (!image?.url) return null;
+  return (
+    <figure className={className}>
+      <img loading="lazy" decoding="async" width={image.width} height={image.height} src={image.url} alt={image.alt || ""} />
+      {(image.caption || image.credit) && (
+        <figcaption>
+          {image.caption && <span>{image.caption}</span>}
+          {image.credit && <small>{image.credit}</small>}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
 export default function EditorialDetail({ editorial, prevNext }) {
   const [heroFailed, setHeroFailed] = useState(false);
 
@@ -86,18 +101,7 @@ export default function EditorialDetail({ editorial, prevNext }) {
               return <div key={key} className="editorial-body__rich-text" dangerouslySetInnerHTML={{ __html: cleanHtml }} />;
             }
             if (block.type === "image") {
-              const image = getBlockImage(block);
-              if (!image?.url) return null;
-              return (
-                <figure key={key} className="editorial-body__media">
-                  <img loading="lazy" decoding="async" width={image.width} height={image.height} src={image.url} alt={image.alt || ""} />
-                  {(image.caption || image.credit) && (
-                    <figcaption>
-                      {image.caption}{image.caption && image.credit ? " · " : ""}{image.credit}
-                    </figcaption>
-                  )}
-                </figure>
-              );
+              return <EditorialPhoto key={key} className="editorial-body__media" image={getBlockImage(block)} />;
             }
             if (block.type === "quote") {
               return (
@@ -112,10 +116,7 @@ export default function EditorialDetail({ editorial, prevNext }) {
               return (
                 <div key={key} className="editorial-body__gallery">
                   {block.gallery.map((image, imageIndex) => (
-                    <figure key={`${image.url}-${imageIndex}`}>
-                      <img loading="lazy" decoding="async" width={image.width} height={image.height} src={image.url} alt={image.alt || ""} />
-                      {(image.caption || image.credit) && <figcaption>{image.caption || image.credit}</figcaption>}
-                    </figure>
+                    <EditorialPhoto key={`${image.url}-${imageIndex}`} image={image} />
                   ))}
                 </div>
               );
