@@ -66,7 +66,6 @@ async function checkCatalogueTouch(browser, base) {
       // Tapping while the list is still coasting only stops the scroll on touch devices.
       // Start the independent tap case with the cover centred and the document stationary.
       await page.reload();
-      if (view === "Lista") await page.getByRole("button", { name: "Rechazar", exact: true }).tap();
       await page.getByRole("button", { name: view }).tap();
       await centreAndObserve(cover);
       const [opened] = await Promise.all([context.waitForEvent("page"), cover.tap()]);
