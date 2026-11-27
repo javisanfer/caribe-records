@@ -1,5 +1,7 @@
-import { useEffect, useLayoutEffect, useState } from "react";
-import { choice, detail, enabled, outbound, permit, preferenceKey, saveChoice, visit } from "./measurement";
+import { createContext, useEffect, useLayoutEffect, useState } from "react";
+import { choice, detail, outbound, permit, preferenceKey, saveChoice, visit } from "./measurement";
+
+export const PlayerConsent = createContext(false);
 
 export function useAudience(location) {
   const [decision, setDecision] = useState(choice);
@@ -11,7 +13,6 @@ export function useAudience(location) {
   }, [decision, location.key, location.pathname]);
 
   useEffect(() => {
-    if (!enabled) return;
     function sync(event) {
       if (event.type === "storage" && event.key !== null && event.key !== preferenceKey) return;
       const value = choice();
@@ -38,7 +39,7 @@ export function useAudience(location) {
     setDecision(value);
     setPreferences(false);
   }
-  return { show: enabled && (!decision || preferences), choose, open: () => setPreferences(true) };
+  return { show: !decision || preferences, allowPlayers: decision === "yes", choose, open: () => setPreferences(true) };
 }
 
 export function useContentView(section, item) {
