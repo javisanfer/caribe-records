@@ -1,4 +1,9 @@
+import { releaseArtistCredit } from "../../../utils/release-artists";
+import { releaseSlug } from "../../../analytics/measurement";
+import { releaseListenUrl } from "../../../utils/release-listen-url";
+import { Link } from "react-router-dom";
 import React from "react";
+import ListenLink from "../listen-link";
 
 function formatDate(d) {
   if (!d) return "";
@@ -28,16 +33,12 @@ export default function ReleaseItem({ release, view = "list" }) {
 
   // Nombre de artista: viene ya normalizado desde ReleasePage,
   // pero por si acaso usamos varios fallbacks
-  const artistName =
-    release.artistName ||
-    (typeof release.artist === "string"
-      ? release.artist
-      : release.artist?.name) ||
-    "Unknown artist";
+  const titleLink = release.managed ? <Link className="content-permalink" to={`/releases/${release.id}`}>{title}</Link> : title;
+  const artistName = releaseArtistCredit(release) || "Artista por confirmar";
 
   // Catálogo / label
   const catalog = release.catalog || release.catNo || release.cat || "";
-  const listenUrl = release.bandcampUrl || release.spotifyUrl || release.appleMusicUrl;
+  const listenUrl = releaseListenUrl(release);
 
   // Fecha: tu API usa release_date
   const date =
@@ -72,15 +73,7 @@ export default function ReleaseItem({ release, view = "list" }) {
   );
 
   const linkedCover = listenUrl ? (
-    <a
-      className="release-cover-link"
-      href={listenUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Escuchar ${title}`}
-    >
-      {cover}
-    </a>
+    <ListenLink className="release-cover-link" href={listenUrl} data-content-type="release" data-content-slug={releaseSlug(release)} aria-label={`Escuchar ${title}`}>{cover}</ListenLink>
   ) : cover;
 
   // Tracklist: tu API usa `tracklist`, con campos { position, title, duration }
@@ -101,14 +94,14 @@ export default function ReleaseItem({ release, view = "list" }) {
         <div className="release-card__artist">
           {artistName}
         </div>
-        <h3 className="release-card__title">{title}</h3>
+        <h3 className="release-card__title">{titleLink}</h3>
         <div className="release-card__details">
           <span>{catalog}</span>
           <span>{date ? formatDate(date) : ""}</span>
         </div>
         {buyUrl && (
           <a
-            href={buyUrl}
+            data-outbound="shop" data-content-type="release" data-content-slug={releaseSlug(release)} href={buyUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-sm btn-outline-light w-100 mt-2"
@@ -130,7 +123,7 @@ export default function ReleaseItem({ release, view = "list" }) {
           {title && (
             <>
               {" "}
-              • <span className="text-white">{title}</span>
+              • <span className="text-white">{titleLink}</span>
             </>
           )}
         </div>
@@ -147,7 +140,7 @@ export default function ReleaseItem({ release, view = "list" }) {
 
         {buyUrl && (
           <a
-            href={buyUrl}
+            data-outbound="shop" data-content-type="release" data-content-slug={releaseSlug(release)} href={buyUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-sm btn-outline-light w-100"

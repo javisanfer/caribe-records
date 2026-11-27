@@ -16,15 +16,19 @@ if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET is required");
 }
 
-module.exports = expressSession({ // ✅ Exportamos directamente el middleware
+module.exports = (client) => expressSession({
   name: sessionCookieName,
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   rolling: true,
-  cookie: sessionCookieOptions,
+  cookie: {
+    ...sessionCookieOptions,
+    // Loopback development may use HTTP. Keep Secure even there when served over TLS.
+    secure: sessionCookieOptions.secure ? true : "auto",
+  },
   store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
+    client,
     collectionName: "sessions",
     ttl: sessionIdleMinutes * 60
   }),

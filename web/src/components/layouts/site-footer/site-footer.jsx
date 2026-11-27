@@ -11,7 +11,10 @@ export default function SiteFooter() {
         <Link to="/about">About</Link>
         <a href="mailto:hola@caribe-records.com">Contacto</a>
       </nav>
-      <span className="cr-site-footer__copyright">© {new Date().getFullYear()} Caribe Records</span>
+      <div className="cr-site-footer__credit">
+        <span className="cr-site-footer__copyright">© {new Date().getFullYear()} Caribe Records</span>
+        <Link to="/legal">Información legal</Link>
+      </div>
     </footer>
   );
 }

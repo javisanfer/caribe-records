@@ -1,4 +1,5 @@
 const Artist = require("../models/artist.model");
+const Release = require("../models/release.model");
 const slugify = require("slugify");
 
 // Helper para generar slug
@@ -13,6 +14,16 @@ function ensureSlug(artist = {}) {
   });
 }
 
+async function withAlbums(artist) {
+  // Imported records can carry older album links on the artist itself.
+  artist.albums = await Release.find({
+    catalogVisible: { $ne: false },
+    $or: [{ _id: { $in: artist.albums || [] } }, { artist: artist._id }, { collaborators: artist._id }],
+  }).select("title format release_date cover_image cover listenUrl spotifyUrl appleMusicUrl bandcampUrl catalog serialNumber")
+    .sort({ release_date: -1, createdAt: -1 }).lean();
+  return artist;
+}
+
 /* ======================================================
    GET /artists  (público)
 ====================================================== */
@@ -24,8 +35,8 @@ exports.getArtists = async (req, res) => {
 
     res.json(artists);
   } catch (error) {
-    console.error("Error obteniendo artistas:", error);
-    res.status(500).json({ error: "Error interno obteniendo artistas" });
+    console.error("Error obteniendo artistas:", error.name);
+    throw error;
   }
 };
 
@@ -34,24 +45,16 @@ exports.getArtists = async (req, res) => {
 ====================================================== */
 exports.getArtistById = async (req, res) => {
   try {
-    const artist = await Artist.findById(req.params.id)
-      .populate({
-        path: "albums",
-        match: { catalogVisible: { $ne: false } },
-        select:
-          "title format release_date cover_image cover spotifyUrl catalog serialNumber",
-        options: { sort: { release_date: -1, createdAt: -1 } },
-      })
-      .lean();
+    const artist = await Artist.findById(req.params.id).lean();
 
     if (!artist || artist.rosterVisible === false) {
       return res.status(404).json({ message: "Artist not found" });
     }
 
-    res.json(artist);
+    res.json(await withAlbums(artist));
   } catch (error) {
-    console.error("Error obteniendo artista por ID:", error);
-    res.status(500).json({ error: "Error interno obteniendo artista" });
+    console.error("Error obteniendo artista por ID:", error.name);
+    throw error;
   }
 };
 
@@ -60,24 +63,16 @@ exports.getArtistById = async (req, res) => {
 ====================================================== */
 exports.getArtistBySlug = async (req, res) => {
   try {
-    const artist = await Artist.findOne({ slug: req.params.slug })
-      .populate({
-        path: "albums",
-        match: { catalogVisible: { $ne: false } },
-        select:
-          "title format release_date cover_image cover spotifyUrl catalog serialNumber",
-        options: { sort: { release_date: -1, createdAt: -1 } },
-      })
-      .lean();
+    const artist = await Artist.findOne({ slug: req.params.slug }).lean();
 
     if (!artist || (artist.rosterVisible === false && !req.path.startsWith("/admin/"))) {
       return res.status(404).json({ message: "Artist not found" });
     }
 
-    res.json(artist);
+    res.json(await withAlbums(artist));
   } catch (error) {
-    console.error("Error obteniendo artista por slug:", error);
-    res.status(500).json({ error: "Error interno obteniendo artista" });
+    console.error("Error obteniendo artista por slug:", error.name);
+    throw error;
   }
 };
 
@@ -105,10 +100,10 @@ exports.createArtists = async (req, res) => {
 
     return res.status(201).json(Array.isArray(req.body) ? created : created[0]);
   } catch (error) {
-    console.error("Error al crear artistas:", error);
-    res.status(500).json({
+    console.error("Error al crear artistas:", error.name);
+    res.status(error.code === 11000 ? 409 : 400).json({
       message: "Error al crear artistas",
-      error: error.message,
+      fields: Object.keys(error.errors || {}),
     });
   }
 };
@@ -119,6 +114,7 @@ exports.createArtists = async (req, res) => {
 exports.updateArtist = async (req, res) => {
   try {
     const updates = { ...req.body };
+    if (updates.bio !== undefined && updates.bioHtml === undefined) updates.bioHtml = "";
 
     // Si cambia el nombre → regenerar slug (a no ser que el user lo ponga a mano)
     if (updates.name && !updates.slug) {
@@ -127,8 +123,8 @@ exports.updateArtist = async (req, res) => {
 
     const updatedArtist = await Artist.findOneAndUpdate(
       { slug: req.params.slug },
-      updates,
-      { new: true }
+      { $set: updates },
+      { new: true, runValidators: true }
     );
 
     if (!updatedArtist) {
@@ -137,8 +133,8 @@ exports.updateArtist = async (req, res) => {
 
     res.json(updatedArtist);
   } catch (error) {
-    console.error("Error actualizando artista:", error);
-    res.status(400).json({ error: error.message });
+    console.error("Error actualizando artista:", error.name);
+    res.status(400).json({ message: "Comprueba los datos del artista", fields: Object.keys(error.errors || {}) });
   }
 };
 
@@ -157,7 +153,7 @@ exports.deleteArtist = async (req, res) => {
 
     res.json({ message: "Artist deleted successfully" });
   } catch (error) {
-    console.error("Error eliminando artista:", error);
-    res.status(500).json({ error: "Error interno eliminando artista" });
+    console.error("Error eliminando artista:", error.name);
+    throw error;
   }
 };

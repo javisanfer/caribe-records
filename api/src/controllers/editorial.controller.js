@@ -1,13 +1,11 @@
+const { imageUrlFor } = require("../config/storage.config");
 const Editorial = require("../models/editorial.model");
-const Artist = require("../models/artist.model"); // 👈 NUEVO
+const Artist = require("../models/artist.model");
+const Release = require("../models/release.model");
+const { isObjectIdOrHexString } = require("mongoose");
 
 // -------------------- Utilidad de paginación --------------------
-function getPagination(query) {
-  const page = Math.max(1, parseInt(query.page || "1", 10));
-  const limit = Math.min(50, Math.max(1, parseInt(query.limit || "12", 10)));
-  const skip = (page - 1) * limit;
-  return { page, limit, skip };
-}
+const { getPagination } = require("../utils/pagination");
 
 const slugify = require("slugify");
 const generateSlug = (title) =>
@@ -29,37 +27,33 @@ function normalizeIdArray(value) {
   return [];
 }
 
-function normalizeEditorialBlocks(value) {
-  if (!value) return [];
-  let blocks = value;
-  if (typeof value === "string") {
-    try {
-      blocks = JSON.parse(value);
-    } catch {
-      return [];
-    }
-  }
-  if (!Array.isArray(blocks)) return [];
+const associationError = "Selecciona lanzamientos del catálogo de los artistas asociados.";
 
-  return blocks.slice(0, 200).flatMap((block) => {
-    if (!block || typeof block !== "object") return [];
-    if (block.type === "paragraph" && typeof block.text === "string") {
-      return [{ type: "paragraph", text: block.text }];
-    }
-    if (block.type === "quote" && typeof block.quote === "string") {
-      return [{ type: "quote", quote: block.quote, cite: typeof block.cite === "string" ? block.cite : "" }];
-    }
-    if (block.type === "image" && block.image && typeof block.image.url === "string") {
-      return [{ type: "image", image: {
-        url: block.image.url,
-        alt: typeof block.image.alt === "string" ? block.image.alt : "",
-        caption: typeof block.image.caption === "string" ? block.image.caption : "",
-        credit: typeof block.image.credit === "string" ? block.image.credit : "",
-      } }];
-    }
-    if (block.type === "separator") return [{ type: "separator" }];
-    return [];
-  });
+async function validAssociations(artists, releases) {
+  if (!artists.every(isObjectIdOrHexString) || !releases.every(isObjectIdOrHexString)) return false;
+  if (!releases.length) return true;
+  if (!artists.length) return false;
+  const count = await Release.countDocuments({ _id: { $in: releases }, $or: [{ artist: { $in: artists } }, { collaborators: { $in: artists } }] });
+  return count === new Set(releases).size;
+}
+
+function sameIds(a, b) {
+  const ids = new Set(a);
+  return ids.size === new Set(b).size && b.every((id) => ids.has(id));
+}
+
+function normalizeEditorialBlocks(value) {
+  if (value === undefined || value === "") return [];
+  const blocks = typeof value === "string" ? JSON.parse(value) : value;
+  if (!Array.isArray(blocks)) throw new Error("Los bloques deben ser una lista");
+  // The nested Mongoose schemas validate types and keep only supported fields.
+  return blocks;
+}
+
+function editorialCredits(value) {
+  const credits = typeof value === "string" ? JSON.parse(value) : value;
+  if (!Array.isArray(credits)) throw new Error("Los créditos deben ser una lista");
+  return credits;
 }
 
 function validatePublishableEditorial({ status, publishAt, hero, blocks }) {
@@ -77,7 +71,13 @@ function validatePublishableEditorial({ status, publishAt, hero, blocks }) {
 // GET /api/editorials
 exports.getEditorialsPublic = async (req, res) => {
   try {
-    const { tag, q } = req.query;
+    const { tag, q, artist } = req.query;
+    if ([tag, q, artist].some((value) => value !== undefined && typeof value !== "string")) {
+      return res.status(400).json({ message: "Filtro editorial no válido" });
+    }
+    if (artist && !isObjectIdOrHexString(artist)) {
+      return res.status(400).json({ message: "Identificador de artista no válido" });
+    }
     const { page, limit, skip } = getPagination(req.query);
     const now = new Date();
 
@@ -89,8 +89,10 @@ exports.getEditorialsPublic = async (req, res) => {
     };
 
     const filter = { ...visibility };
-    if (tag) filter.tags = tag;
-    if (q) filter.$text = { $search: q };
+    if (req.query.featured === "true") filter.featured = true;
+    if (artist) filter.relatedArtists = { $eq: String(artist) };
+    if (tag) filter.tags = { $eq: String(tag) };
+    if (q) filter.$text = { $search: String(q) };
 
     const [total, items] = await Promise.all([
       Editorial.countDocuments(filter),
@@ -111,10 +113,7 @@ exports.getEditorialsPublic = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching editorials",
-      error: error.message,
-    });
+    throw error;
   }
 };
 
@@ -129,16 +128,13 @@ exports.getEditorialBySlugPublic = async (req, res) => {
         { status: "published" },
         { status: "scheduled", publishAt: { $lte: now } },
       ],
-    }).populate("author", "name");
+    }).populate("author", "name").populate("relatedArtists", "name slug");
 
     if (!doc) return res.status(404).json({ message: "Editorial not found" });
 
     res.json(doc);
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching editorial",
-      error: error.message,
-    });
+    throw error;
   }
 };
 
@@ -177,10 +173,7 @@ exports.getEditorialsAdmin = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching admin editorials",
-      error: error.message,
-    });
+    throw error;
   }
 };
 
@@ -193,10 +186,7 @@ exports.getEditorialBySlugAdmin = async (req, res) => {
 
     res.json(doc);
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching editorial",
-      error: error.message,
-    });
+    throw error;
   }
 };
 
@@ -224,13 +214,15 @@ exports.createEditorial = async (req, res) => {
     if (body.publishAt) payload.publishAt = body.publishAt;
 
     // author opcional
-    if (req.user?.sub) payload.author = req.user.sub;
+    if (req.user?._id) payload.author = req.user._id;
+    if (body.credits !== undefined) payload.credits = editorialCredits(body.credits);
+    if (body.relatedReleases !== undefined) payload.relatedReleases = normalizeIdArray(body.relatedReleases);
 
     // HERO -------------------------
     payload.hero = {};
 
     if (req.file) {
-      payload.hero.url = req.file.path;
+      payload.hero.url = imageUrlFor(req.file);
     } else if (body.heroUrl) {
       payload.hero.url = body.heroUrl;
     }
@@ -290,6 +282,9 @@ exports.createEditorial = async (req, res) => {
 
     // 👇 NUEVO: artistas relacionados
     const relatedArtistsIds = normalizeIdArray(body.relatedArtists);
+    if (!await validAssociations(relatedArtistsIds, payload.relatedReleases || [])) {
+      return res.status(400).json({ message: associationError });
+    }
     if (relatedArtistsIds.length) {
       payload.relatedArtists = relatedArtistsIds;
     }
@@ -310,12 +305,12 @@ exports.createEditorial = async (req, res) => {
     if (error.code === 11000) {
       return res
         .status(409)
-        .json({ message: "Duplicate slug", error: error.keyValue });
+        .json({ message: "Duplicate slug", fields: Object.keys(error.keyValue || {}) });
     }
 
     res.status(400).json({
       message: "Error creating editorial",
-      error: error.message,
+      fields: Object.keys(error.errors || {}),
     });
   }
 };
@@ -337,6 +332,8 @@ exports.updateEditorial = async (req, res) => {
     const body = req.body;
 
     // Guardamos los artistas anteriores para sincronizar
+    if (body.credits !== undefined) editorial.credits = editorialCredits(body.credits);
+    const prevReleases = (editorial.relatedReleases || []).map(String);
     const prevArtists = (editorial.relatedArtists || []).map((id) => id.toString());
 
     // Si cambia el título → regenerar slug
@@ -357,8 +354,8 @@ exports.updateEditorial = async (req, res) => {
       editorial.hero = {};
     }
     if (req.file) {
-      editorial.hero.url = req.file.path;
-    } else if (body.heroUrl) {
+      editorial.hero.url = imageUrlFor(req.file);
+    } else if (editorial.hero && body.heroUrl !== undefined) {
       editorial.hero.url = body.heroUrl;
     }
     if (editorial.hero) {
@@ -399,7 +396,7 @@ exports.updateEditorial = async (req, res) => {
     };
 
     // Otros
-    editorial.featured =
+    if (body.featured !== undefined) editorial.featured =
       body.featured === "true" ||
       body.featured === "on" ||
       body.featured === true;
@@ -408,11 +405,14 @@ exports.updateEditorial = async (req, res) => {
     editorial.series = body.series ?? editorial.series;
 
     // 👇 NUEVO: actualizar artistas relacionados
-    let newArtists = prevArtists;
-    if (body.relatedArtists !== undefined) {
-      newArtists = normalizeIdArray(body.relatedArtists);
-      editorial.relatedArtists = newArtists;
+    const newArtists = body.relatedArtists === undefined ? prevArtists : normalizeIdArray(body.relatedArtists);
+    const newReleases = body.relatedReleases === undefined ? prevReleases : normalizeIdArray(body.relatedReleases);
+    const changed = !sameIds(prevArtists, newArtists) || !sameIds(prevReleases, newReleases);
+    if (changed && !await validAssociations(newArtists, newReleases)) {
+      return res.status(400).json({ message: associationError });
     }
+    if (body.relatedArtists !== undefined) editorial.relatedArtists = newArtists;
+    if (body.relatedReleases !== undefined) editorial.relatedReleases = newReleases;
 
     await editorial.save();
 
@@ -441,7 +441,7 @@ exports.updateEditorial = async (req, res) => {
   } catch (error) {
     res.status(400).json({
       message: "Error updating editorial",
-      error: error.message,
+      fields: Object.keys(error.errors || {}),
     });
   }
 };
@@ -463,9 +463,6 @@ exports.deleteEditorial = async (req, res) => {
 
     res.json({ message: "Editorial deleted successfully" });
   } catch (error) {
-    res.status(500).json({
-      message: "Error deleting editorial",
-      error: error.message,
-    });
+    throw error;
   }
 };

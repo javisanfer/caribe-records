@@ -3,9 +3,9 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 
 // importa tus modelos para que se registren
-require('../src/models/artist.model');
-require('../src/models/editorial.model');
-require('../src/models/event.model');
+require('../models/artist.model');
+require('../models/editorial.model');
+require('../models/event.model');
 
 async function main() {
   const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/caribe_records';

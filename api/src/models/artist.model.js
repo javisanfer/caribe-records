@@ -2,32 +2,34 @@ const mongoose = require("mongoose");
 const slugify = require("slugify");
 
 // --- Subesquemas (sin _id, embebidos dentro del artista) ---
+const externalUrl = { type: String, trim: true, match: /^https?:\/\//i };
+
 const socialSchema = new mongoose.Schema({
-  instagram: String,
-  youtube: String,
-  x: String,              // Twitter/X
-  facebook: String,
+  instagram: externalUrl,
+  youtube: externalUrl,
+  x: externalUrl,              // Twitter/X
+  facebook: externalUrl,
 }, { _id: false });
 
 const streamingSchema = new mongoose.Schema({
-  spotify: String,
-  appleMusic: String,
-  amazonMusic: String,
-  youtubeMusic: String,
-  deezer: String,
-  tidal: String,
-  bandcamp: String,
+  spotify: externalUrl,
+  appleMusic: externalUrl,
+  amazonMusic: externalUrl,
+  youtubeMusic: externalUrl,
+  deezer: externalUrl,
+  tidal: externalUrl,
+  bandcamp: externalUrl,
 }, { _id: false });
 
 const webSchema = new mongoose.Schema({
-  officialStore: String,  // “Official Store”
-  website: String,        // Web general si la hay
-  pressKit: String,       // Opcional: EPK/press kit
+  officialStore: externalUrl,  // “Official Store”
+  website: externalUrl,        // Web general si la hay
+  pressKit: externalUrl,       // Opcional: EPK/press kit
 }, { _id: false });
 
 const videoSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  url:   { type: String, required: true }, // YouTube/Vimeo/etc.
+  url:   { ...externalUrl, required: true }, // YouTube/Vimeo/etc.
   year:  Number
 }, { _id: false });
 
@@ -42,6 +44,7 @@ const artistSchema = new mongoose.Schema({
   name:   { type: String, required: true, trim: true },
   slug:   { type: String, unique: true },
   bio:    { type: String },
+  bioHtml: { type: String },
   rosterVisible: { type: Boolean, default: true },
   genres: [{ type: String, trim: true }],
 
@@ -53,6 +56,14 @@ const artistSchema = new mongoose.Schema({
 
   // Media
   photos: photosSchema,
+  gallery: [new mongoose.Schema({
+    url: { type: String, required: true }, alt: String, caption: String,
+  }, { _id: false })],
+  links: [new mongoose.Schema({
+    group: { type: String, enum: ["social", "streaming", "web"], required: true },
+    label: { type: String, trim: true, required: true },
+    url: { type: String, trim: true, required: true, match: /^https?:\/\//i },
+  }, { _id: false })],
 
   // Enlaces
   web:       webSchema,

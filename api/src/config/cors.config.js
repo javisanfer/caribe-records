@@ -1,4 +1,5 @@
 const cors = require("cors");
+const createError = require("http-errors");
 
 const CORS_ORIGINS = (process.env.CORS_ORIGINS || "http://localhost:5173")
   .split(",")
@@ -9,10 +10,11 @@ const corsMiddleware = cors({
     if (!origin || CORS_ORIGINS.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(createError(403, "Origen no permitido"));
     }
   },
   credentials: true,
 });
 
 module.exports = corsMiddleware;
+module.exports.isTrustedOrigin = (origin) => CORS_ORIGINS.includes(origin);

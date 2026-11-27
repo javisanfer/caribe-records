@@ -1,0 +1,75 @@
+{
+  "heading": "Música popular\nindependiente",
+  "statement": "Somos un sello discográfico nacido en la periferia de Madrid.\n\nNos atraen los proyectos con una voz propia y todo lo que puede crecer alrededor de su música. Trabajamos cerca de cada artista y dejamos espacio para explorar.",
+  "photographs": [
+    {
+      "url": "/images/about/archivo-475520.jpg",
+      "alt": "Público en una sala de conciertos, en blanco y negro"
+    },
+    {
+      "url": "/images/about/archivo-141414_003.jpg",
+      "alt": "Díptico de una guitarra y una cámara en el local"
+    },
+    {
+      "url": "/images/about/archivo-475519.jpg",
+      "alt": "Retrato de grupo con un disco en el pasillo de una sala"
+    },
+    {
+      "url": "/images/about/archivo-141413_018.jpg",
+      "alt": "Músicos sobre el escenario bajo luces azules"
+    },
+    {
+      "url": "/images/about/archivo-141413_009.jpg",
+      "alt": "Pegatinas de sellos y bandas en una pared"
+    },
+    {
+      "url": "/images/about/archivo-475518.jpg",
+      "alt": "Tres personas compartiendo la cabina de DJ"
+    },
+    {
+      "url": "/images/about/133672_003.jpg",
+      "alt": "Sesión de grabación de Aeronave Adolescente"
+    },
+    {
+      "url": "/images/about/archivo-141414_014.jpg",
+      "alt": "Díptico de un encuentro frente a una ferretería"
+    },
+    {
+      "url": "/images/about/archivo-101_4529.jpg",
+      "alt": "Los Reels tocando en Maravillas"
+    },
+    {
+      "url": "/images/about/archivo-img_9609.jpg",
+      "alt": "Concierto entre las estanterías de una tienda de discos"
+    },
+    {
+      "url": "/images/about/archivo-img_9617.jpg",
+      "alt": "Guitarristas en un concierto"
+    },
+    {
+      "url": "/images/about/archivo-img_9596.jpg",
+      "alt": "Actuación con teclado y micrófono"
+    },
+    {
+      "url": "/images/about/archivo-img_9643.jpg",
+      "alt": "Un concierto visto desde el público"
+    }
+  ],
+  "links": [
+    {
+      "label": "Escríbenos",
+      "detail": "hola@caribe-records.com",
+      "href": "mailto:hola@caribe-records.com"
+    },
+    {
+      "label": "Instagram",
+      "detail": "@cariberecords",
+      "href": "https://www.instagram.com/cariberecords/"
+    },
+    {
+      "label": "X",
+      "detail": "@caribe_records",
+      "href": "https://x.com/caribe_records"
+    }
+  ]
+}

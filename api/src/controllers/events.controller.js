@@ -1,13 +1,14 @@
+const { publicEvents } = require("../utils/public-events");
 const Event = require("../models/event.model");
 const Artist = require("../models/artist.model");
 
-// -------- Utils --------
-function getPagination(query) {
-  const page = Math.max(1, parseInt(query.page || "1", 10));
-  const limit = Math.min(50, Math.max(1, parseInt(query.limit || "12", 10)));
-  const skip = (page - 1) * limit;
-  return { page, limit, skip };
+// Events imported before slugs existed can be edited using their original ID.
+function adminEventFilter(value) {
+  return /^[a-f0-9]{24}$/i.test(value) ? { $or: [{ slug: value }, { _id: value }] } : { slug: value };
 }
+
+// -------- Utils --------
+const { getPagination } = require("../utils/pagination");
 
 function parseDate(value, endOfDay = false) {
   if (!value) return null;
@@ -27,12 +28,11 @@ exports.getEventsPublic = async (req, res) => {
     const { city, country, q, artist } = req.query;
     const { page, limit, skip } = getPagination(req.query);
 
-    // Sin filtro explícito, incluir también el histórico.
     const from = parseDate(req.query.from);
     const to = parseDate(req.query.to, true);
 
     const filter = {
-      isActive: true,
+      ...publicEvents(),
       ...(from || to ? { date: {
         ...(from ? { $gte: from } : {}),
         ...(to ? { $lte: to } : {}),
@@ -62,9 +62,7 @@ exports.getEventsPublic = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching events", error: error.message });
+    throw error;
   }
 };
 
@@ -73,15 +71,13 @@ exports.getEventBySlugPublic = async (req, res) => {
   try {
     const doc = await Event.findOne({
       slug: req.params.slug,
-      isActive: true,
+      ...publicEvents(),
     }).populate({ path: "lineup", select: "name slug photos.portraitUrl" });
 
     if (!doc) return res.status(404).json({ message: "Event not found" });
     res.json(doc);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching event", error: error.message });
+    throw error;
   }
 };
 
@@ -129,16 +125,14 @@ exports.getEventsAdmin = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching admin events", error: error.message });
+    throw error;
   }
 };
 
 // GET /api/admin/events/slug/:slug
 exports.getEventByIdAdmin = async (req, res) => {
   try {
-    const doc = await Event.findOne({ slug: req.params.slug }).populate({
+    const doc = await Event.findOne(adminEventFilter(req.params.slug)).populate({
       path: "lineup",
       select: "name slug",
     });
@@ -146,9 +140,7 @@ exports.getEventByIdAdmin = async (req, res) => {
     if (!doc) return res.status(404).json({ message: "Event not found" });
     res.json(doc);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching event", error: error.message });
+    throw error;
   }
 };
 
@@ -197,12 +189,12 @@ exports.createEvent = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({
         message: "Duplicate key (slug must be unique)",
-        error: error.keyValue,
+        fields: Object.keys(error.keyValue || {}),
       });
     }
     res
       .status(400)
-      .json({ message: "Error creating event", error: error.message });
+      .json({ message: "Error creating event", fields: Object.keys(error.errors || {}) });
   }
 };
 
@@ -213,7 +205,7 @@ exports.createEvent = async (req, res) => {
 // PATCH /api/admin/events/slug/:slug
 exports.updateEvent = async (req, res) => {
   try {
-    const doc = await Event.findOne({ slug: req.params.slug });
+    const doc = await Event.findOne(adminEventFilter(req.params.slug));
     if (!doc) return res.status(404).json({ message: "Event not found" });
 
     // Guardamos el lineup previo para sincronizar luego
@@ -280,12 +272,12 @@ exports.updateEvent = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({
         message: "Duplicate key (slug must be unique)",
-        error: error.keyValue,
+        fields: Object.keys(error.keyValue || {}),
       });
     }
     res
       .status(400)
-      .json({ message: "Error updating event", error: error.message });
+      .json({ message: "Error updating event", fields: Object.keys(error.errors || {}) });
   }
 };
 
@@ -296,7 +288,7 @@ exports.updateEvent = async (req, res) => {
 // DELETE /api/admin/events/slug/:slug
 exports.deleteEvent = async (req, res) => {
   try {
-    const deleted = await Event.findOneAndDelete({ slug: req.params.slug });
+    const deleted = await Event.findOneAndDelete(adminEventFilter(req.params.slug));
     if (!deleted) return res.status(404).json({ message: "Event not found" });
 
     // 👇 NUEVO: limpiar Artist.events
@@ -307,8 +299,6 @@ exports.deleteEvent = async (req, res) => {
 
     res.json({ message: "Event deleted successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting event", error: error.message });
+    throw error;
   }
 };
