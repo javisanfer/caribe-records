@@ -18,3 +18,12 @@ test("el cierre de sesión elimina la misma cookie que crea la sesión", () => {
 test("la sesión expira tras cinco minutos de inactividad por defecto", () => {
   assert.equal(sessionCookieOptions.maxAge, 5 * 60 * 1000);
 });
+
+test("producción siempre exige HTTPS, incluso con una variable local heredada", () => {
+  const { execFileSync } = require("node:child_process");
+  const result = execFileSync(process.execPath, ["-p", "require('./src/config/session-options.config').sessionCookieOptions.secure"], {
+    cwd: require("node:path").resolve(__dirname, ".."),
+    env: { ...process.env, NODE_ENV: "production", HOST: "127.0.0.1", SESSION_SECURE: "false" },
+  });
+  assert.equal(result.toString().trim(), "true");
+});
