@@ -2086,12 +2086,24 @@ html body {
   text-transform: uppercase;
 }
 
-.detail-pagination a span {
+.detail-pagination a > span {
   font-size: clamp(1.45rem, 3vw, 3.5rem);
   font-weight: 670;
   line-height: .94;
   letter-spacing: -.04em;
 }
+
+.artist-neighbour {
+  display: flex;
+  align-items: center;
+  gap: .3em;
+}
+.artist-neighbour > [aria-hidden] { flex: none; }
+.artist-neighbour__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.artist-detail__pagination > :last-child .artist-neighbour { justify-content: flex-end; }
 
 .detail-pagination a:hover {
   color: var(--cr-white);
@@ -3074,7 +3086,8 @@ html body {
   .artist-release small { display: none; }
   .detail-pagination > a,
   .detail-pagination > span { min-height: 124px; padding: 18px; }
-  .detail-pagination a span { font-size: 1.2rem; }
+  .detail-pagination a > span { font-size: 1.2rem; }
+  .artist-detail__pagination > a { padding-inline: clamp(10px, 3.5vw, 18px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
