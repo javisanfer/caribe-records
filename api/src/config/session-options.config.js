@@ -7,7 +7,7 @@ const sessionCookieName = process.env.SESSION_COOKIE_NAME || "connect.sid";
 
 const sessionCookieOptions = {
   httpOnly: true,
-  secure: process.env.SESSION_SECURE === "true",
+  secure: process.env.NODE_ENV === "production" || process.env.SESSION_SECURE === "true",
   sameSite: process.env.SESSION_SAME_SITE || "lax",
   maxAge: sessionIdleMinutes * 60 * 1000,
 };

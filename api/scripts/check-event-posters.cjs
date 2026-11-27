@@ -2,7 +2,8 @@ const assert = require("node:assert/strict");
 const { readFileSync } = require("node:fs");
 
 async function checkEventPosters(page, base, root, expect) {
-  const upload = await page.request.post(base + "/api/v1/upload", { multipart: {
+  const headers = { Origin: base };
+  const upload = await page.request.post(base + "/api/v1/upload", { headers, multipart: {
     image: { name: "cartel.png", mimeType: "image/png", buffer: readFileSync(root + "/web/public/favicon.png") },
   } });
   assert.equal(upload.status(), 200);
@@ -11,7 +12,7 @@ async function checkEventPosters(page, base, root, expect) {
   const created = [];
   try {
     for (const [year, posterUrl] of [[2002, imageUrl], [2001, "/favicon.png"]]) {
-      const result = await page.request.post(collection, { data: {
+      const result = await page.request.post(collection, { headers, data: {
         title: "Cartel QA " + year, date: year + "-03-21", venue: "Sala QA", city: "Madrid",
         artistName: "Prueba de carteles", posterUrl, sourceUrl: "https://example.org/cartel",
       } });
@@ -51,7 +52,7 @@ async function checkEventPosters(page, base, root, expect) {
       }
     }
   } finally {
-    for (const slug of created) await page.request.delete(collection + "/slug/" + slug);
+    for (const slug of created) await page.request.delete(collection + "/slug/" + slug, { headers });
   }
 }
 

@@ -90,7 +90,7 @@ async function main() {
       if (!browserApi) browserApi = await startApi();
       const browser = await driver.launch();
       try {
-        const page = await browser.newPage({ viewport: { width: 375, height: 812 } });
+        const page = await browser.newPage({ reducedMotion: "reduce", viewport: { width: 375, height: 812 } });
         await page.route("**/*", (route) => route.request().url().startsWith(base) ? route.continue() : route.abort());
         const errors = [];
         page.on("pageerror", (err) => errors.push(err.name));
@@ -134,14 +134,15 @@ async function main() {
               const background = mouseHover ? "rgb(0, 32, 209)" : "rgba(0, 0, 0, 0)";
               await year.hover();
               await expect(year).toHaveCSS("background-color", background);
+              await row.evaluate((el) => el.scrollIntoView({ behavior: "instant", block: "center" }));
               await row.locator("time").hover();
-              await expect(row).toHaveCSS("background-color", background);
+              await expect(row, "La fila bajo el ratón usa el color de interacción").toHaveCSS("background-color", background);
               await expect(row.getByRole("link", { name: /Entradas/i })).toHaveCSS("color", mouseHover ? "rgb(255, 255, 255)" : "rgb(0, 32, 209)");
               await page.mouse.move(0, 0);
               await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
               await artistTicket.press("Tab");
               await expect(row.getByRole("link", { name: /Entradas/i })).toBeFocused();
-              await expect(row).toHaveCSS("background-color", "rgb(0, 32, 209)");
+              await expect(row, "La fila enfocada con Tab usa el color de interacción").toHaveCSS("background-color", "rgb(0, 32, 209)");
             }
             if (path === "/admin/new-artist") {
               assert.equal(await page.getByRole("heading", { name: /^(Integrantes|Galería|Vídeos)$/ }).count(), 0);
